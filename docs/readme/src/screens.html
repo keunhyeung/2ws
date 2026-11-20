@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>2WS single phone</title>
+<link rel="stylesheet" href="phone.css">
+<style>
+  html, body { width: 300px; height: 620px; overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<script src="phone.js"></script>
+<script>
+  var t = themeFromQuery();
+  document.body.appendChild(phone(t.q.get('name') || 'quiz', t.theme, 620 / 868, false));
+  whenReady();
+</script>
+</body>
+</html>

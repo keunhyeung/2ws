@@ -1,4 +1,66 @@
+<div align="center">
+
+<img src="icons/icon-192.png" width="88" alt="2WS 앱 아이콘">
+
 # 2WS
+
+설치 없이 오프라인으로 공부하는 투자자산운용사 무료 웹앱입니다.
+
+[![사이트 열기](https://img.shields.io/badge/%EC%82%AC%EC%9D%B4%ED%8A%B8_%EC%97%B4%EA%B8%B0-keunhyeung.github.io%2F2ws-0a0a0a?style=flat-square)](https://keunhyeung.github.io/2ws/)
+![PWA](https://img.shields.io/badge/PWA-%EC%98%A4%ED%94%84%EB%9D%BC%EC%9D%B8_%EB%8F%99%EC%9E%91-0a0a0a?style=flat-square)
+[![License: MIT (code)](https://img.shields.io/badge/code-MIT-0a0a0a?style=flat-square)](LICENSE)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/readme/hero-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/readme/hero-light.png">
+  <img src="docs/readme/hero-light.png" width="100%" alt="2WS 화면: 개념 사전, 문제 풀이, 해설 화면을 띄운 휴대폰 세 대">
+</picture>
+
+</div>
+
+## 화면
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/quiz-dark.png">
+        <img src="docs/readme/screens/quiz-light.png" width="220" alt="문제 풀이 화면">
+      </picture>
+      <br><sub><b>문제 풀이</b><br>4지선다·OX 풀이</sub>
+    </td>
+    <td align="center" width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/explain-dark.png">
+        <img src="docs/readme/screens/explain-light.png" width="220" alt="해설 화면">
+      </picture>
+      <br><sub><b>해설</b><br>풀이 직후 해설 확인</sub>
+    </td>
+    <td align="center" width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/dict-dark.png">
+        <img src="docs/readme/screens/dict-light.png" width="220" alt="개념 사전 화면">
+      </picture>
+      <br><sub><b>개념 사전</b><br>주요 용어 찾아보기</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/history-dark.png">
+        <img src="docs/readme/screens/history-light.png" width="220" alt="풀이 기록 화면">
+      </picture>
+      <br><sub><b>풀이 기록</b><br>기기에만 저장되는 기록</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/readme/screens/welcome-dark.png" width="220" alt="환영 화면">
+      <br><sub><b>환영 화면</b><br>가벼운 인사로 시작</sub>
+    </td>
+    <td width="33%"></td>
+  </tr>
+</table>
+
+## 소개
 
 투자자산운용사 시험 공부를 위해 개인이 만들어 GitHub Pages로 공개한 무료·비영리 개인 학습용 웹앱입니다. 광고·결제·회원가입 없이 [https://keunhyeung.github.io/2ws/](https://keunhyeung.github.io/2ws/)에서 이용할 수 있으며, 상업적 이용을 금지합니다.
 
