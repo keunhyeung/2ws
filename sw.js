@@ -1,6 +1,6 @@
 'use strict';
 
-const BUILD = '816f58f6cbe8';
+const BUILD = '28157bb5a575';
 const PRECACHE = [
   "./",
   "./about.html",
@@ -13,7 +13,7 @@ const PRECACHE = [
   "./host/backup.js?v=912d7a4b9199",
   "./host/boot.js?v=41df814bff09",
   "./host/consent.js?v=24e8f944a9cf",
-  "./host/welcome.js?v=a6f0bd7d7429",
+  "./host/welcome.js?v=57918881caa0",
   "./host/install-guide.js?v=f905c0abe912",
   "./host/pwa.js?v=4d48abeacefe",
   "./host/about-link.js?v=a2e9f2650913",
