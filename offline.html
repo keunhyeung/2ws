@@ -5706,21 +5706,21 @@ function dictionaryMarkup(query,selectedId){
  if(!search&&!selectedId)return browseTerms();
  if(selectedId){
   const chosen=getTerm(selectedId);
-  return `<div class="v2-dictionary">${chosen?dictionaryTermMarkup(chosen,true):'<p>개념을 찾을 수 없습니다.</p>'}</div>`;
+  return `<div class="v2-dictionary">${chosen?dictionaryTermMarkup(chosen,true):'<p>개념을 찾을 수 없어요.</p>'}</div>`;
  }
  const concepts=allTerms().filter(term=>matchesDictionaryTerm(term,search));
  const numbers=data.registry.filter(item=>Object.values(item).some(value=>typeof value==='string'&&value.toLowerCase().includes(search)));
  const exact=term=>Number(termSearchNames(term).some(name=>name?.toLowerCase()===search));
  concepts.sort((a,b)=>exact(b)-exact(a));
  const renderResults=(title,items,markup)=>items.length
-  ?`<section><h2>${title}</h2><div class="dict-rows">${items.slice(0,60).map(markup).join('')}</div>${items.length>60?'<p class="dict-note">검색어를 좁히면 더 많은 항목을 찾을 수 있습니다.</p>':''}</section>`:'';
+  ?`<section><h2>${title}</h2><div class="dict-rows">${items.slice(0,60).map(markup).join('')}</div>${items.length>60?'<p class="dict-note">검색어를 좁히면 더 많은 항목을 찾을 수 있어요.</p>':''}</section>`:'';
  const conceptsHtml=renderResults('개념',concepts,term=>dictionaryTermMarkup(term,false));
  const numbersHtml=renderResults('숫자와 기간',numbers,item=>`<article>
   <h3><a href="${esc(dictionaryHref(item.id,quizOrigin(location.hash),'registry'))}">${esc(item.title)} <strong class="v2-number">${esc(item.value)}</strong></a></h3>
   ${item.meaning?`<p>${esc(item.meaning)}</p>`:''}
  </article>`);
  const results=/\d/.test(search)?numbersHtml+conceptsHtml:conceptsHtml+numbersHtml;
- return `<div class="v2-dictionary v2-dict-results">${results||'<p>검색 결과가 없습니다.</p>'}</div>`;
+ return `<div class="v2-dictionary v2-dict-results">${results||'<p>검색 결과가 없어요.</p>'}</div>`;
 }
 function practiceConcept(id){const q=orderedChoiceQuestions().find(x=>(x.conceptIds||[]).includes(id));setHash(q?'#choice/'+encodeURIComponent(q.id):'#questions')}
 function quizOrigin(hash){
@@ -6003,7 +6003,7 @@ function renderGraph(){
   return;
  }
  const term=members?members[0]:getTerm(id);
- if(!term){$('#app').innerHTML=back+header('개념을 찾을 수 없습니다');return}
+ if(!term){$('#app').innerHTML=back+header('개념을 찾을 수 없어요');return}
  const neighbors=catalog.adjacent(term.id);
  const broader=new Set(term.broaderIds||[]);
  const parents=neighbors.filter(item=>broader.has(item.id));
@@ -6052,7 +6052,7 @@ function renderGraph(){
  search.oninput=()=>{
   const query=search.value.trim().toLowerCase();
   const matches=query?catalog.search(query):[];
-  $('#graphResults').innerHTML=matches.length?list(matches):query?'<p>검색 결과가 없습니다.</p>':'';
+  $('#graphResults').innerHTML=matches.length?list(matches):query?'<p>검색 결과가 없어요.</p>':'';
  };
 }
 function allOxQuestions(){let legacy=units.flatMap(u=>(u.quiz||[]).map(q=>({...q,unitId:u.id,conceptIds:q.conceptIds||u.conceptIds||[]})));return [...legacy,...(data.course.extraOxQuestions||[])]}
@@ -6066,7 +6066,7 @@ function historyRowMarkup({id,a,q}){
  const selected=typeof a.selected==='boolean'?(a.selected?'O':'X'):optionLabel(a.selected),when=friendlyTime(a.at);
  return `<article><div class="v2-history-meta"><span>${esc(unitFor(q.unitId)?.title||'')}</span>${when?`<time datetime="${esc(a.at)}">${esc(when)}</time>`:''}</div><h2>${esc(displayStem(q))}</h2><div class="v2-history-foot"><p class="v2-history-result"><span class="${a.correct?'is-right':'is-wrong'}">${a.correct?'정답':'오답'}</span> 내 답 ${esc(selected)}</p><button type="button" class="v2-history-reopen" data-reopen="${esc(id)}">문제 풀기</button></div></article>`;
 }
-function renderHistory(){let oxById=new Map(allOxQuestions().map(q=>[q.id,q])),choiceById=new Map(choices().map(q=>[q.id,q])),rows=Object.entries(record.answers).map(([id,a])=>{let q=oxById.get(id)||choiceById.get(id);return q?{id,a,q}:null}).filter(Boolean).sort((a,b)=>(b.a.at||'').localeCompare(a.a.at||''));const solvedRight=rows.filter(({a})=>a.correct).length;$('#app').innerHTML=header('풀이 기록',(window.TextbookProgressAdapter&&window.TextbookProgressAdapter.available!==false?'이 기기의 이 브라우저에 저장돼요':'이 기록은 현재 실행에만 남아요'))+`<div class="v2-history-stats"><div class="v2-stat"><b>${rows.length}</b><span>푼 문제</span></div>${rows.length?`<div class="v2-stat"><b>${Math.round(solvedRight/rows.length*100)}%</b><span>정답률</span></div>`:''}</div><div class="v2-history">${rows.map(historyRowMarkup).join('')||'<p>아직 푼 문제가 없습니다.<span>문제 탭에서 첫 문제를 풀어 보세요.</span></p>'}</div>${window.TextbookProgressBackup?window.TextbookProgressBackup.buttonsHtml():''}<button class="text-btn" id="clearHistory">풀이 기록 지우기</button><a class="v2-history-questions" href="#questions">문제 목록</a>`;$$('[data-reopen]').forEach(b=>b.onclick=()=>{let id=b.dataset.reopen;setHash((choiceById.has(id)?'#choice/':'#ox/')+encodeURIComponent(id))});$('#clearHistory').onclick=async()=>{if(window.TextbookProgressAdapter&&window.TextbookProgressAdapter.persistent&&window.TextbookProgressAdapter.available!==false&&!window.confirm(`저장된 풀이 기록 ${Object.keys((record&&record.answers)||{}).length}문항을 모두 지울까요?\n지운 기록은 되돌릴 수 없어요. 먼저 '기록 내보내기'로 백업해 두세요.`))return;record={answers:{},read:{}};writeQueue=writeQueue.then(()=>adapter.clear()).catch(()=>{});await writeQueue;renderHistory()}}
+function renderHistory(){let oxById=new Map(allOxQuestions().map(q=>[q.id,q])),choiceById=new Map(choices().map(q=>[q.id,q])),rows=Object.entries(record.answers).map(([id,a])=>{let q=oxById.get(id)||choiceById.get(id);return q?{id,a,q}:null}).filter(Boolean).sort((a,b)=>(b.a.at||'').localeCompare(a.a.at||''));const solvedRight=rows.filter(({a})=>a.correct).length;$('#app').innerHTML=header('풀이 기록',(window.TextbookProgressAdapter&&window.TextbookProgressAdapter.available!==false?'이 기기의 이 브라우저에 저장돼요':'이 기록은 현재 실행에만 남아요'))+`<div class="v2-history-stats"><div class="v2-stat"><b>${rows.length}</b><span>푼 문제</span></div>${rows.length?`<div class="v2-stat"><b>${Math.round(solvedRight/rows.length*100)}%</b><span>정답률</span></div>`:''}</div><div class="v2-history">${rows.map(historyRowMarkup).join('')||'<p>아직 푼 문제가 없어요.<span>문제 탭에서 첫 문제를 풀어 보세요.</span></p>'}</div>${window.TextbookProgressBackup?window.TextbookProgressBackup.buttonsHtml():''}<button class="text-btn" id="clearHistory">풀이 기록 지우기</button><a class="v2-history-questions" href="#questions">문제 목록</a>`;$$('[data-reopen]').forEach(b=>b.onclick=()=>{let id=b.dataset.reopen;setHash((choiceById.has(id)?'#choice/':'#ox/')+encodeURIComponent(id))});$('#clearHistory').onclick=async()=>{if(window.TextbookProgressAdapter&&window.TextbookProgressAdapter.persistent&&window.TextbookProgressAdapter.available!==false&&!window.confirm(`저장된 풀이 기록 ${Object.keys((record&&record.answers)||{}).length}문항을 모두 지울까요?\n지운 기록은 되돌릴 수 없어요. 먼저 '기록 내보내기'로 백업해 두세요.`))return;record={answers:{},read:{}};writeQueue=writeQueue.then(()=>adapter.clear()).catch(()=>{});await writeQueue;renderHistory()}}
 const lessonGroups = [
  {title:'주식, 수익률, 채권', stageStart:0, stageEnd:3},
  {title:'파생상품, 경제, 대체투자', stageStart:3, stageEnd:5},
@@ -6128,7 +6128,7 @@ function renderQuestionBank(){
   $(`[data-qid="${CSS.escape(firstNew.id)}"]`)?.focus();
  };
 }
-function renderStandaloneOx(id){let q=allOxQuestions().find(x=>x.id===id);if(!q){$('#app').innerHTML=header('문제를 찾을 수 없습니다','OX');return}let ans=record.answers[q.id]?.selected,u=unitFor(q.unitId),fresh=ans!==undefined&&freshAnswerId===q.id;freshAnswerId='';$('#app').innerHTML=`<article class="v2-question"><div class="v2-qmeta">${esc(u?.title||'OX')}</div>${promptMarkup(q,ans!==undefined)}${ans===undefined?`<div class="v2-ox"><button data-answer="true">O <small>맞다</small></button><button data-answer="false">X <small>틀리다</small></button></div>`:`<div class="v2-result ${ans===q.answer?'right':'wrong'}"><b>${markMarkup(ans===q.answer,fresh)}<span>${ans===q.answer?'정답이에요':'다시 확인해 보세요'}. 정답은 ${q.answer?'O':'X'}입니다.</span></b><div class="v2-explanation-copy">${solutionMarkup(q)}</div>${q.trap?`<p><b>헷갈리기 쉬운 점</b> ${readerTermsMarkup(q.trap,true)}</p>`:''}<button class="text-btn" id="retryOx">다시 풀기</button></div>`}</article>`;$$('[data-answer]').forEach(b=>b.onclick=()=>{record.answers[q.id]={selected:b.dataset.answer==='true',correct:(b.dataset.answer==='true')===q.answer,at:new Date().toISOString()};freshAnswerId=q.id;queueSave();renderStandaloneOx(id)});if($('#retryOx'))$('#retryOx').onclick=()=>retry(q.id,()=>renderStandaloneOx(id))}
+function renderStandaloneOx(id){let q=allOxQuestions().find(x=>x.id===id);if(!q){$('#app').innerHTML=header('문제를 찾을 수 없어요','OX');return}let ans=record.answers[q.id]?.selected,u=unitFor(q.unitId),fresh=ans!==undefined&&freshAnswerId===q.id;freshAnswerId='';$('#app').innerHTML=`<article class="v2-question"><div class="v2-qmeta">${esc(u?.title||'OX')}</div>${promptMarkup(q,ans!==undefined)}${ans===undefined?`<div class="v2-ox"><button data-answer="true">O <small>맞다</small></button><button data-answer="false">X <small>틀리다</small></button></div>`:`<div class="v2-result ${ans===q.answer?'right':'wrong'}"><b>${markMarkup(ans===q.answer,fresh)}<span>${ans===q.answer?'정답이에요':'다시 확인해 보세요'}. 정답은 ${q.answer?'O':'X'}예요.</span></b><div class="v2-explanation-copy">${solutionMarkup(q)}</div>${q.trap?`<p><b>헷갈리기 쉬운 점</b> ${readerTermsMarkup(q.trap,true)}</p>`:''}<button class="text-btn" id="retryOx">다시 풀기</button></div>`}</article>`;$$('[data-answer]').forEach(b=>b.onclick=()=>{record.answers[q.id]={selected:b.dataset.answer==='true',correct:(b.dataset.answer==='true')===q.answer,at:new Date().toISOString()};freshAnswerId=q.id;queueSave();renderStandaloneOx(id)});if($('#retryOx'))$('#retryOx').onclick=()=>retry(q.id,()=>renderStandaloneOx(id))}
 const choiceTopicFallbacks = {
  '01':'세금', '02':'금융상품', '03':'펀드와 신탁', '04':'부동산', '05':'금융투자업',
  '06':'운용과 투자자 보호', '07':'대체투자와 해외투자', '08':'기업분석', '09':'투자분석',
@@ -6164,7 +6164,7 @@ function renderStandaloneChoice(){
  const index=ordered.findIndex(q=>q.id===id);
  const q=ordered[index],next=ordered[index+1],prev=ordered[index-1];
  choiceNav=null;
- if(!q){$('#app').innerHTML=header('문제를 찾을 수 없습니다','4지선다');return}
+ if(!q){$('#app').innerHTML=header('문제를 찾을 수 없어요','4지선다');return}
  lastChoiceId=q.id;
  choiceNav={id:q.id,prev:prev?.id||'',next:next?.id||''};
  const ans=record.answers[q.id]?.selected,graded=ans!==undefined,total=ordered.length;
@@ -6182,7 +6182,7 @@ function renderStandaloneChoice(){
 function renderUnits(){let stages=data.course.learningPath?.stages||[];$('#app').innerHTML=header('전체 단원')+stages.map(s=>`<section class="v2-unitstage"><h2>${esc(s.title)}</h2><p>${esc(s.description||'')}</p><div>${(s.unitIds||[]).map(id=>{let u=unitFor(id);return u?`<button data-unit="${esc(id)}">${esc(u.title)} →</button>`:''}).join('')}</div></section>`).join('');$$('[data-unit]').forEach(b=>b.onclick=()=>setHash('#unit/'+encodeURIComponent(b.dataset.unit)))}
 function renderUnit(){
  const id=decodeURIComponent(location.hash.slice(6)),u=unitFor(id);
- if(!u){$('#app').innerHTML=header('단원을 찾을 수 없습니다','본문');return}
+ if(!u){$('#app').innerHTML=header('단원을 찾을 수 없어요','본문');return}
  let body=u.bodyHtml||'';
  if(id==='u14-01'){
   const positions=[
