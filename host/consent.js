@@ -8,12 +8,14 @@
   var TEXT = {
     title: '2WS 이용 전 확인',
     intro: '시작하기 전에 아래 내용을 확인해 주세요.',
+    // Each item is a list of segments: a plain string, or [text, flags] where
+    // flags 'b' = bold (strong) and 'n' = keep together (no line break inside).
     items: [
-      '2WS는 금융투자협회·CFA Institute 등과 무관한 무료·비영리 개인 학습용 비공식 자료입니다.',
-      '문항 작성·해설·검토에 AI 도구를 활용해 오류가 있을 수 있고 정확성을 보장하지 않으니, 법령 원문과 공식 교재를 확인해 주세요.',
-      '학습 목적의 정보 제공용이며 투자 권유나 투자자문이 아닙니다.',
-      '문제·해설·용어 데이터의 재배포와 상업적 이용을 금지합니다.',
-      '풀이 기록은 이 기기 안에만 저장되며 외부로 보내지 않습니다.'
+      ['2WS는 ', ['금융투자협회·CFA', 'n'], ' Institute 등과 ', ['무관한', 'b'], ' ', ['무료·비영리', 'n'], ' 개인 학습용 ', ['비공식 자료', 'bn'], '입니다.'],
+      ['문항 작성·해설·검토에 ', ['AI 도구를 활용해', 'b'], ' 오류가 있을 수 있고 ', ['정확성을 보장하지 않으니,', 'b'], ' ', ['법령 원문과 공식 교재를', 'n'], ' ', ['확인해 주세요.', 'n']],
+      ['학습 목적의 정보 제공용이며 ', ['투자 권유나 ', 'b'], ['투자자문이 아닙니다.', 'bn']],
+      ['문제·해설·용어 데이터의 ', ['재배포와 상업적 ', 'b'], ['이용을 금지', 'bn'], '합니다.'],
+      ['풀이 기록은 ', ['이 기기 안에만 저장', 'b'], '되며 외부로 ', ['보내지 않습니다.', 'n']]
     ],
     linkBefore: '출처·저작권 등 자세한 내용은 ',
     linkLabel: '안내',
@@ -29,7 +31,7 @@
     'max-height:calc(100dvh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));',
     'margin:auto;padding:0;border:0;border-radius:var(--radius-l,28px);overflow:hidden;',
     'box-shadow:var(--shadow-float,0 12px 32px rgba(10,10,10,.14));line-height:1.6;',
-    'letter-spacing:var(--tracking-normal,-.01em);word-break:keep-all;',
+    'letter-spacing:var(--tracking-normal,-.01em);word-break:keep-all;overflow-wrap:break-word;',
     'animation:ws-consent-in var(--motion-base,220ms) var(--ease-out,cubic-bezier(.2,.8,.2,1)) both}',
     'dialog.ws-consent{position:fixed;inset:0}',
     'dialog.ws-consent:not([open]){display:none}',
@@ -44,20 +46,23 @@
     '.ws-consent *{box-sizing:border-box}',
     '.ws-consent-head{flex:none;padding:24px 24px 0}',
     '.ws-consent h2{margin:0;font-size:var(--text-title,1.5rem);line-height:var(--leading-title,1.38);',
-    'font-weight:var(--weight-heavy,800);letter-spacing:var(--tracking-tight,-.03em);outline:none}',
-    '.ws-consent-intro{margin:8px 0 0;font-size:var(--text-label,.9375rem);line-height:1.5;color:var(--color-ink-2,#4a4a4a)}',
+    'font-weight:var(--weight-heavy,800);letter-spacing:var(--tracking-tight,-.03em);outline:none;text-wrap:balance}',
+    '.ws-consent-intro{margin:8px 0 0;font-size:var(--text-label,.9375rem);line-height:1.5;color:var(--color-ink-2,#4a4a4a);word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}',
     '.ws-consent-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;',
     '-webkit-overflow-scrolling:touch;padding:16px 24px 4px}',
     '.ws-consent ul{list-style:none;margin:0;padding:0;border-radius:var(--radius-m,18px);',
     'background:var(--color-sunken,#f4f4f4);overflow:hidden}',
     '.ws-consent li{display:flex;align-items:flex-start;gap:12px;margin:0;padding:12px 16px;font-size:var(--text-label,.9375rem);line-height:1.6;color:var(--color-ink,#0a0a0a)}',
     '.ws-consent li+li{box-shadow:inset 0 1px 0 var(--color-line,#e4e4e4)}',
-    '.ws-consent-text{flex:1 1 auto;min-width:0}',
+    '.ws-consent-text{flex:1 1 auto;min-width:0;word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}',
+    '.ws-consent-text strong{font-weight:var(--weight-bold,700);color:inherit}',
+    '.ws-consent-text .ws-nb{white-space:nowrap}',
     '.ws-consent-check{position:relative;display:block;flex:none;width:18px;height:18px;margin-top:3px;border-radius:50%;',
     'background:var(--color-correct,var(--color-ink,#0a0a0a))}',
     '.ws-consent-check::after{content:"";position:absolute;left:50%;top:45%;width:4.14px;height:8.28px;',
     'border:solid var(--color-on-signal,#fff);border-width:0 2px 2px 0;transform:translate(-50%,-50%) rotate(45deg)}',
-    '.ws-consent .ws-consent-link{margin:12px 8px 0;font-size:var(--text-caption,.8125rem);line-height:1.5;color:var(--color-ink-3,#6b6b6b)}',
+    '.ws-consent .ws-consent-link{margin:12px 8px 0;font-size:var(--text-caption,.8125rem);line-height:1.5;color:var(--color-ink-3,#6b6b6b);',
+    'word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}',
     '.ws-consent .ws-consent-link a{color:var(--color-ink,#0a0a0a);font-weight:var(--weight-bold,700);text-decoration:underline;',
     'text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--color-ink-3,#6b6b6b)}',
     '.ws-consent-foot{flex:none;padding:16px 24px calc(24px + 0px)}',
@@ -112,6 +117,21 @@
     return node;
   }
 
+  function textNode(segments) {
+    var box = el('span', 'ws-consent-text');
+    for (var i = 0; i < segments.length; i++) {
+      var seg = segments[i];
+      if (typeof seg === 'string') {
+        box.appendChild(document.createTextNode(seg));
+        continue;
+      }
+      var flags = seg[1] || '';
+      var node = el(flags.indexOf('b') >= 0 ? 'strong' : 'span', flags.indexOf('n') >= 0 ? 'ws-nb' : '', seg[0]);
+      box.appendChild(node);
+    }
+    return box;
+  }
+
   function build(tag) {
     var root = el(tag, 'ws-consent');
     var title = el('h2', '', TEXT.title);
@@ -125,7 +145,7 @@
       var mark = el('span', 'ws-consent-check');
       mark.setAttribute('aria-hidden', 'true');
       row.appendChild(mark);
-      row.appendChild(el('span', 'ws-consent-text', TEXT.items[i]));
+      row.appendChild(textNode(TEXT.items[i]));
       list.appendChild(row);
     }
 
