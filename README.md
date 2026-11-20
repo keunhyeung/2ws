@@ -88,48 +88,28 @@
   </tr>
 </table>
 
-## 앱처럼 설치하기
+## 앱으로 설치해 보세요
 
-2WS를 홈 화면에 추가하면 주소창 없이 전체 화면으로 바로 열 수 있고, 한 번 열어 두면 오프라인에서도 동작합니다. 문제 화면이나 기록 화면 맨 아래의 작은 "안내" 링크를 눌러 안내 화면 맨 위의 "앱 설치하기" 버튼을 사용하면 간편하게 설치할 수 있습니다.
+홈 화면 아이콘으로 바로 열리고, 주소창 없는 전체 화면으로 깔끔하게 볼 수 있어요. 한 번 열어 두면 오프라인에서도 공부할 수 있어요.
 
 <table>
   <tr>
-    <td align="center" width="33%">
-      <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/install-ios-dark.png">
-        <img src="docs/readme/screens/install-ios-light.png" width="200" alt="아이폰 설치 안내 창">
-      </picture>
-      <br><sub>아이폰 설치 안내 창</sub>
+    <td valign="top" width="50%">
+      <h3>📱 갤럭시(안드로이드)</h3>
+      <p><b>1. Chrome으로 열기</b><br><sub>지금 페이지를 Chrome 브라우저로 열어요</sub></p>
+      <p><b>2. 오른쪽 위 ⋮ 메뉴 누르기</b><br><sub>"앱 설치" 또는 "홈 화면에 추가"를 선택해요</sub></p>
+      <p><b>3. "설치" 누르면 완료</b><br><sub>잠시 후 홈 화면에 2WS 아이콘이 생겨요</sub></p>
+      <p><sub><i>삼성 인터넷은 메뉴 → "현재 페이지 추가" → "홈 화면"으로 추가해요.</i></sub></p>
     </td>
-    <td align="center" width="33%">
-      <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/install-ios2-dark.png">
-        <img src="docs/readme/screens/install-ios2-light.png" width="200" alt="아이폰 홈 화면 추가 단계 안내">
-      </picture>
-      <br><sub>홈 화면 추가 단계 안내</sub>
-    </td>
-    <td align="center" width="33%">
-      <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/install-android-dark.png">
-        <img src="docs/readme/screens/install-android-light.png" width="200" alt="안드로이드 설치 창">
-      </picture>
-      <br><sub>안드로이드 설치 창</sub>
+    <td valign="top" width="50%">
+      <h3>📱 아이폰</h3>
+      <p><b>1. 꼭 Safari로 열기</b><br><sub>Chrome이 아닌 Safari 브라우저로 열어요</sub></p>
+      <p><b>2. 아래 공유 버튼 누르기</b><br><sub>최신 iOS는 ⋯ 버튼 → 공유를 눌러요</sub></p>
+      <p><b>3. 목록에서 "홈 화면에 추가"</b><br><sub>이어서 "추가"를 누르면 홈 화면에 아이콘이 생겨요</sub></p>
+      <p><sub><i>아이폰은 자동 설치가 지원되지 않아 이 방법으로만 설치할 수 있어요.</i></sub></p>
     </td>
   </tr>
 </table>
-
-**아이폰**
-
-1. Safari로 https://keunhyeung.github.io/2ws/ 에 접속해 문제 화면이나 기록 화면 맨 아래의 "안내" 링크를 누릅니다.
-2. 안내 화면 맨 위의 "앱 설치하기" 버튼을 누릅니다.
-3. 설치 안내 창에서 "홈 화면에 추가"를 누르면 추가 방법을 그림으로 안내합니다. (아이폰은 브라우저 정책상 자동 설치가 되지 않아 안내만 표시됩니다.)
-4. 안내에 따라 Safari 공유 버튼을 누른 뒤 공유 메뉴의 "더 보기" → "홈 화면에 추가"를 선택합니다.
-
-**안드로이드**
-
-1. Chrome 등의 브라우저로 https://keunhyeung.github.io/2ws/ 에 접속해 문제 화면이나 기록 화면 맨 아래의 "안내" 링크를 누릅니다.
-2. 안내 화면 맨 위의 "앱 설치하기" 버튼을 누릅니다.
-3. 브라우저의 설치 창이 바로 뜨면 "설치"를 눌러 완료합니다.
 
 ## 소개
 
