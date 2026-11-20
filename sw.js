@@ -1,6 +1,6 @@
 'use strict';
 
-const BUILD = '28157bb5a575';
+const BUILD = '8086bc18e9ad';
 const PRECACHE = [
   "./",
   "./about.html",
@@ -21,7 +21,7 @@ const PRECACHE = [
   "./vendor/pwa-install/pwa-install.bundle.js?v=89518cf364a9",
   "./assets/labs.js?v=9b1c421bc4c8",
   "./assets/term-guide.js?v=437ef37535de",
-  "./assets/easy-reasons.js?v=2d871b07aa67",
+  "./assets/easy-reasons.js?v=c67b66a8dee7",
   "./assets/basic-terms.js?v=c6e064d4da49",
   "./assets/basic-hints.js?v=085bcf7c5a63",
   "./assets/quiz-references.js?v=65f07dfeb45a",
