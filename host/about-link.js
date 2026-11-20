@@ -12,7 +12,7 @@
     var s = document.createElement('style');
     s.id = CLASS + '-style';
     s.textContent =
-      '.' + CLASS + '{margin:var(--space-6,24px) 0 0;text-align:center}' +
+      '.' + CLASS + '{margin:var(--space-6,24px) 0 0;text-align:right}' +
       '.' + CLASS + ' a{display:inline-block;padding:var(--space-2,8px) var(--space-3,12px);color:var(--color-ink-3,#6b6b6b);' +
       'font-size:var(--text-caption,13px);font-weight:var(--weight-medium,500);text-decoration:underline;' +
       'text-decoration-thickness:1px;text-underline-offset:3px}';

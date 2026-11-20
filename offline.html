@@ -554,7 +554,7 @@ html{scrollbar-gutter:stable}
 .v2-dict-links{display:flex;flex-wrap:wrap;gap:var(--space-2);margin:var(--space-3) 0 var(--space-2)}
 .v2-dict-links a{display:inline-flex;align-items:center;min-height:40px;max-width:100%;padding:var(--space-2) var(--space-4);border-radius:var(--radius-pill);background:var(--color-sunken);color:var(--color-ink);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-medium);text-decoration:none}
 @media(hover:hover){.v2-dict-links a:hover{background:var(--color-line)}
-.v2-dict-map{display:block;width:fit-content;margin:var(--space-2) calc(-1*var(--space-3)) 0 auto;padding:var(--space-2) var(--space-3);color:var(--color-ink-2);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none}
+.v2-dict-map{display:block;width:fit-content;margin:var(--space-3) calc(-1*var(--space-3)) calc(-1*var(--space-2)) auto;padding:var(--space-2) var(--space-3);color:var(--color-ink-2);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none}
 .v2-dict-map:hover{color:var(--color-ink)}}
 .v2-number-fields{display:flex;flex-direction:column;gap:var(--space-3);margin:var(--space-2) 0 var(--space-3)}
 .v2-number-fields b{display:block;color:var(--color-ink-3);font-size:var(--text-caption);line-height:var(--leading-caption);font-weight:var(--weight-bold)}
@@ -636,7 +636,7 @@ html{scrollbar-gutter:stable}
 .atlas-matches button:is(:hover,:focus-visible){background:var(--color-sunken)}
 .atlas-matches p{margin:0;padding:var(--space-2) var(--space-3);color:var(--color-ink-3);font-size:var(--text-label)}
 .atlas-footer{bottom:max(var(--space-4),env(safe-area-inset-bottom));align-items:flex-end}
-.atlas-context{align-self:center;min-width:0}
+.atlas-context{align-self:center;flex:1;min-width:0;display:flex}
 .atlas-help{color:var(--color-ink-3);font-size:var(--text-caption);line-height:var(--leading-caption);font-weight:var(--weight-bold)}
 .atlas-touch{display:none}
 .atlas-controls{display:inline-flex;flex:none;gap:var(--space-2);pointer-events:auto}
@@ -644,7 +644,7 @@ html{scrollbar-gutter:stable}
 .atlas-controls button:active{transform:scale(.96)}
 @media(hover:hover){.atlas-controls button:hover{background:var(--color-line)}}
 .atlas-controls svg{width:20px;height:20px}
-.atlas-read{pointer-events:auto;display:inline-flex;align-items:center;min-height:var(--size-tap);padding:0 var(--space-5);border-radius:var(--radius-pill);background:var(--color-inverse);color:var(--color-on-inverse);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none;overflow-wrap:anywhere}
+.atlas-read{pointer-events:auto;display:inline-flex;align-items:center;gap:var(--space-2);max-width:100%;min-width:0;min-height:var(--size-tap);padding:0 var(--space-5);border-radius:var(--radius-pill);background:var(--color-inverse);color:var(--color-on-inverse);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none;white-space:nowrap}.atlas-read-name{min-width:0;overflow:hidden;text-overflow:ellipsis}.atlas-read-go{flex:none}
 @media(pointer:coarse){.atlas-mouse{display:none}.atlas-touch{display:inline}}
 #app:has(.v2-graph-wrap) .v2-hero h1{color:var(--color-ink-3);font-size:var(--text-label);line-height:var(--leading-label);letter-spacing:var(--tracking-normal)}
 .v2-graph-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-3);align-items:start}
@@ -702,7 +702,7 @@ html{scrollbar-gutter:stable}
 .v2-graph-members a{display:inline-flex;align-items:center;min-height:var(--size-tap);padding:0 var(--space-5);border-radius:var(--radius-pill);background:var(--color-surface);color:var(--color-ink);font-weight:var(--weight-medium);text-decoration:none}
 @media(hover:hover){.v2-graph-members a:hover{background:var(--color-line)}}
 
-</style><meta name="site-build" content="4e7426e5f6d1"><link rel="stylesheet" href="./host/host.css?v=4fa2018c4d85"><script src="./host/progress-store.js?v=7854702d7a5d"></script><script src="./host/backup.js?v=912d7a4b9199"></script><script src="./host/boot.js?v=41df814bff09"></script><script src="./host/consent.js?v=24e8f944a9cf"></script><script src="./host/welcome.js?v=57918881caa0"></script><script src="./host/install-guide.js?v=f905c0abe912"></script><script src="./host/pwa.js?v=4d48abeacefe" defer></script><script src="./host/about-link.js?v=a2e9f2650913" defer></script></head><body><header class="v2-top">
+</style><meta name="site-build" content="4e7426e5f6d1"><link rel="stylesheet" href="./host/host.css?v=4fa2018c4d85"><script src="./host/progress-store.js?v=7854702d7a5d"></script><script src="./host/backup.js?v=912d7a4b9199"></script><script src="./host/boot.js?v=41df814bff09"></script><script src="./host/consent.js?v=24e8f944a9cf"></script><script src="./host/welcome.js?v=9dc9369509b1"></script><script src="./host/install-guide.js?v=f905c0abe912"></script><script src="./host/pwa.js?v=4d48abeacefe" defer></script><script src="./host/about-link.js?v=fda2a9c4b6e1" defer></script></head><body><header class="v2-top">
   <span class="v2-brand">2WS</span>
   <nav class="v2-primary-nav" aria-label="주요 메뉴">
     <a href="#choices">문제</a>
@@ -5687,13 +5687,12 @@ function dictionaryTermMarkup(term,selected){
  const mapLink=`<a class="v2-dict-map" href="#graph/${esc(encodeURIComponent(term.id))}">개념 지도에서 보기 →</a>`;
  const practice=data.concepts.some(item=>item.id===term.id)
   ?`<button type="button" class="primary" data-practice="${esc(term.id)}">관련 문제 풀기</button>`:'';
- const more=`<details><summary>더 보기</summary>
+ const more=body||extraLinks.length?`<details><summary>더 보기</summary>
    ${body?`<div class="v2-longtext">${body}</div>`:''}
    ${extraLinks.length?`<div class="v2-dict-links">${extraLinks.join('')}</div>`:''}
-   ${mapLink}
-  </details>`;
+  </details>`:'';
  return `<article class="v2-dict-card${title.length>16?' is-long':''}"><h2>${esc(title)}</h2>
-  ${explanation}${termFigureMarkup(term.id)}${broaderConceptsMarkup(term,dictionaryHref)}${window.OptionLab.conceptMarkup(term.id)}</article>${study.example}${comparison}${more}${study.point}${dictionaryCheckMarkup(term)}${practice}`;
+  ${explanation}${termFigureMarkup(term.id)}${broaderConceptsMarkup(term,dictionaryHref)}${window.OptionLab.conceptMarkup(term.id)}${mapLink}</article>${study.example}${comparison}${more}${study.point}${dictionaryCheckMarkup(term)}${practice}`;
 }
 
 function registryFields(item){
@@ -5956,7 +5955,7 @@ function renderAtlas(){
  function showSelection(term){
   help.hidden=Boolean(term);
   read.hidden=!term;
-  if(term){read.href='#graph/'+encodeURIComponent(term.id);read.textContent=peekTermTitle(term)+' 읽기 →'}
+  if(term){read.href='#graph/'+encodeURIComponent(term.id);read.innerHTML='<span class="atlas-read-name">'+esc(peekTermTitle(term))+'</span><span class="atlas-read-go">읽기 →</span>'}
  }
  if(atlasCamera.selectedId)showSelection(getTerm(atlasCamera.selectedId));
  function hideMatches(){results.hidden=true;results.replaceChildren()}

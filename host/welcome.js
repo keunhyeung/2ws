@@ -516,7 +516,21 @@
       for (var k = 0; k < slides[n].length; k++) node.appendChild(el('div', 'ws-w-line', slides[n][k]));
       stage.appendChild(node);
       void node.offsetWidth;
-      node.classList.add('ws-w-in');
+      if (n === 0 && !prev) {
+        /* First sentence: wait for the web font (max 400ms) so it never flashes in a
+           fallback font, then fade in slowly. */
+        node.style.transitionDuration = '.85s';
+        var shown = false;
+        var reveal = function () {
+          if (shown || state.closed) return;
+          shown = true;
+          node.classList.add('ws-w-in');
+        };
+        try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { later(reveal, 120); }); } catch (_) {}
+        later(reveal, 400);
+      } else {
+        node.classList.add('ws-w-in');
+      }
       state.current = node;
       state.index = n;
       for (var q = 0; q < dots.length; q++) {

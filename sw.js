@@ -1,22 +1,22 @@
 'use strict';
 
-const BUILD = '58b1f9a6b0ab';
+const BUILD = '48399fb845af';
 const PRECACHE = [
   "./",
   "./about.html",
   "./data/concepts.json",
   "./data/course.json",
   "./data/registry.json",
-  "./assets/app.css?v=d49583bf3077",
+  "./assets/app.css?v=e9403c41cb4e",
   "./host/host.css?v=4fa2018c4d85",
   "./host/progress-store.js?v=7854702d7a5d",
   "./host/backup.js?v=912d7a4b9199",
   "./host/boot.js?v=41df814bff09",
   "./host/consent.js?v=24e8f944a9cf",
-  "./host/welcome.js?v=57918881caa0",
+  "./host/welcome.js?v=9dc9369509b1",
   "./host/install-guide.js?v=f905c0abe912",
   "./host/pwa.js?v=4d48abeacefe",
-  "./host/about-link.js?v=a2e9f2650913",
+  "./host/about-link.js?v=fda2a9c4b6e1",
   "./host/install.js?v=a8af3b19c8ea",
   "./vendor/pwa-install/pwa-install.bundle.js?v=89518cf364a9",
   "./assets/labs.js?v=9b1c421bc4c8",
@@ -30,7 +30,7 @@ const PRECACHE = [
   "./assets/atlas-layout.js?v=d87d9da1745d",
   "./assets/concept-atlas.js?v=28278f2cd912",
   "./assets/term-figures.js?v=416a4d07945e",
-  "./assets/app.js?v=eb7c34b55986",
+  "./assets/app.js?v=427ec71cbcfe",
   "./assets/fonts/OFL.txt",
   "./assets/fonts/PretendardVariable.woff2",
   "./manifest.webmanifest",

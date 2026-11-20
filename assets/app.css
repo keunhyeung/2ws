@@ -553,7 +553,7 @@ html{scrollbar-gutter:stable}
 .v2-dict-links{display:flex;flex-wrap:wrap;gap:var(--space-2);margin:var(--space-3) 0 var(--space-2)}
 .v2-dict-links a{display:inline-flex;align-items:center;min-height:40px;max-width:100%;padding:var(--space-2) var(--space-4);border-radius:var(--radius-pill);background:var(--color-sunken);color:var(--color-ink);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-medium);text-decoration:none}
 @media(hover:hover){.v2-dict-links a:hover{background:var(--color-line)}
-.v2-dict-map{display:block;width:fit-content;margin:var(--space-2) calc(-1*var(--space-3)) 0 auto;padding:var(--space-2) var(--space-3);color:var(--color-ink-2);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none}
+.v2-dict-map{display:block;width:fit-content;margin:var(--space-3) calc(-1*var(--space-3)) calc(-1*var(--space-2)) auto;padding:var(--space-2) var(--space-3);color:var(--color-ink-2);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none}
 .v2-dict-map:hover{color:var(--color-ink)}}
 .v2-number-fields{display:flex;flex-direction:column;gap:var(--space-3);margin:var(--space-2) 0 var(--space-3)}
 .v2-number-fields b{display:block;color:var(--color-ink-3);font-size:var(--text-caption);line-height:var(--leading-caption);font-weight:var(--weight-bold)}
@@ -635,7 +635,7 @@ html{scrollbar-gutter:stable}
 .atlas-matches button:is(:hover,:focus-visible){background:var(--color-sunken)}
 .atlas-matches p{margin:0;padding:var(--space-2) var(--space-3);color:var(--color-ink-3);font-size:var(--text-label)}
 .atlas-footer{bottom:max(var(--space-4),env(safe-area-inset-bottom));align-items:flex-end}
-.atlas-context{align-self:center;min-width:0}
+.atlas-context{align-self:center;flex:1;min-width:0;display:flex}
 .atlas-help{color:var(--color-ink-3);font-size:var(--text-caption);line-height:var(--leading-caption);font-weight:var(--weight-bold)}
 .atlas-touch{display:none}
 .atlas-controls{display:inline-flex;flex:none;gap:var(--space-2);pointer-events:auto}
@@ -643,7 +643,7 @@ html{scrollbar-gutter:stable}
 .atlas-controls button:active{transform:scale(.96)}
 @media(hover:hover){.atlas-controls button:hover{background:var(--color-line)}}
 .atlas-controls svg{width:20px;height:20px}
-.atlas-read{pointer-events:auto;display:inline-flex;align-items:center;min-height:var(--size-tap);padding:0 var(--space-5);border-radius:var(--radius-pill);background:var(--color-inverse);color:var(--color-on-inverse);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none;overflow-wrap:anywhere}
+.atlas-read{pointer-events:auto;display:inline-flex;align-items:center;gap:var(--space-2);max-width:100%;min-width:0;min-height:var(--size-tap);padding:0 var(--space-5);border-radius:var(--radius-pill);background:var(--color-inverse);color:var(--color-on-inverse);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none;white-space:nowrap}.atlas-read-name{min-width:0;overflow:hidden;text-overflow:ellipsis}.atlas-read-go{flex:none}
 @media(pointer:coarse){.atlas-mouse{display:none}.atlas-touch{display:inline}}
 #app:has(.v2-graph-wrap) .v2-hero h1{color:var(--color-ink-3);font-size:var(--text-label);line-height:var(--leading-label);letter-spacing:var(--tracking-normal)}
 .v2-graph-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-3);align-items:start}

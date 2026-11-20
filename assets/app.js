@@ -587,13 +587,12 @@ function dictionaryTermMarkup(term,selected){
  const mapLink=`<a class="v2-dict-map" href="#graph/${esc(encodeURIComponent(term.id))}">개념 지도에서 보기 →</a>`;
  const practice=data.concepts.some(item=>item.id===term.id)
   ?`<button type="button" class="primary" data-practice="${esc(term.id)}">관련 문제 풀기</button>`:'';
- const more=`<details><summary>더 보기</summary>
+ const more=body||extraLinks.length?`<details><summary>더 보기</summary>
    ${body?`<div class="v2-longtext">${body}</div>`:''}
    ${extraLinks.length?`<div class="v2-dict-links">${extraLinks.join('')}</div>`:''}
-   ${mapLink}
-  </details>`;
+  </details>`:'';
  return `<article class="v2-dict-card${title.length>16?' is-long':''}"><h2>${esc(title)}</h2>
-  ${explanation}${termFigureMarkup(term.id)}${broaderConceptsMarkup(term,dictionaryHref)}${window.OptionLab.conceptMarkup(term.id)}</article>${study.example}${comparison}${more}${study.point}${dictionaryCheckMarkup(term)}${practice}`;
+  ${explanation}${termFigureMarkup(term.id)}${broaderConceptsMarkup(term,dictionaryHref)}${window.OptionLab.conceptMarkup(term.id)}${mapLink}</article>${study.example}${comparison}${more}${study.point}${dictionaryCheckMarkup(term)}${practice}`;
 }
 
 function registryFields(item){
@@ -856,7 +855,7 @@ function renderAtlas(){
  function showSelection(term){
   help.hidden=Boolean(term);
   read.hidden=!term;
-  if(term){read.href='#graph/'+encodeURIComponent(term.id);read.textContent=peekTermTitle(term)+' 읽기 →'}
+  if(term){read.href='#graph/'+encodeURIComponent(term.id);read.innerHTML='<span class="atlas-read-name">'+esc(peekTermTitle(term))+'</span><span class="atlas-read-go">읽기 →</span>'}
  }
  if(atlasCamera.selectedId)showSelection(getTerm(atlasCamera.selectedId));
  function hideMatches(){results.hidden=true;results.replaceChildren()}
