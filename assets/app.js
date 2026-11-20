@@ -489,7 +489,7 @@ function dictionaryDefinitionMarkup(value,term,linkedIds){
 function studyNotes(item,linkedIds,{example,point}){
  const note=(label,text)=>text?`<section class="dict-study-note"><h3>${label}</h3>
   <p>${dictionaryDefinitionMarkup(text,item,linkedIds)}</p></section>`:'';
- return {example:note('예시',example),point:note('구분하는 법',point)};
+ return {example:note('예시',example),point:note('주의할 점',point)};
 }
 
 let findStudyChecks;
@@ -521,7 +521,7 @@ function studyQuestionMarkup({checks,index,selected},fresh=false){
   return `<button type="button" ${state?`class="${key?'is-correct':'is-wrong'}" `:''}data-study-action="${value}" aria-label="${mark}, ${meaning}${mine?', 내가 고른 답':''}${state?', '+state:''}"${answered?' disabled':''}><b>${mark}</b><small>${state||meaning}</small></button>`;
  };
  const next=answered
-  ?`<button type="button" class="text-btn" data-study-action="${index+1<checks.length?'next':'restart'}">${index+1<checks.length?'다음 OX':checks.length>1?'처음부터 다시 풀기':'다시 풀기'}</button>`:'';
+  ?`<button type="button" class="text-btn" data-study-action="${index+1<checks.length?'next':'restart'}">${index+1<checks.length?'다음으로 →':checks.length>1?'처음부터 다시 풀기':'다시 풀기'}</button>`:'';
  return `<div class="dict-check-heading"><h3>이해 확인</h3>${checks.length>1?`<small>${index+1} / ${checks.length}</small>`:''}</div>
   <p class="dict-check-question" tabindex="-1">${esc(question.statement)}</p>
   <div class="dict-check-options">${answerButton(true)}${answerButton(false)}</div>${feedback}${next}`;
@@ -583,13 +583,14 @@ function dictionaryTermMarkup(term,selected){
  const extraLinks=[
   ...related.map(item=>`<a href="${esc(dictionaryHref(item.id))}">${esc(peekTermTitle(item))}</a>`),
   ...unitLinks,
-  `<a href="#graph/${esc(encodeURIComponent(term.id))}">개념 지도</a>`,
  ];
+ const mapLink=`<a class="v2-dict-map" href="#graph/${esc(encodeURIComponent(term.id))}">개념 지도에서 보기 →</a>`;
  const practice=data.concepts.some(item=>item.id===term.id)
   ?`<button type="button" class="primary" data-practice="${esc(term.id)}">관련 문제 풀기</button>`:'';
  const more=`<details><summary>더 보기</summary>
    ${body?`<div class="v2-longtext">${body}</div>`:''}
-   <div class="v2-dict-links">${extraLinks.join('')}</div>
+   ${extraLinks.length?`<div class="v2-dict-links">${extraLinks.join('')}</div>`:''}
+   ${mapLink}
   </details>`;
  return `<article class="v2-dict-card${title.length>16?' is-long':''}"><h2>${esc(title)}</h2>
   ${explanation}${termFigureMarkup(term.id)}${broaderConceptsMarkup(term,dictionaryHref)}${window.OptionLab.conceptMarkup(term.id)}</article>${study.example}${comparison}${more}${study.point}${dictionaryCheckMarkup(term)}${practice}`;
@@ -792,7 +793,7 @@ function graphCopyMarkup(term,steps){
  const interpretation=note.interpretation||term.interpretation;
  const example=term.studyExample||(!formula?note.example:null);
  for(const [label,text] of [['공식',formula],['계산 예시',calculation],['예시 해석',formula&&interpretation],
-  ['예시',example],['구분하는 법',term.studyPoint]]){
+  ['예시',example],['주의할 점',term.studyPoint]]){
   const isEquation=label==='공식'||label==='계산 예시';
   const parts=plain(text).filter(part=>!isEquation||!repeatsCalculation(part));
   if(parts.length)details.push(`<h3>${label}</h3>${paragraphs(parts)}`);

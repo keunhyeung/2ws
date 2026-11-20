@@ -6,7 +6,7 @@
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f0f0f0">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a">
 <title>2WS 안내</title>
-<link rel="stylesheet" href="./assets/app.css?v=4a2fef0ccb07">
+<link rel="stylesheet" href="./assets/app.css?v=d49583bf3077">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
@@ -27,6 +27,7 @@
 .about strong{font-weight:var(--weight-bold)}
 .about-note{margin:var(--space-3) var(--space-2) 0;color:var(--color-ink-3);font-size:var(--text-caption);line-height:1.5;font-weight:var(--weight-medium)}
 .about a{color:inherit;font-weight:var(--weight-bold);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--color-ink-3);overflow-wrap:anywhere}
+.about-install .primary{width:100%}
 </style>
 </head>
 <body><header class="v2-top">
@@ -35,11 +36,17 @@
     <a href="./#choices">문제</a>
     <a href="./#dictionary">사전</a>
     <a href="./#history">기록</a>
-    <a href="./about.html" aria-current="page">안내</a>
   </nav>
 </header>
 <main class="about">
 <h1>2WS 안내</h1>
+<section data-install-card>
+<h2>앱 설치</h2>
+<ul class="about-card">
+<li>홈 화면에 설치하면 주소창 없이 전체 화면으로 열리고, 오프라인에서도 공부할 수 있습니다.</li>
+<li class="about-install"><button type="button" class="primary" data-install-button hidden>앱 설치하기</button><span data-install-done hidden>이미 앱으로 설치되어 있습니다.</span></li>
+</ul>
+</section>
 <section>
 <h2>이 앱에 대하여</h2>
 <ul class="about-card">
@@ -90,5 +97,7 @@
 </ul>
 </section>
 </main>
+<script src="./vendor/pwa-install/pwa-install.bundle.js?v=89518cf364a9" defer></script>
+<script src="./host/install.js?v=a8af3b19c8ea" defer></script>
 </body>
 </html>

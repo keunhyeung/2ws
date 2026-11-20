@@ -1,20 +1,24 @@
 'use strict';
 
-const BUILD = '1f14e2b73251';
+const BUILD = '816f58f6cbe8';
 const PRECACHE = [
   "./",
   "./about.html",
   "./data/concepts.json",
   "./data/course.json",
   "./data/registry.json",
-  "./assets/app.css?v=4a2fef0ccb07",
+  "./assets/app.css?v=d49583bf3077",
   "./host/host.css?v=4fa2018c4d85",
   "./host/progress-store.js?v=7854702d7a5d",
   "./host/backup.js?v=912d7a4b9199",
   "./host/boot.js?v=41df814bff09",
-  "./host/consent.js?v=f6ac2ef1e698",
-  "./host/welcome.js?v=b9a7a69d949c",
+  "./host/consent.js?v=24e8f944a9cf",
+  "./host/welcome.js?v=a6f0bd7d7429",
+  "./host/install-guide.js?v=f905c0abe912",
   "./host/pwa.js?v=4d48abeacefe",
+  "./host/about-link.js?v=a2e9f2650913",
+  "./host/install.js?v=a8af3b19c8ea",
+  "./vendor/pwa-install/pwa-install.bundle.js?v=89518cf364a9",
   "./assets/labs.js?v=9b1c421bc4c8",
   "./assets/term-guide.js?v=437ef37535de",
   "./assets/easy-reasons.js?v=2d871b07aa67",
@@ -26,7 +30,7 @@ const PRECACHE = [
   "./assets/atlas-layout.js?v=d87d9da1745d",
   "./assets/concept-atlas.js?v=28278f2cd912",
   "./assets/term-figures.js?v=416a4d07945e",
-  "./assets/app.js?v=7b4b3262a84e",
+  "./assets/app.js?v=72409716f7e4",
   "./assets/fonts/OFL.txt",
   "./assets/fonts/PretendardVariable.woff2",
   "./manifest.webmanifest",

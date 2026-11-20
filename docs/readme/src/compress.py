@@ -10,7 +10,7 @@ OUT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 TARGETS = []
 for t in ("light", "dark"):
     TARGETS.append((os.path.join(OUT, f"hero-{t}.png"), 600_000))
-    for n in ("quiz", "explain", "dict", "map", "history", "welcome"):
+    for n in ("quiz", "explain", "dict", "peek", "peek2", "atlas", "node", "history", "install-ios", "install-ios2", "install-android"):
         TARGETS.append((os.path.join(OUT, "screens", f"{n}-{t}.png"), 250_000))
 
 

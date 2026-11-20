@@ -285,8 +285,19 @@
     try { parts.title.focus({ preventScroll: true }); } catch (_) {}
   }
 
+  /* welcome.js shows its intro first on a first visit; open the consent
+   * dialog once the intro is closed. If no intro is on screen, open now. */
   function start() {
-    try { open(); } catch (_) {}
+    setTimeout(function () {
+      if (document.getElementById('ws-welcome-root')) {
+        window.addEventListener('ws-welcome-done', function once() {
+          window.removeEventListener('ws-welcome-done', once);
+          try { open(); } catch (_) {}
+        });
+      } else {
+        try { open(); } catch (_) {}
+      }
+    }, 0);
   }
 
   try {

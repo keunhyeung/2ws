@@ -3,7 +3,8 @@
 
   var KEY = '2ws-welcome';
   var VERSION = 'v1';
-  var EVENT_NAME = 'ws-consent-accepted';
+  var DONE_EVENT = 'ws-welcome-done';
+  var announced = false;
   var STYLE_ID = 'ws-welcome-style';
   var ROOT_ID = 'ws-welcome-root';
 
@@ -13,9 +14,8 @@
     skip: '바로 시작',
     slides: [
       ['안녕하세요!', '투자자산운용사 입문을 환영합니다.'],
-      ['투운사 후기엔 일주일, 사흘,', '심지어 몇 시간 합격담도 있죠.'],
-      ['대체 어떤 초능력인지', '저도 가끔 궁금해집니다.'],
-      ['그래도 그런 전설에 휘둘리기엔', '지식을 채우는 재미가 꽤 쏠쏠합니다.'],
+      ['투운사엔 일주일, 사흘, 몇 시간', '기적 같은 합격 후기가 참 많죠.'],
+      ['화려한 무용담에 눈길은 가지만', '하나씩 채우는 재미도 쏠쏠해요.'],
       ['차곡차곡 쌓아 올린 끝에서', '합격의 기쁨을 만나시길 기원합니다.'],
       ['자, 이제 2WS와 함께', '시작해 볼까요?']
     ]
@@ -590,6 +590,7 @@
         var app = document.getElementById('app');
         if (app && typeof app.focus === 'function') app.focus({ preventScroll: true });
       } catch (_) {}
+      announce();
     }
 
     function finish() {
@@ -699,9 +700,17 @@
     }
   }
 
-  function onAccepted() {
+  /* Tells consent.js that the intro is over (or was never shown). */
+  function announce() {
+    if (announced) return;
+    announced = true;
+    try { window.dispatchEvent(new CustomEvent(DONE_EVENT)); } catch (_) {}
+  }
+
+  /* First visit: the intro comes first, then the consent dialog. */
+  function start() {
     try {
-      if (seen()) return;
+      if (seen()) { announce(); return; }
       open();
     } catch (_) {
       try {
@@ -709,8 +718,10 @@
         if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
         document.body.style.overflow = '';
       } catch (_) {}
+      announce();
     }
   }
 
-  window.addEventListener(EVENT_NAME, onAccepted);
+  if (document.body) start();
+  else document.addEventListener('DOMContentLoaded', start);
 })();

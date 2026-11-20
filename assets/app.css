@@ -552,7 +552,9 @@ html{scrollbar-gutter:stable}
 .v2-dictionary>details .v2-longtext{margin:var(--space-2) 0 var(--space-3);padding:0;background:none;line-height:1.65}
 .v2-dict-links{display:flex;flex-wrap:wrap;gap:var(--space-2);margin:var(--space-3) 0 var(--space-2)}
 .v2-dict-links a{display:inline-flex;align-items:center;min-height:40px;max-width:100%;padding:var(--space-2) var(--space-4);border-radius:var(--radius-pill);background:var(--color-sunken);color:var(--color-ink);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-medium);text-decoration:none}
-@media(hover:hover){.v2-dict-links a:hover{background:var(--color-line)}}
+@media(hover:hover){.v2-dict-links a:hover{background:var(--color-line)}
+.v2-dict-map{display:block;width:fit-content;margin:var(--space-2) calc(-1*var(--space-3)) 0 auto;padding:var(--space-2) var(--space-3);color:var(--color-ink-2);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none}
+.v2-dict-map:hover{color:var(--color-ink)}}
 .v2-number-fields{display:flex;flex-direction:column;gap:var(--space-3);margin:var(--space-2) 0 var(--space-3)}
 .v2-number-fields b{display:block;color:var(--color-ink-3);font-size:var(--text-caption);line-height:var(--leading-caption);font-weight:var(--weight-bold)}
 .v2-number-fields span{display:block}
@@ -576,7 +578,7 @@ html{scrollbar-gutter:stable}
 .dict-check-feedback{padding:var(--space-4) var(--space-5);border-radius:var(--radius-m);background:var(--color-sunken)}
 .dict-check-feedback>strong{display:flex;align-items:flex-start;gap:var(--space-3);color:var(--color-ink);font-size:var(--text-heading);line-height:var(--leading-heading);font-weight:var(--weight-heavy);letter-spacing:var(--tracking-tight)}
 .dict-check-feedback p{margin:var(--space-2) 0 0;color:var(--color-ink-2);font-size:var(--text-label);line-height:1.65}
-.dict-check .text-btn{align-self:flex-start;margin:calc(-1*var(--space-2)) 0 calc(-1*var(--space-2)) calc(-1*var(--space-3))}
+.dict-check .text-btn{align-self:flex-end;margin:calc(-1*var(--space-2)) calc(-1*var(--space-3)) calc(-1*var(--space-2)) 0}
 
 .v2-history-stats{display:flex;gap:var(--space-10);margin:var(--space-4) 0 var(--space-3);padding:var(--space-6);border-radius:var(--radius-l);background:var(--color-surface)}
 .v2-stat{display:flex;flex-direction:column;gap:var(--space-1)}

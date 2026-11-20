@@ -1,7 +1,7 @@
 > [!NOTE]
 > **제작자 코멘트**
 >
-> 직장과 병행해 한 달 정도 공부했는데, 문제은행식이라는 말을 멋대로 이해해 엉뚱한 방법으로 매달렸습니다. 정작 중요한 것은 시중 모의고사 문제를 최대한 많이 풀어 보는 것이었습니다. 만들어 두고 민망하지만, 이 앱만으로는 모의고사 풀이를 대신할 수 없습니다. 이동하는 틈틈이 공부하는 용도로만 활용해 주세요.
+> 직장과 병행해 한 달 정도 공부하였습니다. 제 경험상, 가장 중요한 것은 시중 모의고사 문제를 최대한 많이 풀어보는 것이라 생각합니다. 해당 프로그램은 틈틈이 공부하는, 보조용으로 활용해주세요.
 
 <div align="center">
 
@@ -27,43 +27,109 @@
 
 <table>
   <tr>
-    <td align="center" width="33%">
+    <td align="center" width="25%">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/quiz-dark.png">
-        <img src="docs/readme/screens/quiz-light.png" width="220" alt="문제 풀이 화면">
+        <img src="docs/readme/screens/quiz-light.png" width="180" alt="문제 풀이 화면">
       </picture>
-      <br><sub><b>문제 풀이</b><br>4지선다·OX 풀이</sub>
+      <br><sub><b>문제 풀이</b><br>4지선다·OX 문제 바로 풀기</sub>
     </td>
-    <td align="center" width="33%">
+    <td align="center" width="25%">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/explain-dark.png">
-        <img src="docs/readme/screens/explain-light.png" width="220" alt="해설 화면">
+        <img src="docs/readme/screens/explain-light.png" width="180" alt="해설 화면">
       </picture>
-      <br><sub><b>해설</b><br>풀이 직후 해설 확인</sub>
+      <br><sub><b>해설 화면</b><br>풀이 직후 보기별 해설과 밑줄 개념</sub>
     </td>
-    <td align="center" width="33%">
+    <td align="center" width="25%">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/dict-dark.png">
-        <img src="docs/readme/screens/dict-light.png" width="220" alt="개념 사전 화면">
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/peek-dark.png">
+        <img src="docs/readme/screens/peek-light.png" width="180" alt="해설 속 개념 팝업 화면">
       </picture>
-      <br><sub><b>개념 사전</b><br>주요 용어 찾아보기</sub>
+      <br><sub><b>개념 팝업</b><br>공식·숫자 대입·예시 팝업 표시</sub>
+    </td>
+    <td align="center" width="25%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/peek2-dark.png">
+        <img src="docs/readme/screens/peek2-light.png" width="180" alt="연결 개념으로 이동한 화면">
+      </picture>
+      <br><sub><b>연결 개념</b><br>다음 개념 이동 및 이전 개념 복귀</sub>
     </td>
   </tr>
   <tr>
-    <td align="center" width="33%">
+    <td align="center" width="25%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/atlas-dark.png">
+        <img src="docs/readme/screens/atlas-light.png" width="180" alt="개념 지도 화면">
+      </picture>
+      <br><sub><b>개념 지도</b><br>모든 개념과 연결을 한 장에</sub>
+    </td>
+    <td align="center" width="25%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/node-dark.png">
+        <img src="docs/readme/screens/node-light.png" width="180" alt="개념별 연결 지도 화면">
+      </picture>
+      <br><sub><b>연결 지도</b><br>상위·하위·관련 개념을 눌러 탐색</sub>
+    </td>
+    <td align="center" width="25%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/dict-dark.png">
+        <img src="docs/readme/screens/dict-light.png" width="180" alt="개념 사전 화면">
+      </picture>
+      <br><sub><b>개념 사전</b><br>주요 용어 찾아보기</sub>
+    </td>
+    <td align="center" width="25%">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/history-dark.png">
-        <img src="docs/readme/screens/history-light.png" width="220" alt="풀이 기록 화면">
+        <img src="docs/readme/screens/history-light.png" width="180" alt="풀이 기록 화면">
       </picture>
-      <br><sub><b>풀이 기록</b><br>기기에만 저장되는 기록</sub>
+      <br><sub><b>풀이 기록</b><br>기록은 기기에만 저장</sub>
     </td>
-    <td align="center" width="33%">
-      <img src="docs/readme/screens/welcome-dark.png" width="220" alt="환영 화면">
-      <br><sub><b>환영 화면</b><br>가벼운 인사로 시작</sub>
-    </td>
-    <td width="33%"></td>
   </tr>
 </table>
+
+## 앱처럼 설치하기
+
+2WS를 홈 화면에 추가하면 주소창 없이 전체 화면으로 바로 열 수 있고, 한 번 열어 두면 오프라인에서도 동작합니다. 문제 화면이나 기록 화면 맨 아래의 작은 "안내" 링크를 눌러 안내 화면 맨 위의 "앱 설치하기" 버튼을 사용하면 간편하게 설치할 수 있습니다.
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/install-ios-dark.png">
+        <img src="docs/readme/screens/install-ios-light.png" width="200" alt="아이폰 설치 안내 창">
+      </picture>
+      <br><sub>아이폰 설치 안내 창</sub>
+    </td>
+    <td align="center" width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/install-ios2-dark.png">
+        <img src="docs/readme/screens/install-ios2-light.png" width="200" alt="아이폰 홈 화면 추가 단계 안내">
+      </picture>
+      <br><sub>홈 화면 추가 단계 안내</sub>
+    </td>
+    <td align="center" width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screens/install-android-dark.png">
+        <img src="docs/readme/screens/install-android-light.png" width="200" alt="안드로이드 설치 창">
+      </picture>
+      <br><sub>안드로이드 설치 창</sub>
+    </td>
+  </tr>
+</table>
+
+**아이폰**
+
+1. Safari로 https://keunhyeung.github.io/2ws/ 에 접속해 문제 화면이나 기록 화면 맨 아래의 "안내" 링크를 누릅니다.
+2. 안내 화면 맨 위의 "앱 설치하기" 버튼을 누릅니다.
+3. 설치 안내 창에서 "홈 화면에 추가"를 누르면 추가 방법을 그림으로 안내합니다. (아이폰은 브라우저 정책상 자동 설치가 되지 않아 안내만 표시됩니다.)
+4. 안내에 따라 Safari 공유 버튼을 누른 뒤 공유 메뉴의 "더 보기" → "홈 화면에 추가"를 선택합니다.
+
+**안드로이드**
+
+1. Chrome 등의 브라우저로 https://keunhyeung.github.io/2ws/ 에 접속해 문제 화면이나 기록 화면 맨 아래의 "안내" 링크를 누릅니다.
+2. 안내 화면 맨 위의 "앱 설치하기" 버튼을 누릅니다.
+3. 브라우저의 설치 창이 바로 뜨면 "설치"를 눌러 완료합니다.
 
 ## 소개
 
