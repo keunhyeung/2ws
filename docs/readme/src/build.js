@@ -6,7 +6,6 @@
  *   node docs/readme/src/build.js
  *   EDGE="C:/path/to/chrome.exe" node docs/readme/src/build.js
  *
- * shots/install-*.png are captures of the real <pwa-install> dialog on about.html (iPhone/Android user agents).
  * Output: docs/readme/hero-{light,dark}.png and docs/readme/screens/{name}-{light,dark}.png
  */
 const { spawn, spawnSync } = require('child_process');
@@ -17,7 +16,7 @@ const { pathToFileURL } = require('url');
 
 const SRC = __dirname;
 const OUT = path.resolve(SRC, '..');
-const NAMES = ['quiz', 'explain', 'dict', 'peek', 'peek2', 'atlas', 'node', 'history', 'install-ios', 'install-ios2', 'install-android'];
+const NAMES = ['quiz', 'explain', 'dict', 'peek', 'peek2', 'atlas', 'node', 'history'];
 const THEMES = ['light', 'dark'];
 const CANDIDATES = [
   process.env.EDGE,
