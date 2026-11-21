@@ -1,6 +1,6 @@
 'use strict';
 
-const BUILD = 'b8ceb1eb5da2';
+const BUILD = 'fb2b05775564';
 const PRECACHE = [
   "./",
   "./about.html",
