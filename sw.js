@@ -1,13 +1,13 @@
 'use strict';
 
-const BUILD = '24d94c285d68';
+const BUILD = '4001379e13c7';
 const PRECACHE = [
   "./",
   "./about.html",
   "./data/concepts.json",
   "./data/course.json",
   "./data/registry.json",
-  "./assets/app.css?v=eb916a846868",
+  "./assets/app.css?v=d3839c11f8d8",
   "./host/host.css?v=4fa2018c4d85",
   "./host/progress-store.js?v=7854702d7a5d",
   "./host/backup.js?v=912d7a4b9199",
@@ -29,7 +29,7 @@ const PRECACHE = [
   "./assets/atomic-atlas.js?v=5688493e4ae2",
   "./assets/atlas-layout.js?v=3321b36c4459",
   "./assets/concept-atlas.js?v=b11351f279d3",
-  "./assets/term-figures.js?v=416a4d07945e",
+  "./assets/term-figures.js?v=46f8df3b89b9",
   "./assets/app.js?v=baaa146f1fec",
   "./assets/fonts/OFL.txt",
   "./assets/fonts/PretendardVariable.woff2",

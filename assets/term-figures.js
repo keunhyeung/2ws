@@ -132,6 +132,18 @@
   math.longMA = x => 0.38 + 0.24 * x;
   math.shortMA = (x, direction) => math.longMA(x) + direction * 0.2 * Math.tanh(4.5 * (x - 0.45));
 
+  math.candleShape = ({ o, h, l, c }) => {
+    const hi = Math.max(o, c), lo = Math.min(o, c);
+    return { rise: c > o, hi, lo, body: hi - lo, upper: h - hi, lower: lo - l, mid: (o + c) / 2 };
+  };
+  math.trendCandles = (dir, n, anchor, step) => Array.from({ length: n }, (_, i) => {
+    const c = anchor - dir * (n - 1 - i) * step, o = c - dir * step * 0.8;
+    return { o, h: Math.max(o, c) + step * 0.35, l: Math.min(o, c) - step * 0.35, c };
+  });
+  math.roundBottom = (u, m) => m.floor + m.depth * (2 * u - 1) ** 2;
+  math.roundTop = (u, m) => 1 - math.roundBottom(u, m);
+  math.line = ([u0, v0], [u1, v1]) => u => v0 + (v1 - v0) * (u - u0) / (u1 - u0);
+
   const models = {
     frontier: { s0: 0.22, m0: 0.5, k: 4, sMax: 1 },
     optimal: { s0: 0.2, m0: 0.45, k: 4.5, sp: 0.55, q: 0.7, sMin: 0.33, sMax: 0.9 },
@@ -186,6 +198,37 @@
     const u = (m.lm.y0 - m.is.y0) / (m.is.slope - m.lm.slope);
     return { u, v: m.is.y0 + m.is.slope * u };
   };
+  models.candles = {
+    hammer: { dir: -1, n: 4, anchor: 56, step: 7, days: [{ o: 40, h: 49, l: 12, c: 47 }] },
+    'hanging-man': { dir: 1, n: 4, anchor: 60, step: 7, days: [{ o: 64, h: 73, l: 36, c: 71 }] },
+    'shooting-star': { dir: 1, n: 4, anchor: 58, step: 7, days: [{ o: 68, h: 96, l: 60, c: 62 }] },
+    piercing: { dir: -1, n: 3, anchor: 74, step: 6, days: [{ o: 76, h: 78, l: 44, c: 46 }, { o: 40, h: 68, l: 38, c: 66 }] },
+    'dark-cloud': { dir: 1, n: 3, anchor: 40, step: 6, days: [{ o: 38, h: 70, l: 36, c: 68 }, { o: 74, h: 76, l: 46, c: 48 }] },
+    'morning-star': { dir: -1, n: 3, anchor: 80, step: 6, days: [{ o: 82, h: 84, l: 52, c: 54 }, { o: 45, h: 53, l: 41, c: 49 }, { o: 52, h: 76, l: 50, c: 74 }] },
+    'evening-star': { dir: 1, n: 3, anchor: 30, step: 6, days: [{ o: 28, h: 58, l: 26, c: 56 }, { o: 66, h: 70, l: 60, c: 62 }, { o: 60, h: 62, l: 34, c: 36 }] },
+    gap: { dir: 1, n: 3, anchor: 50, step: 6, days: [{ o: 50, h: 66, l: 48, c: 62 }, { o: 76, h: 88, l: 75, c: 86 }] },
+    candle: { rise: { o: 36, h: 90, l: 14, c: 72 }, fall: { o: 72, h: 90, l: 14, c: 36 } },
+  };
+  models.shapes = {
+    flag: { pole: [[0.05, 0.1], [0.36, 0.8]], top: 0.8, from: 0.36, to: 0.8, slope: -0.5, width: 0.16, touches: [0.46, 0.56, 0.66], breakout: [0.76, 0.66], end: [0.95, 0.96] },
+    wedge: { upper: [[0.06, 0.88], [0.8, 0.52]], lower: [[0.06, 0.58], [0.8, 0.46]], touches: [0.22, 0.4, 0.56, 0.68, 0.77], exit: [[0.85, 0.03], [0.96, 0.2]], uEnd: 0.96 },
+    rectangle: { top: 0.8, bottom: 0.3, points: [[0, 0.52], [0.16, 0.8], [0.4, 0.3], [0.62, 0.8], [0.82, 0.3], [0.98, 0.92]] },
+    rounding: { floor: 0.22, depth: 0.6 },
+    elliott: { points: [[0.04, 0.1], [0.19, 0.4], [0.27, 0.28], [0.5, 0.74], [0.58, 0.6], [0.72, 0.86], [0.82, 0.52], [0.88, 0.66], [0.97, 0.34]], names: ['1', '2', '3', '4', '5', 'A', 'B', 'C'] },
+  };
+  models.wedgePath = mirror => {
+    const m = models.shapes.wedge, up = math.line(...m.upper), lo = math.line(...m.lower), flip = ([u, v]) => [u, 1 - v];
+    const touches = [[m.upper[0][0], up(m.upper[0][0])], ...m.touches.map((u, i) => [u, i % 2 === 0 ? lo(u) : up(u)])];
+    const path = [...touches, ...m.exit.map(([u, over]) => [u, up(u) + over])];
+    const lines = { upper: [[m.upper[0][0], up(m.upper[0][0])], [m.uEnd, up(m.uEnd)]], lower: [[m.lower[0][0], lo(m.lower[0][0])], [m.uEnd, lo(m.uEnd)]] };
+    if (!mirror) return { up, lo, path, lines };
+    return { up: u => 1 - lo(u), lo: u => 1 - up(u), path: path.map(flip), lines: { upper: lines.lower.map(flip), lower: lines.upper.map(flip) } };
+  };
+  models.flagGeometry = () => {
+    const m = models.shapes.flag, upper = u => m.top + m.slope * (u - m.from), lower = u => upper(u) - m.width;
+    const path = [m.pole[0], m.pole[1], [m.touches[0], lower(m.touches[0])], [m.touches[1], upper(m.touches[1])], [m.touches[2], lower(m.touches[2])], m.breakout, m.end];
+    return { upper, lower, path };
+  };
 
   const frame = ({ left, right, top, bottom, dx = [0, 1], dy = [0, 1] }) => ({
     left, right, top, bottom,
@@ -201,7 +244,7 @@
   const mapPts = (f, pts) => pts.map(([u, v]) => [f.X(u), f.Y(v)]);
   const closed = pts => [...pts, pts[0]];
 
-  const LINE_CLASS = { main: 'v2-fig-main', sub: 'v2-fig-sub', dash: 'v2-fig-sub v2-fig-dash', axis: 'v2-fig-axis' };
+  const LINE_CLASS = { main: 'v2-fig-main', sub: 'v2-fig-sub', dash: 'v2-fig-sub v2-fig-dash', axis: 'v2-fig-axis', wick: 'v2-fig-wick', wickMuted: 'v2-fig-wick v2-fig-muted' };
   function addLine(s, kind, pts) {
     if (pts.length < 2) return;
     s.items.push({ k: 'line', cls: LINE_CLASS[kind], pts, kind });
@@ -212,8 +255,8 @@
     s.items.push({ k: 'dot', x, y, r });
     s.obst.push({ k: 'circle', x, y, r });
   }
-  function addRect(s, x, y, w, h) {
-    s.items.push({ k: 'rect', x, y, w, h });
+  function addRect(s, x, y, w, h, cls, rx) {
+    s.items.push({ k: 'rect', x, y, w, h, cls, rx });
     s.obst.push({ k: 'box', box: { x0: x, x1: x + w, y0: y, y1: y + h } });
   }
   function addHead(s, tip, dir, len = 8, half = 3.6) {
@@ -845,6 +888,159 @@
   define('dead-cross', '시간을 가로축, 가격을 세로축으로 한 평면에서 단기 이동평균선이 장기 이동평균선 위에서 시작해 한 점에서 아래로 뚫고 내려간다.',
     '단기 이동평균선이 장기 이동평균선을 위에서 아래로 뚫는다.', s0 => cross(s0, -1));
 
+  const LEGEND = '빈 몸통은 양봉, 채운 몸통은 음봉';
+  const CANDLE_BOX = { left: 14, right: 286, top: 26, bottom: 148 };
+  const LEAD_W = 12, DAY_W = 20, DAY_W_MANY = 18;
+  function drawCandle(s, f, c, x, w, muted) {
+    const shape = math.candleShape(c), yHi = f.Y(shape.hi), yLo = f.Y(shape.lo), wick = muted ? 'wickMuted' : 'wick';
+    if (c.h > shape.hi) addLine(s, wick, [[x, f.Y(c.h)], [x, yHi]]);
+    if (c.l < shape.lo) addLine(s, wick, [[x, yLo], [x, f.Y(c.l)]]);
+    const h = Math.max(yLo - yHi, 2);
+    addRect(s, x - w / 2, yHi, w, h, 'v2-fig-body ' + (shape.rise ? 'v2-fig-rise' : 'v2-fig-fall') + (muted ? ' v2-fig-muted' : ''), 1);
+    s.candles.push({ ...c, ...shape, x, w, muted, top: f.Y(c.h), bottom: f.Y(c.l), bodyTop: yHi, bodyBottom: yHi + h });
+  }
+  function candleRow(kind, spec, room = 0) {
+    const lead = spec.n ? math.trendCandles(spec.dir, spec.n, spec.anchor, spec.step) : [];
+    const all = [...lead, ...spec.days], low = Math.min(...all.map(c => c.l)), high = Math.max(...all.map(c => c.h)), margin = (high - low) * 0.05;
+    const s = newScene(kind), f = frame({ ...CANDLE_BOX, right: CANDLE_BOX.right - room, dy: [low - margin, high + margin] });
+    s.frame = f;
+    s.candles = [];
+    const pad = lead.length ? 0.5 : 0, slot = (f.right - f.left) / (lead.length + pad + spec.days.length);
+    const leadX = lead.map((_, i) => f.left + slot * (i + 0.5));
+    const dayX = spec.days.map((_, i) => f.left + slot * (lead.length + pad + i + 0.5));
+    lead.forEach((c, i) => drawCandle(s, f, c, leadX[i], LEAD_W, true));
+    spec.days.forEach((c, i) => drawCandle(s, f, c, dayX[i], spec.days.length > 1 ? DAY_W_MANY : DAY_W, false));
+    if (lead.length) addText(s, spec.dir > 0 ? '상승추세' : '하락추세', (leadX[0] + leadX[leadX.length - 1]) / 2, 16, 'middle', 'name');
+    addText(s, LEGEND, W / 2, 184, 'middle', 'name');
+    return { s, f, leadX, dayX, w: spec.days.length > 1 ? DAY_W_MANY : DAY_W };
+  }
+  const dayNames = (row, names) => names.forEach((name, i) => addText(row.s, name, row.dayX[i], 166, 'middle', 'name'));
+  function longWick(kind, wickSide) {
+    const spec = models.candles[kind], row = candleRow(kind, spec, 78), c = spec.days[0], shape = math.candleShape(c), f = row.f;
+    const edge = row.dayX[0] + row.w / 2, wickMid = wickSide === 'lower' ? (shape.lo + c.l) / 2 : (shape.hi + c.h) / 2;
+    place(row.s, '작은 몸통', [edge, f.Y(shape.mid)], { dirs: ['E'], gap: 6, steps: [1, 1.5] });
+    place(row.s, wickSide === 'lower' ? '긴 아래꼬리' : '긴 위꼬리', [row.dayX[0], f.Y(wickMid)], { dirs: ['E'], gap: 10, steps: [1, 1.4] });
+    return row.s;
+  }
+  function crossesMiddle(kind) {
+    const spec = models.candles[kind], row = candleRow(kind, spec), f = row.f, mid = math.candleShape(spec.days[0]).mid;
+    addLine(row.s, 'dash', [[row.dayX[0] + row.w / 2, f.Y(mid)], [row.dayX[1] + row.w / 2 + 6, f.Y(mid)]]);
+    dayNames(row, ['1일차', '2일차']);
+    return row.s;
+  }
+  const threeDays = kind => {
+    const row = candleRow(kind, models.candles[kind]);
+    dayNames(row, ['1일차', '2일차', '3일차']);
+    return row.s;
+  };
+  const TREND_UP = '상승추세를 이루는 작은 캔들', TREND_DOWN = '하락추세를 이루는 작은 캔들';
+  define('hammer', `${TREND_DOWN} 네 개 뒤에 몸통이 위쪽에 작고 아래꼬리가 몸통보다 훨씬 길며 위꼬리는 거의 없는 캔들 한 개가 나타난다.`,
+    '하락 뒤에 작은 몸통과 긴 아래꼬리가 나타나면 망치형이다. 상승반전 후보 신호로 본다.', s0 => longWick(s0.kind, 'lower'));
+  define('hanging-man', `${TREND_UP} 네 개 뒤에 몸통이 위쪽에 작고 아래꼬리가 몸통보다 훨씬 긴 캔들 한 개가 나타난다.`,
+    '교수형은 모양이 망치형과 같지만 상승 뒤에 나타난다. 하락반전을 경계한다.', s0 => longWick(s0.kind, 'lower'));
+  define('shooting-star', `${TREND_UP} 네 개 뒤에 몸통이 아래쪽에 작고 윗꼬리가 몸통보다 훨씬 긴 캔들 한 개가 나타난다.`,
+    '상승 뒤에 작은 몸통과 긴 윗꼬리가 나타나면 유성형이다. 상승세 약화를 뜻한다.', s0 => longWick(s0.kind, 'upper'));
+  define('piercing', `${TREND_DOWN} 세 개 뒤에 긴 음봉이 나오고, 다음 날 더 낮게 출발한 양봉이 점선으로 표시한 음봉 몸통의 중간보다 위에서 끝난다.`,
+    '둘째 날 양봉이 첫날 음봉 몸통의 중간(점선)보다 위에서 마감하면 관통형이다.', s0 => crossesMiddle(s0.kind));
+  define('dark-cloud', `${TREND_UP} 세 개 뒤에 긴 양봉이 나오고, 다음 날 더 높게 출발한 음봉이 점선으로 표시한 양봉 몸통의 중간보다 아래에서 끝난다.`,
+    '둘째 날 음봉이 첫날 양봉 몸통의 중간(점선)보다 아래에서 마감하면 먹구름형이다.', s0 => crossesMiddle(s0.kind));
+  define('morning-star', `${TREND_DOWN} 세 개 뒤에 긴 음봉, 작은 몸통, 긴 양봉이 차례로 나오고 셋째 날 양봉이 첫날 음봉 몸통 안에서 끝난다.`,
+    '샛별형은 긴 음봉, 작은 몸통, 긴 양봉 순서로 나타난다. 셋째 날 첫날 음봉 몸통 안으로 되돌아오면 상승반전을 살핀다.', s0 => threeDays(s0.kind));
+  define('evening-star', `${TREND_UP} 세 개 뒤에 긴 양봉, 작은 몸통, 긴 음봉이 차례로 나오고 셋째 날 음봉이 첫날 양봉 몸통 안에서 끝난다.`,
+    '석별형은 긴 양봉, 작은 몸통, 긴 음봉 순서로 나타난다. 샛별형의 반대 모양으로 하락반전을 살핀다.', s0 => threeDays(s0.kind));
+  define('gap', `${TREND_UP} 세 개와 양봉 뒤에 전날 고가보다 훨씬 높은 가격에서 출발한 양봉이 나타나 두 캔들 사이에 거래가 없는 빈 구간이 생긴다.`,
+    '진행 중인 상승 추세에서 전날 고가와 다음 날 저가 사이가 비면 급진형 갭이다. 추세의 지속과 가속을 뜻한다.', s0 => {
+      const spec = models.candles.gap, row = candleRow(s0.kind, spec, 62), f = row.f, s = row.s;
+      const [yTop, yBottom] = [f.Y(spec.days[1].l), f.Y(spec.days[0].h)];
+      addArea(s, [[row.dayX[0], yTop], [row.dayX[1], yTop], [row.dayX[1], yBottom], [row.dayX[0], yBottom]]);
+      place(s, '빈 구간', [row.dayX[1] + row.w / 2, (yTop + yBottom) / 2], { dirs: ['E'], gap: 6, steps: [1, 1.5] });
+      dayNames(row, ['전날', '다음 날']);
+      return s;
+    });
+  define('candle', '왼쪽의 빈 몸통 캔들은 종가가 시가보다 높은 양봉이고 오른쪽의 채운 몸통 캔들은 종가가 시가보다 낮은 음봉이며, 꼬리는 고가와 저가까지 이어진다.',
+    '몸통은 시가와 종가 사이, 꼬리는 고가와 저가까지다. 종가가 시가보다 높으면 양봉, 낮으면 음봉이다.', s0 => {
+      const m = models.candles.candle, s = newScene(s0.kind), f = frame({ ...CANDLE_BOX, dy: [0, 100] }), w = 34;
+      s.frame = f;
+      s.candles = [];
+      const sides = [['rise', 96, -1, ['종가', '시가']], ['fall', 204, 1, ['시가', '종가']]];
+      for (const [name, x, side, [top, bottom]] of sides) {
+        const c = m[name], shape = math.candleShape(c), edge = x + side * w / 2, dirs = [side < 0 ? 'W' : 'E'];
+        drawCandle(s, f, c, x, w, false);
+        place(s, '고가', [x, f.Y(c.h)], { dirs, gap: 8, steps: [1, 1.4] });
+        place(s, top, [edge, f.Y(shape.hi)], { dirs, gap: 6, steps: [1, 1.4] });
+        place(s, bottom, [edge, f.Y(shape.lo)], { dirs, gap: 6, steps: [1, 1.4] });
+        place(s, '저가', [x, f.Y(c.l)], { dirs, gap: 8, steps: [1, 1.4] });
+        addText(s, name === 'rise' ? '양봉' : '음봉', x, 166, 'middle', 'note');
+      }
+      addText(s, LEGEND, W / 2, 184, 'middle', 'name');
+      return s;
+    });
+
+  define('flag', '시간을 가로축, 가격을 세로축으로 한 평면에서 가격이 가파르게 오르는 깃대 뒤에 아래로 기운 평행한 두 점선 사이에서 짧게 쉬다가 위쪽 점선을 뚫고 다시 오른다.',
+    '가파른 상승이 깃대이고, 아래로 기운 두 점선 사이의 짧은 조정이 깃발이다. 조정이 끝나면 다시 오른다.', s0 => {
+      const s = patternScene(s0.kind), f = s.frame, m = models.shapes.flag, g = models.flagGeometry();
+      addCurve(s, f, 'dash', [[m.from, g.upper(m.from)], [m.to, g.upper(m.to)]]);
+      addCurve(s, f, 'dash', [[m.from, g.lower(m.from)], [m.to, g.lower(m.to)]]);
+      priceLine(s, f, g.path);
+      const mid = [(m.pole[0][0] + m.pole[1][0]) / 2, (m.pole[0][1] + m.pole[1][1]) / 2], flagU = (m.from + m.to) / 2;
+      place(s, '깃대', [f.X(mid[0]), f.Y(mid[1])], { dirs: ['NW', 'W', 'N'], gap: 7 });
+      place(s, '깃발', [f.X(flagU), f.Y(g.upper(flagU))], { dirs: ['N', 'NE', 'NW'], gap: 7 });
+      return s;
+    });
+  define('wedge', '시간을 가로축, 가격을 세로축으로 한 평면 두 개에서 왼쪽은 아래로 기울며 좁아지는 두 선 사이의 가격이 위로 벗어나고, 오른쪽은 위로 기울며 좁아지는 두 선 사이의 가격이 아래로 벗어난다.',
+    '두 추세선이 같은 방향으로 기울면서 좁아진다. 이름은 선의 기울기를 따르고, 신호는 추세선을 뚫을 때 확인한다.', s0 => {
+      const spec = ['하락쐐기형', '상승쐐기형'].map(title => ({ title, xName: '시간', yName: '가격' }));
+      const s = panels(s0.kind, spec);
+      s.frames.forEach((f, i) => {
+        const w = models.wedgePath(i === 1);
+        addCurve(s, f, 'dash', w.lines.upper);
+        addCurve(s, f, 'dash', w.lines.lower);
+        priceLine(s, f, w.path);
+      });
+      return s;
+    });
+  define('rectangle', '시간을 가로축, 가격을 세로축으로 한 평면에서 가격이 위쪽 수평 점선과 아래쪽 수평 점선 사이를 오르내려 산 두 개와 골 두 개를 만든 뒤 위쪽 선을 뚫고 오른다.',
+    '위쪽 저항선과 아래쪽 지지선 사이를 오르내린다. 산 두 개와 골 두 개가 있어야 직사각형으로 본다.', s0 => {
+      const s = patternScene(s0.kind), f = s.frame, m = models.shapes.rectangle;
+      addCurve(s, f, 'dash', [[0, m.top], [1, m.top]]);
+      addCurve(s, f, 'dash', [[0, m.bottom], [1, m.bottom]]);
+      priceLine(s, f, m.points);
+      for (const [u, v] of m.points) {
+        const peak = Math.abs(v - m.top) < 1e-9, valley = Math.abs(v - m.bottom) < 1e-9;
+        if (!peak && !valley) continue;
+        addDot(s, f.X(u), f.Y(v));
+        place(s, peak ? '산' : '골', [f.X(u), f.Y(v)], { dirs: peak ? ['N'] : ['S'], gap: 7 });
+      }
+      place(s, '저항선', [f.X(0.3), f.Y(m.top)], { dirs: ['N'], gap: 6 });
+      place(s, '지지선', [f.X(0.52), f.Y(m.bottom)], { dirs: ['S'], gap: 6 });
+      return s;
+    });
+  const rounding = (s0, curve, names, arms) => {
+    const s = patternScene(s0.kind), f = s.frame, m = models.shapes.rounding, at = u => [f.X(u), f.Y(curve(u, m))];
+    addCurve(s, f, 'main', sample(u => curve(u, m), 0, 1, 64));
+    const extreme = at(0.5);
+    addDot(s, extreme[0], extreme[1]);
+    place(s, names[1], extreme, { dirs: arms.extreme, gap: 7 });
+    place(s, names[0], at(0.14), { dirs: arms.left, gap: 8 });
+    place(s, names[2], at(0.86), { dirs: arms.right, gap: 8 });
+    return s;
+  };
+  define('rounding-bottom', '시간을 가로축, 가격을 세로축으로 한 평면에서 가격이 완만한 U자 곡선을 그리며 서서히 내려가 바닥을 만든 뒤 서서히 올라간다.',
+    '급한 V자가 아니라 U자처럼 서서히 하락이 약해지고 상승으로 바뀐다.', s0 => rounding(s0, math.roundBottom, ['하락', '바닥', '상승'], { left: ['E', 'NE'], right: ['W', 'NW'], extreme: ['S', 'SE', 'SW'] }));
+  define('rounding-top', '시간을 가로축, 가격을 세로축으로 한 평면에서 가격이 완만한 역U자 곡선을 그리며 서서히 올라가 꼭대기를 만든 뒤 서서히 내려간다.',
+    '상승이 서서히 둔화되며 역U자를 그리고 하락 추세로 바뀐다.', s0 => rounding(s0, math.roundTop, ['상승', '꼭대기', '하락'], { left: ['E', 'SE'], right: ['W', 'SW'], extreme: ['N', 'NE', 'NW'] }));
+  define('elliott', '시간을 가로축, 가격을 세로축으로 한 평면에서 가격이 1부터 5까지 번호가 붙은 다섯 개 상승 파동으로 오른 뒤 A, B, C 세 파동으로 내려간다.',
+    '1, 3, 5번이 추진파이고 2, 4번이 조정파다. 5파가 끝나면 A, B, C 조정이 이어진다.', s0 => {
+      const s = patternScene(s0.kind), f = s.frame, m = models.shapes.elliott;
+      priceLine(s, f, m.points);
+      m.points.slice(1).forEach(([u, v], i) => {
+        const p = [f.X(u), f.Y(v)], peak = v > m.points[i][1];
+        addDot(s, p[0], p[1]);
+        place(s, m.names[i], p, { dirs: peak ? ['N', 'NE', 'NW'] : ['S', 'SE', 'SW'], gap: 8 });
+      });
+      return s;
+    });
+
   const pathOf = (pts, close) => pts.map((p, i) => (i ? 'L' : 'M') + fmt(p[0]) + ' ' + fmt(p[1])).join('') + (close ? 'Z' : '');
   function markup(s, def) {
     const body = s.items.map(it => {
@@ -852,7 +1048,7 @@
       if (it.k === 'line') return `<path class="${it.cls}" d="${pathOf(it.pts)}"/>`;
       if (it.k === 'dot') return `<circle class="v2-fig-dot" cx="${fmt(it.x)}" cy="${fmt(it.y)}" r="${it.r}"/>`;
       if (it.k === 'head') return `<path class="v2-fig-dot" d="${pathOf(it.pts, true)}"/>`;
-      return `<rect class="v2-fig-bar" x="${fmt(it.x)}" y="${fmt(it.y)}" width="${fmt(it.w)}" height="${fmt(it.h)}" rx="2"/>`;
+      return `<rect class="${it.cls || 'v2-fig-bar'}" x="${fmt(it.x)}" y="${fmt(it.y)}" width="${fmt(it.w)}" height="${fmt(it.h)}" rx="${it.rx ?? 2}"/>`;
     }).join('');
     const texts = s.texts.map(t => `<text class="v2-fig-${t.cls}" x="${fmt(t.x)}" y="${fmt(t.y)}"${t.anchor === 'start' ? '' : ` text-anchor="${t.anchor}"`}>${esc(t.text)}</text>`).join('');
     return `<figure class="v2-figure" data-figure="${def.kind}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(def.label)}">${body}${texts}</svg><figcaption>${esc(def.caption)}</figcaption></figure>`;
@@ -918,6 +1114,21 @@
   ['glossary-c9bfba0e709ddb16ccc8', '지지선', 'support'],
   ['glossary-8ed5426dcc1a1bea58be', '저항선', 'resistance'],
   ['glossary-04f7cdf4dd367d149fb5', '추세선', 'trendline'],
+  ['glossary-3bf1d4e0ddf43a3b12bb', '망치형', 'hammer'],
+  ['glossary-67a7f749ff8080bc339d', '교수형', 'hanging-man'],
+  ['glossary-37853b80f9482bca9344', '유성형', 'shooting-star'],
+  ['glossary-32eef7714b866077be25', '관통형', 'piercing'],
+  ['glossary-431f9262bd612cd01e76', '먹구름형', 'dark-cloud'],
+  ['glossary-5c42595d468bb4828527', '샛별형', 'morning-star'],
+  ['glossary-72e59182091bc5e08ff7', '석별형', 'evening-star'],
+  ['glossary-e30efd4419133d758ea9', '캔들', 'candle'],
+  ['glossary-b4326cfb6f53635d7e3f', '급진형 갭', 'gap'],
+  ['glossary-6f0b5805bf81dc4f5e2a', '깃발형', 'flag'],
+  ['glossary-6030fbe22c26cc1b9c13', '쐐기형', 'wedge'],
+  ['glossary-be8424292e5696b7eae0', '직사각형 패턴', 'rectangle'],
+  ['glossary-3de5e8204852e78b7dca', '원형바닥형', 'rounding-bottom'],
+  ['glossary-6224853ae9f36eed5b06', '원형천정형', 'rounding-top'],
+  ['glossary-28c4816ec2b60afe24f2', '엘리어트 파동이론', 'elliott'],
   ['glossary-46606bd7fdca7db61420', '골든크로스', 'golden-cross'],
   ['glossary-cbee9f87dd1add3b01b8', '데드크로스', 'dead-cross'],
   ['c69', '재화시장 균형곡선–화폐시장 균형곡선, 구축효과, 피구, 리카르도 구분', 'is-lm'],

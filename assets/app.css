@@ -208,7 +208,7 @@ body{margin:0;background:var(--color-bg);color:var(--color-ink);font-family:var(
 .v2-longtext th,.v2-longtext td{min-width:5.5em;padding:var(--space-2) var(--space-3);overflow-wrap:normal;border:0;box-shadow:inset 0 -1px 0 var(--color-line);text-align:left;vertical-align:top}
 .v2-longtext th{color:var(--color-ink-3);font-size:var(--text-caption);font-weight:var(--weight-bold)}
 .v2-longtext img{max-width:100%}
-.v2-longtext .formula-block,.v2-longtext .formula-display,.v2-graph-copy .formula-block,.v2-graph-copy .formula-display{max-width:100%;margin:1em 0;padding:var(--space-4) var(--space-5);border-radius:var(--radius-m);background:var(--color-sunken);color:var(--color-ink);font-weight:var(--weight-bold);font-variant-numeric:tabular-nums;line-height:1.75;white-space:pre;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.v2-longtext .formula-block,.v2-longtext .formula-display,.v2-graph-copy .formula-block,.v2-graph-copy .formula-display{max-width:100%;margin:1em 0;padding:var(--space-4) var(--space-5);border-radius:var(--radius-m);background:var(--color-sunken);color:var(--color-ink);font-weight:var(--weight-bold);font-variant-numeric:tabular-nums;line-height:1.75;white-space:pre-wrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .v2-labgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-3);margin-top:var(--space-5)}
 .v2-labgrid section{padding:var(--space-4) var(--space-5);border-radius:var(--radius-m);background:var(--color-sunken)}
 .v2-labgrid h3{margin:0}
@@ -255,6 +255,12 @@ body{margin:0;background:var(--color-bg);color:var(--color-ink);font-family:var(
 .v2-fig-note,.v2-fig-title{fill:var(--color-ink);font-size:12px;font-weight:var(--weight-bold)}
 .v2-fig-small{fill:var(--color-ink);font-size:10.5px;font-weight:var(--weight-bold)}
 .v2-fig-name{fill:var(--color-ink-3);font-size:11px;font-weight:var(--weight-regular)}
+.v2-fig-wick{fill:none;stroke:var(--color-ink);stroke-width:2;stroke-linecap:butt}
+.v2-fig-body{stroke:var(--color-ink);stroke-width:2}
+.v2-fig-rise{fill:none}
+.v2-fig-fall{fill:var(--color-ink)}
+.v2-fig-wick.v2-fig-muted,.v2-fig-body.v2-fig-muted{stroke:var(--color-ink-3)}
+.v2-fig-body.v2-fig-fall.v2-fig-muted{fill:var(--color-ink-3)}
 .v2-filterbar{display:flex;gap:var(--space-3);flex-wrap:wrap;margin:var(--space-3) 0}
 .v2-filterbar label{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;max-width:100%;gap:var(--space-1);color:var(--color-ink-3);font-size:var(--text-caption);line-height:var(--leading-caption);font-weight:var(--weight-bold)}
 .v2-filterbar select{min-height:40px;max-width:100%;padding:0 var(--space-3);text-overflow:ellipsis;border:0;border-radius:var(--radius-pill);background:var(--color-surface);color:var(--color-ink);font-size:max(16px,var(--text-label))}
@@ -552,6 +558,8 @@ html{scrollbar-gutter:stable}
 .dict-reading-details[open]>summary::after{margin-top:3px;transform:rotate(-135deg)}
 .dict-reading-details>:not(summary){color:var(--color-ink-2);font-size:var(--text-label);line-height:1.65}
 .dict-reading-details .v2-longtext{margin:var(--space-2) 0 var(--space-3);padding:0;background:none;line-height:1.65}
+.dict-reading-details .v2-longtext table{width:100%}
+.dict-reading-details .v2-longtext th,.dict-reading-details .v2-longtext td{min-width:0;padding-inline:var(--space-2);word-break:keep-all}
 .v2-dict-links{display:flex;flex-wrap:wrap;gap:var(--space-2);margin:var(--space-3) 0 var(--space-2)}
 .v2-dict-links a{display:inline-flex;align-items:center;min-height:40px;max-width:100%;padding:var(--space-2) var(--space-4);border-radius:var(--radius-pill);background:var(--color-sunken);color:var(--color-ink);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-medium);text-decoration:none}
 .v2-dict-map{display:block;width:fit-content;margin:var(--space-3) calc(-1*var(--space-3)) calc(-1*var(--space-2)) auto;padding:var(--space-2) var(--space-3);color:var(--color-ink-2);font-size:var(--text-label);line-height:var(--leading-label);font-weight:var(--weight-bold);text-decoration:none}
