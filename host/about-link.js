@@ -20,7 +20,7 @@
   }
   function sync(app) {
     var link = app.querySelector(':scope > .' + CLASS);
-    if (wanted()) {
+    if (wanted() && !app.querySelector(':scope > [data-host]')) {
       if (link && link === app.lastElementChild) return;
       if (!link) {
         link = document.createElement('p');

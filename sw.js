@@ -1,6 +1,6 @@
 'use strict';
 
-const BUILD = 'fb2b05775564';
+const BUILD = '24d94c285d68';
 const PRECACHE = [
   "./",
   "./about.html",
@@ -16,7 +16,7 @@ const PRECACHE = [
   "./host/welcome.js?v=e4997e8f9fc8",
   "./host/install-guide.js?v=f905c0abe912",
   "./host/pwa.js?v=4d48abeacefe",
-  "./host/about-link.js?v=fda2a9c4b6e1",
+  "./host/about-link.js?v=a8ae0ca72a1e",
   "./host/install.js?v=a8af3b19c8ea",
   "./vendor/pwa-install/pwa-install.bundle.js?v=89518cf364a9",
   "./assets/labs.js?v=9b1c421bc4c8",
