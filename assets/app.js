@@ -1147,12 +1147,31 @@ function lessonUnitIds(lesson){
  const stages = data.course.learningPath?.stages || [];
  return stages.slice(lesson.stageStart, lesson.stageEnd).flatMap(stage=>stage.unitIds);
 }
+function choiceOrderIds(){
+ const ids = data.course.choiceOrder;
+ return Array.isArray(ids) && ids.length ? ids : null;
+}
 function orderedChoiceQuestions(){
  const unitOrder = lessonGroups.flatMap(lessonUnitIds);
  const rank = new Map(unitOrder.map((id,index)=>[id,index]));
- const ordered = choices().slice().sort((a,b)=>(rank.get(a.unitId)??Infinity)-(rank.get(b.unitId)??Infinity));
+ const byPath = list=>list.slice().sort((a,b)=>(rank.get(a.unitId)??Infinity)-(rank.get(b.unitId)??Infinity));
+ const listed = choiceOrderIds();
+ if(listed){
+  const byId = new Map(choices().map(q=>[q.id,q])), shown = new Set(), head = [];
+  for(const id of listed){
+   const q = byId.get(id);
+   if(q && !shown.has(id)){shown.add(id);head.push(q)}
+  }
+  return head.concat(byPath(choices().filter(q=>!shown.has(q.id))));
+ }
+ const ordered = byPath(choices());
  const preferred = epChoices(firstEpisode() || {})[0];
  return preferred ? [preferred,...ordered.filter(q=>q.id!==preferred.id)] : ordered;
+}
+function unitsInQuestionOrder(lessonUnits, questions){
+ const unitIds = new Set(lessonUnits), seen = [];
+ for(const q of questions)if(unitIds.has(q.unitId) && !seen.includes(q.unitId))seen.push(q.unitId);
+ return seen.concat(lessonUnits.filter(id=>!seen.includes(id)));
 }
 const bankState = {lesson:0, mode:'mcq', unit:'', limit:12, filtersOpen:false};
 function renderQuestionBank(){
@@ -1161,6 +1180,7 @@ function renderQuestionBank(){
  const lessonUnits = lessonUnitIds(lesson);
  const unitIds = new Set(lessonUnits);
  const questions = state.mode==='mcq' ? orderedChoiceQuestions() : allOxQuestions();
+ const unitOptions = state.mode==='mcq' && choiceOrderIds() ? unitsInQuestionOrder(lessonUnits, questions) : lessonUnits;
  const rows = questions.filter(q=>unitIds.has(q.unitId) && (!state.unit || q.unitId===state.unit));
  $('#app').innerHTML = `<section class="lesson-bank">
   <h1>문제 풀기</h1>
@@ -1170,7 +1190,7 @@ function renderQuestionBank(){
    <summary>필터${state.mode!=='mcq'||state.unit?' 적용 중':''}</summary>
    <div class="v2-filterbar">
     <label>유형 <select id="qMode"><option value="mcq" ${state.mode==='mcq'?'selected':''}>4지선다</option><option value="ox" ${state.mode==='ox'?'selected':''}>OX</option></select></label>
-    <label>단원 <select id="qUnit"><option value="">전체</option>${lessonUnits.map(id=>`<option value="${esc(id)}" ${state.unit===id?'selected':''}>${esc(unitFor(id)?.title||id)}</option>`).join('')}</select></label>
+    <label>단원 <select id="qUnit"><option value="">전체</option>${unitOptions.map(id=>`<option value="${esc(id)}" ${state.unit===id?'selected':''}>${esc(unitFor(id)?.title||id)}</option>`).join('')}</select></label>
    </div>
   </details>
   <ul class="lesson-list">${rows.slice(0,state.limit).map((q,index)=>`<li><button type="button" data-qid="${esc(q.id)}"><span class="lesson-number">${index+1}</span><span>${esc(promptHeading(q))}</span><span class="lesson-chevron" aria-hidden="true">›</span></button></li>`).join('')}</ul>
@@ -1400,5 +1420,5 @@ window.addEventListener('hashchange',event=>{
  jumpTo(enterEntry(offset));
  if(focusPager)$('.v2-graph-pages')?.focus({preventScroll:true});
  saveNavMemo();
-});if(globalThis.__TEXTBOOK_TEST__)globalThis.__textbookTest={getState:()=>JSON.parse(JSON.stringify(record)),getData:()=>data,getAtlasCatalog,queueSave,getAllOx:()=>allOxQuestions(),getFirstEpisode:()=>firstEpisode(),getEpisodeChoices:id=>epChoices(allEpisodes().find(e=>e.id===id)||{}),practiceConceptHref,getTerm,dictionaryMarkup:(q,id)=>dictionaryMarkup(q,id),searchTerms:q=>allTerms().filter(x=>matchesDictionaryTerm(x,q.toLowerCase()))};bindConceptPeek();bindChoiceSwipe();start();
+});if(globalThis.__TEXTBOOK_TEST__)globalThis.__textbookTest={getState:()=>JSON.parse(JSON.stringify(record)),getData:()=>data,getAtlasCatalog,queueSave,getAllOx:()=>allOxQuestions(),getOrderedChoices:()=>orderedChoiceQuestions(),getFirstEpisode:()=>firstEpisode(),getEpisodeChoices:id=>epChoices(allEpisodes().find(e=>e.id===id)||{}),practiceConceptHref,getTerm,dictionaryMarkup:(q,id)=>dictionaryMarkup(q,id),searchTerms:q=>allTerms().filter(x=>matchesDictionaryTerm(x,q.toLowerCase()))};bindConceptPeek();bindChoiceSwipe();start();
 })();

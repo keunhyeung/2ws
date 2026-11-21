@@ -1,6 +1,6 @@
 'use strict';
 
-const BUILD = 'f33b7766b420';
+const BUILD = '883ece8e2bb5';
 const PRECACHE = [
   "./",
   "./about.html",
@@ -30,7 +30,7 @@ const PRECACHE = [
   "./assets/atlas-layout.js?v=3321b36c4459",
   "./assets/concept-atlas.js?v=b11351f279d3",
   "./assets/term-figures.js?v=416a4d07945e",
-  "./assets/app.js?v=af68fa3b0286",
+  "./assets/app.js?v=baaa146f1fec",
   "./assets/fonts/OFL.txt",
   "./assets/fonts/PretendardVariable.woff2",
   "./manifest.webmanifest",
