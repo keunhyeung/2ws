@@ -2291,7 +2291,27 @@
     }
 
     const scan = (source, options) => { const report = []; markup(source, options, report); return report; };
-    return { markup, scan };
+
+    const STEP_BOUNDARY = /([가-힣][.!?]+)(\s+)/g;
+    const STEP_RELATION = /[=≈≠≤≥<>]/;
+    const STEP_OPERATOR = /[+\u2212\-×÷\u00b2\u00b3\u221a^/<>]/;
+    const STEP_ARITHMETIC = /[\d+\u2212\-×÷\u00b2\u00b3\u221a^/<>()]/;
+    const STEP_SENTENCE = /(?:다|요)[.!?]*$|[.!?]$/;
+    const STEP_CONNECTIVE = /^(?:따라서|그러므로|그래서|즉|이때|여기서|그러면|하지만|그런데|그러나)(?:\s|$)/;
+    function split(line) {
+      const whole = { text: line, calc: '' };
+      if (typeof line !== 'string') return whole;
+      let cut = null;
+      for (const m of line.matchAll(STEP_BOUNDARY)) cut = { head: m.index + m[1].length, tail: m.index + m[0].length };
+      if (!cut) return whole;
+      const text = line.slice(0, cut.head), calc = line.slice(cut.tail).trim();
+      if (!text.trim() || !calc) return whole;
+      if (!STEP_RELATION.test(calc) || !STEP_OPERATOR.test(calc)) return whole;
+      if (STEP_SENTENCE.test(calc) || STEP_CONNECTIVE.test(calc)) return whole;
+      if (/^[가-힣]/.test(calc) && STEP_ARITHMETIC.test(calc.slice(0, calc.search(STEP_RELATION)))) return whole;
+      return { text, calc };
+    }
+    return { markup, scan, split };
   })();
 
   return { forTerm, render, scene, collisions, registry, kinds, math, models, textWidth, fractions, captions: Object.fromEntries(kinds.map(k => [k, FIG[k].caption])), labels: Object.fromEntries(kinds.map(k => [k, FIG[k].label])) };

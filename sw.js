@@ -1,13 +1,13 @@
 'use strict';
 
-const BUILD = '24f1d2d9b8cd';
+const BUILD = 'c07ed203c8d2';
 const PRECACHE = [
   "./",
   "./about.html",
   "./data/concepts.json",
   "./data/course.json",
   "./data/registry.json",
-  "./assets/app.css?v=c760f175c735",
+  "./assets/app.css?v=493bde9b8ee6",
   "./host/host.css?v=4fa2018c4d85",
   "./host/progress-store.js?v=7854702d7a5d",
   "./host/backup.js?v=912d7a4b9199",
@@ -21,7 +21,7 @@ const PRECACHE = [
   "./vendor/pwa-install/pwa-install.bundle.js?v=89518cf364a9",
   "./assets/labs.js?v=9b1c421bc4c8",
   "./assets/term-guide.js?v=437ef37535de",
-  "./assets/easy-reasons.js?v=9fafd3324774",
+  "./assets/easy-reasons.js?v=683c9f646b19",
   "./assets/basic-terms.js?v=c6e064d4da49",
   "./assets/basic-hints.js?v=085bcf7c5a63",
   "./assets/quiz-references.js?v=65f07dfeb45a",
@@ -29,8 +29,8 @@ const PRECACHE = [
   "./assets/atomic-atlas.js?v=5688493e4ae2",
   "./assets/atlas-layout.js?v=3321b36c4459",
   "./assets/concept-atlas.js?v=b11351f279d3",
-  "./assets/term-figures.js?v=6d627371e183",
-  "./assets/app.js?v=6db35f8b476b",
+  "./assets/term-figures.js?v=fbd25986f77a",
+  "./assets/app.js?v=5be38559c6ef",
   "./assets/fonts/OFL.txt",
   "./assets/fonts/PretendardVariable.woff2",
   "./manifest.webmanifest",

@@ -40,6 +40,16 @@ window.addEventListener('resize',()=>{for(const el of heldHeights.splice(0))if(e
 function explanationMarkup(html,text){
  return fraction(html?richTermsMarkup(html,{normalize:true}):`<p>${readerTermsMarkup(text||'',true)}</p>`);
 }
+function reasonMarkup(reason){
+ if(!String(reason).includes('\n'))return explanationMarkup('',reason);
+ const lines=String(reason).split('\n').map(line=>line.trim()).filter(Boolean);
+ if(lines.length<2)return explanationMarkup('',lines[0]??'');
+ const split=globalThis.TermFigures?.fractions?.split;
+ return `<div class="v2-steps">${lines.map(line=>{
+  const {text,calc}=split?split(line):{text:line,calc:''};
+  return `<div class="v2-step${/^따라서\s/.test(line)?' is-answer':''}"><p>${fraction(readerTermsMarkup(text.replace(/ ([=≈≠≤≥<>]) (?=\S)/g,' $1\u00a0'),true))}</p>${calc?`<p class="v2-step-calc">${fraction(basicTermsMarkup(calc.replace(/([=≈≠≤≥<>]) (?=\S)/g,'$1\u00a0').replace(/([만억조천]) (?=원)/g,'$1\u00a0'),esc),{mode:'calc',rows:true})}</p>`:''}</div>`;
+ }).join('')}</div>`;
+}
 function quizEasyReasons(q){
  return window.QuizEasyReasons?.[q.id];
 }
@@ -51,7 +61,7 @@ function optionExplanation(q,option){
 }
 function solutionMarkup(q){
  const easy=quizEasyReasons(q)?.reason;
- if(easy)return explanationMarkup('',easy);
+ if(easy)return reasonMarkup(easy);
  return q.options?optionExplanation(q,q.options.find(o=>o.id===q.correctOptionId)):explanationMarkup(q.explanationHtml,q.explanation);
 }
 function markMarkup(ok,fresh){return `<span class="v2-mark ${ok?'is-ok':'is-no'}${fresh?' is-fresh':''}" aria-hidden="true"></span>`}
@@ -64,7 +74,7 @@ function choiceFeedbackMarkup(q,answer,actions,fresh){
  });
  return `<div class="v2-explain ${answer===q.correctOptionId?'correct':'incorrect'}">
   <h3>${markMarkup(answer===q.correctOptionId,fresh)}<span>${answer===q.correctOptionId?'맞았어요':'정답은 '+optionLabel(q.correctOptionId)+'번이에요'}</span></h3>
-  ${reason&&!repeatsOption?`<div class="v2-explanation-copy">${explanationMarkup('',reason)}</div>`:''}
+  ${reason&&!repeatsOption?`<div class="v2-explanation-copy">${reasonMarkup(reason)}</div>`:''}
   ${actions}
  </div>`;
 }
