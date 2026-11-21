@@ -1,19 +1,19 @@
 'use strict';
 
-const BUILD = '48399fb845af';
+const BUILD = 'ce7c6c0c6ae6';
 const PRECACHE = [
   "./",
   "./about.html",
   "./data/concepts.json",
   "./data/course.json",
   "./data/registry.json",
-  "./assets/app.css?v=e9403c41cb4e",
+  "./assets/app.css?v=9be797b7f737",
   "./host/host.css?v=4fa2018c4d85",
   "./host/progress-store.js?v=7854702d7a5d",
   "./host/backup.js?v=912d7a4b9199",
   "./host/boot.js?v=41df814bff09",
   "./host/consent.js?v=24e8f944a9cf",
-  "./host/welcome.js?v=9dc9369509b1",
+  "./host/welcome.js?v=e4997e8f9fc8",
   "./host/install-guide.js?v=f905c0abe912",
   "./host/pwa.js?v=4d48abeacefe",
   "./host/about-link.js?v=fda2a9c4b6e1",
