@@ -209,6 +209,13 @@ body{margin:0;background:var(--color-bg);color:var(--color-ink);font-family:var(
 .v2-longtext th{color:var(--color-ink-3);font-size:var(--text-caption);font-weight:var(--weight-bold)}
 .v2-longtext img{max-width:100%}
 .v2-longtext .formula-block,.v2-longtext .formula-display,.v2-graph-copy .formula-block,.v2-graph-copy .formula-display{max-width:100%;margin:1em 0;padding:var(--space-4) var(--space-5);border-radius:var(--radius-m);background:var(--color-sunken);color:var(--color-ink);font-weight:var(--weight-bold);font-variant-numeric:tabular-nums;line-height:1.75;white-space:pre-wrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.v2-frac{position:relative;display:inline-grid;grid-template-rows:1fr 1fr;vertical-align:middle;max-width:100%;margin:.15em .12em;text-align:center;white-space:normal;overflow-wrap:anywhere;line-height:1.35;font-variant-numeric:tabular-nums}
+.v2-frac-n,.v2-frac-d{display:block;min-width:0;padding:.1em .3em}
+.v2-frac-n{align-self:end}
+.v2-frac-d{align-self:start;border-top:max(1px,.08em) solid currentColor}
+.v2-frac-row{display:inline-flex;align-items:center;gap:.4em;width:100%;vertical-align:middle}
+.v2-frac-row>.v2-frac{flex:0 1 auto;min-width:5em;margin:0}
+.v2-frac-t{flex:none;white-space:nowrap}
 .v2-labgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-3);margin-top:var(--space-5)}
 .v2-labgrid section{padding:var(--space-4) var(--space-5);border-radius:var(--radius-m);background:var(--color-sunken)}
 .v2-labgrid h3{margin:0}

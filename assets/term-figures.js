@@ -1724,5 +1724,575 @@
     return { kind: row.kind, kinds: row.kinds, markup: row.kinds.map(kind => render(kind, row.note)).join('') };
   }
 
-  return { forTerm, render, scene, collisions, registry, kinds, math, models, textWidth, captions: Object.fromEntries(kinds.map(k => [k, FIG[k].caption])), labels: Object.fromEntries(kinds.map(k => [k, FIG[k].label])) };
+  const fractions = (() => {
+    const TAG = '\ue000', DEAD = '\ue001';
+    const MARKUP = /(<!--[\s\S]*?-->|<\/?[a-z](?:[^<>"']|"[^"]*"|'[^']*')*>)/gi;
+    const BREAKING = new Set(['p', 'li', 'ul', 'ol', 'dl', 'dt', 'dd', 'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th',
+      'caption', 'blockquote', 'div', 'section', 'article', 'aside', 'header', 'footer', 'figure', 'figcaption', 'details',
+      'summary', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'br', 'hr', 'pre', 'code', 'kbd', 'samp']);
+    const SHIELDED = new Set(['a', 'button', 'svg', 'script', 'style', 'textarea', 'select', 'math', 'title']);
+    const VOID = new Set(['br', 'hr', 'img', 'wbr', 'input', 'meta', 'link', 'area', 'base', 'col', 'embed', 'source', 'track']);
+    const INTERACTIVE = /<(?:a|button|input|select|textarea)\b/i;
+    const MAX_OPERAND = 40;
+    const ROW_RUN = 10, ROW_TOTAL = 10;
+
+    const EXPONENT = '[\\u2070\\u00b9\\u00b2\\u00b3\\u2074-\\u2079\\u207a-\\u207f\\u1d57]';
+    const EXP_ONLY = new RegExp('^(?:' + EXPONENT + '+|\\^[^\\s()]+)$');
+    const NUMBER = '[+\\u2212-]?\\d[\\d,]*(?:\\.\\d+)?(?:' + EXPONENT + '+|\\^[A-Za-z0-9]+)?';
+    const UNITS = '(?:%포인트|퍼센트포인트|%p|bps|bp|points|point|pt|베이시스포인트|퍼센트|포인트|%|㎡|\u338f|\u339e|kg|km|평|원|달러|엔|유로|배|년|개월|일|주|회|명|좌|개|건|세|분|초|시간|월)';
+    const MULT = '[조억만천백]';
+    const UNIT_PART = '(?:' + MULT + '+' + UNITS + '?|' + UNITS + ')';
+    const NUM_RE = new RegExp('^(' + NUMBER + ')(' + UNIT_PART + ')?');
+    const NUM_FULL = new RegExp('^' + NUMBER + '(?:' + UNIT_PART + ')?$');
+    const UNIT_HEAD = new RegExp('^' + UNIT_PART);
+    const UNIT_FULL = new RegExp('^' + UNIT_PART + '$');
+    const MULT_ONLY = new RegExp('^' + MULT + '+$');
+    const TAIL_NAME = /(?:이다|입니다|이므로|이며|이고|이면|이라면|이라는|이라고|이라|으로는|으로|에서는|에서|에게는|에게|까지|부터|이나|이라도|라고|에는|에도|은|는|을|를)$/;
+    const TAIL_ANY = /^(?:이다|입니다|이므로|이며|이고|이면|이라면|이라는|이라고|이라서|이라|으로는|으로|에서는|에서|에게는|에게|까지|부터|이나|이라도|라고|에는|에도|은|는|을|를|이|가|의|와|과|도|만|로|에|다|라|면|며|고|당|씩|\ucbe4|정도|가량|인|인데|일|보다|보다는|처럼|만큼|마다|이상|이하|미만|초과|대비)$/;
+    const NOUN_MYEON = /(?:액|표|단|평|지|방|내|외|측|정|배|전|후|국|화|장|상|겉)면$/;
+    const VERB_END = /(?:다면|하면|으면|라면|니면|거나|하고|하며|했을|므로|인데|은데|는데|지만|어도|아도|해서|써서|와서|라서|어서|아서|여서|이라서|이어서)$|[가-힣]다$|[가-힣]며$|(?:이|하|되|있|없)고$|^(?:때|경우|그리고|또는|따라서|그러므로|그러면|즉|여기서|이때|들어)$/;
+
+    const verbEnd = w => {
+      const word = w.replace(/[.!?…]+$/, '');
+      return VERB_END.test(word) || (/[가-힣]면$/.test(word) && word.length >= 2 && !NOUN_MYEON.test(word));
+    };
+    const NOT_COPULA = /[한된는했인일있없할될을왔갔졌렸랐았었겠함됨하]다$/;
+    const splitTail = (w, min = 2) => {
+      let m = NUM_RE.exec(w);
+      if (m) {
+        const rest = w.slice(m[0].length);
+        return rest && TAIL_ANY.test(rest) ? [m[0], rest] : [w, ''];
+      }
+      m = /^[A-Za-z\u0370-\u03ff][\w\u2080-\u209c'./-]*/.exec(w);
+      if (m && m[0].length < w.length) {
+        const rest = w.slice(m[0].length);
+        return /^[가-힣]/.test(rest) && TAIL_ANY.test(rest) ? [m[0], rest] : [w, ''];
+      }
+      const h = TAIL_NAME.exec(w);
+      if (h && w.length - h[0].length >= min) return [w.slice(0, w.length - h[0].length), h[0]];
+      if (/[가-힣]다$/.test(w) && !NOT_COPULA.test(w) && w.length - 1 >= min) return [w.slice(0, -1), '다'];
+      return [w, ''];
+    };
+    const ADNOMINAL = /(?:하는|되는|있는|없는|같은|라는|받는|주는|남은|높은|낮은|많은|적은|다른|새로운|이어지는|할|될|받을|갚을|있을|없을|얻을|낼)$/;
+    const clauseEnd = w => {
+      if (ADNOMINAL.test(w)) return false;
+      if (verbEnd(w) || /^(?:수가|값이|돈이|것이|점이|때가)$/.test(w)) return true;
+      const tail = splitTail(w, 1)[1];
+      return Boolean(tail) && !/^(?:의|와|과)$/.test(tail);
+    };
+    const SYMBOL_WORD = /^(?:기호|부호|연산자|표시|나눗셈|나누기)(?:으로|[은는이가을를의로])?$/;
+    const BARE_TAIL = /^(?:은|는|이|가|을|를|의|와|과|도|만|로|에|으로|에서|이다|입니다)$/;
+    const MODIFIERS = new Set(['보통', '대개', '일반적으로', '통상', '대략', '약', '또', '더', '각', '각각', '매년', '해마다', '먼저', '다시', '바로', '같은', '그', '이', '저']);
+
+    const ENTITY = /^&(?:[a-zA-Z][a-zA-Z0-9]{1,8}|#\d{1,6}|#[xX][0-9a-fA-F]{1,6});/;
+    const isSpace = c => c === ' ' || c === '\t' || c === '\r' || c === '\u00a0' || c === '\u2009' || c === '\u200a' || c === '\u202f';
+    const OPENERS = '([{（\uff3b', CLOSERS = ')]}）\uff3d';
+    const OPERATORS = '=×≈≠≤≥±→\u21d2↔∴<>' + DEAD;
+    const isDigit = c => c >= '0' && c <= '9';
+
+    function lex(s) {
+      const T = [];
+      const n = s.length;
+      let i = 0;
+      const push = (k, a, b) => { T.push({ k, a, b, m: -1 }); };
+      const signStart = j => {
+        const p = j > 0 ? s[j - 1] : '';
+        return j === 0 || isSpace(p) || p === '\n' || OPENERS.includes(p) || OPERATORS.includes(p) || p === '÷';
+      };
+      while (i < n) {
+        const c = s[i];
+        if (c === '\n') { push('nl', i, i + 1); i += 1; continue; }
+        if (isSpace(c)) { let j = i; while (j < n && isSpace(s[j])) j += 1; push('sp', i, j); i = j; continue; }
+        if (c === '÷') { push('div', i, i + 1); i += 1; continue; }
+        if (c === '&') {
+          const m = ENTITY.exec(s.slice(i, i + 14));
+          if (m) {
+            const name = m[0];
+            const code = /^&#(\d+);$/.exec(name) ? Number(/^&#(\d+);$/.exec(name)[1]) : 0;
+            if (name === '&nbsp;' || code === 160) { push('sp', i, i + name.length); i += name.length; continue; }
+            if (name === '&lt;' || name === '&gt;' || code === 60 || code === 62) { push('op', i, i + name.length); i += name.length; continue; }
+            const last = T[T.length - 1];
+            if (last && last.k === 'word' && last.b === i) last.b = i + name.length; else push('word', i, i + name.length);
+            i += name.length;
+            continue;
+          }
+        }
+        let kind = 'word';
+        const next = i + 1 < n ? s[i + 1] : '';
+        const prev = i > 0 ? s[i - 1] : '';
+        if (OPERATORS.includes(c)) kind = 'op';
+        else if (c === '+' || c === '−') kind = isDigit(next) && signStart(i) ? 'word' : 'op';
+        else if (c === '-') kind = (isSpace(prev) || i === 0) && (isSpace(next) || next === '') ? 'op' : 'word';
+        else if (c === ',') kind = isDigit(prev) && /^\d{3}(?!\d)/.test(s.slice(i + 1, i + 5)) ? 'word' : 'op';
+        else if (c === '/') kind = isSpace(prev) && isSpace(next) ? 'op' : 'word';
+        else if (c === ':' || c === ';' || c === '?' || c === '!') kind = 'punct';
+        else if (c === '.') kind = (isDigit(prev) && isDigit(next)) || (/[A-Za-z]/.test(prev) && /[A-Za-z0-9]/.test(next)) ? 'word' : 'punct';
+        else if (OPENERS.includes(c)) kind = 'open';
+        else if (CLOSERS.includes(c)) kind = 'close';
+        const last = T[T.length - 1];
+        if (kind === 'word' && last && last.k === 'word' && last.b === i) last.b = i + 1;
+        else push(kind, i, i + 1);
+        i += 1;
+      }
+      const stack = [];
+      T.forEach((t, idx) => {
+        if (t.k === 'open') stack.push(idx);
+        else if (t.k === 'close') {
+          const o = stack.pop();
+          if (o !== undefined && OPENERS.indexOf(s[T[o].a]) === CLOSERS.indexOf(s[t.a])) { T[o].m = idx; t.m = o; }
+        }
+      });
+      return T;
+    }
+
+    const bad = why => ({ ok: false, why });
+
+    function analyse(plain, mode) {
+      const T = lex(plain);
+      const n = T.length;
+      const joinable = mode === 'formula' || mode === 'calc';
+      const clauses = mode !== 'formula';
+      const cap = mode === 'formula' || mode === 'shaped' ? 8 : 5;
+      const txt = t => plain.slice(t.a, t.b);
+      const nextSig = i => { let j = i + 1; while (j < n && T[j].k === 'sp') j += 1; return j; };
+      const prevSig = i => { let j = i - 1; while (j >= 0 && T[j].k === 'sp') j -= 1; return j; };
+      const kindAt = j => (j < 0 ? 'start' : j >= n ? 'end' : T[j].k);
+      const exponentAfter = j => {
+        const e = T[j + 1];
+        return e && e.k === 'word' && e.a === T[j].b && EXP_ONLY.test(txt(e)) ? j + 1 : -1;
+      };
+      const gluedTail = j => {
+        const e = T[j + 1];
+        return e && e.k === 'word' && e.a === T[j].b && TAIL_ANY.test(txt(e)) ? j + 1 : -1;
+      };
+      const commaList = (from, dir) => {
+        let i = from;
+        while (i >= 0 && i < n && T[i].k !== 'nl') {
+          if (T[i].k === 'div' || (T[i].k === 'op' && txt(T[i]) !== ',')) return false;
+          i += dir;
+        }
+        return true;
+      };
+      const finish = (a, b, drop, far, farIndex, words) => {
+        if (b - a > MAX_OPERAND) return bad('operand longer than ' + MAX_OPERAND + ' characters');
+        if (words > cap) return bad('operand of more than ' + cap + ' words');
+        if (!/[\p{L}\p{N}]/u.test(plain.slice(a, b))) return bad('empty operand');
+        if (far === 'op' && farIndex >= 0 && farIndex < n && txt(T[farIndex]) === ',') {
+          const dir = T[farIndex].a > a ? 1 : -1;
+          if (commaList(farIndex + dir, dir)) return bad('comma-separated list');
+        }
+        return { ok: true, a, b, drop, far, words };
+      };
+
+      function rightMulti(d) {
+        let i = nextSig(d);
+        if (joinable && i < n && T[i].k === 'nl') i = nextSig(i);
+        if (i >= n) return bad('no denominator');
+        let a = -1, b = -1, far = 'end', farIndex = n, first = true, words = 0, drop = null;
+        while (i < n) {
+          const t = T[i];
+          if (t.k === 'word') {
+            const w = txt(t);
+            if (first && (SYMBOL_WORD.test(w) || BARE_TAIL.test(w))) return bad('the division sign stands alone');
+            const [stem, tail] = clauses ? splitTail(w, first ? 2 : 1) : [w, ''];
+            if (!tail && !first && clauses && verbEnd(w) && !ADNOMINAL.test(w)) { far = 'ender'; farIndex = i; break; }
+            if (a < 0) a = t.a;
+            b = t.a + stem.length;
+            words += 1;
+            if (tail) { far = 'tail'; farIndex = i; break; }
+            first = false;
+            let j = i;
+            const g = T[j + 1];
+            if (g && g.k === 'open' && g.m > j + 1 && g.a === t.b) {
+              j = g.m;
+              b = T[j].b;
+              const e = exponentAfter(j);
+              if (e > 0) { j = e; b = T[j].b; }
+              if (clauses && gluedTail(j) > 0) { far = 'tail'; farIndex = j + 1; break; }
+            }
+            const nx = nextSig(j);
+            if (nx >= n) { far = 'end'; farIndex = nx; break; }
+            if (T[nx].k === 'word') { i = nx; continue; }
+            far = T[nx].k; farIndex = nx;
+            break;
+          } else if (t.k === 'open' && first) {
+            if (t.m < 0) return bad('unbalanced bracket');
+            a = t.a;
+            let j = t.m;
+            b = T[j].b;
+            const e = exponentAfter(j);
+            if (e > 0) { j = e; b = T[j].b; } else drop = [t.a, T[t.m].a];
+            words = 1;
+            if (clauses && gluedTail(j) > 0) { far = 'tail'; farIndex = j + 1; break; }
+            farIndex = nextSig(j); far = kindAt(farIndex);
+            break;
+          } else {
+            if (first) return bad(t.k === 'open' ? 'unbalanced bracket' : 'no denominator');
+            far = t.k; farIndex = i;
+            break;
+          }
+        }
+        if (a < 0) return bad('no denominator');
+        return finish(a, b, drop, far, farIndex, words);
+      }
+
+      function leftMulti(d) {
+        let i = prevSig(d);
+        if (joinable && i >= 0 && T[i].k === 'nl') i = prevSig(i);
+        if (i < 0) return bad('no numerator');
+        let a = -1, b = -1, far = 'start', farIndex = -1, first = true, words = 0, drop = null, group = false;
+        while (i >= 0) {
+          const t = T[i];
+          if (t.k === 'word' || (t.k === 'close' && first)) {
+            if (t.k === 'close') {
+              if (t.m < 0) return bad('unbalanced bracket');
+              b = t.b; a = T[t.m].a; group = true; words = 1;
+              drop = [T[t.m].a, t.a];
+              i = t.m - 1;
+              first = false;
+              if (i >= 0 && T[i].k === 'word' && T[i].b === a && !(clauses && splitTail(txt(T[i]), 1)[1])) { drop = null; continue; }
+              farIndex = prevSig(t.m); far = kindAt(farIndex);
+              break;
+            }
+            const w = txt(t);
+            if (first && EXP_ONLY.test(w) && i > 0 && T[i - 1].k === 'close' && T[i - 1].b === t.a && T[i - 1].m >= 0) {
+              const open = T[i - 1].m;
+              b = t.b; a = T[open].a; group = true; words = 1; first = false; drop = null;
+              i = open - 1;
+              if (i >= 0 && T[i].k === 'word' && T[i].b === a) continue;
+              farIndex = prevSig(open); far = kindAt(farIndex);
+              break;
+            }
+            if (first && SYMBOL_WORD.test(w)) return bad('the division sign stands alone');
+            if (!first && clauses && clauseEnd(w)) { far = 'ender'; farIndex = i; break; }
+            if (b < 0) b = t.b;
+            a = t.a;
+            words += 1;
+            first = false;
+            if (group && words > 1) drop = null;
+            const pv = prevSig(i);
+            if (pv < 0) { far = 'start'; farIndex = -1; break; }
+            if (T[pv].k === 'word') { i = pv; continue; }
+            far = T[pv].k; farIndex = pv;
+            break;
+          } else {
+            if (first) return bad(t.k === 'close' ? 'unbalanced bracket' : 'no numerator');
+            far = t.k; farIndex = i;
+            break;
+          }
+        }
+        if (a < 0) return bad('no numerator');
+        if ((far === 'ender' || far === 'start') && words > 1 && !group) {
+          let at = a;
+          while (words > 1) {
+            const m = /^(\S+)\s+/.exec(plain.slice(at, b));
+            if (!m || !(MODIFIERS.has(m[1]) || /[가-힣](?:히|적으로)$/.test(m[1]))) break;
+            at += m[0].length;
+            words -= 1;
+          }
+          a = at;
+        }
+        return finish(a, b, drop, far, farIndex, words);
+      }
+
+      function rightStrict(d) {
+        const i = nextSig(d);
+        if (i >= n) return bad('no denominator');
+        const t = T[i];
+        let b = t.b, drop = null, tail = false, last = i;
+        if (t.k === 'open') {
+          if (t.m < 0) return bad('unbalanced bracket');
+          last = t.m; b = T[last].b;
+          const e = exponentAfter(last);
+          if (e > 0) { last = e; b = T[last].b; } else drop = [t.a, T[t.m].a];
+          if (gluedTail(last) > 0) tail = true;
+        } else if (t.k === 'word') {
+          const w = txt(t);
+          const m = NUM_RE.exec(w);
+          if (m) {
+            const rest = w.slice(m[0].length);
+            b = t.a + m[0].length;
+            if (!rest) {
+              const sp = T[i + 1], un = T[i + 2];
+              if (sp && sp.k === 'sp' && un && un.k === 'word' && (!m[2] || MULT_ONLY.test(m[2]))) {
+                const uw = txt(un), u = UNIT_HEAD.exec(uw);
+                if (u && u[0] && (u[0] === uw || TAIL_ANY.test(uw.slice(u[0].length)))) {
+                  last = i + 2; b = un.a + u[0].length; tail = u[0] !== uw;
+                }
+              }
+            } else if (TAIL_ANY.test(rest)) tail = true;
+            else return bad('number followed by text');
+          } else {
+            const [stem, tl] = splitTail(w);
+            b = t.a + stem.length;
+            tail = Boolean(tl);
+            const g = T[i + 1];
+            if (!tl && g && g.k === 'open' && g.m > i + 1 && g.a === t.b) {
+              last = g.m; b = T[last].b;
+              const e = exponentAfter(last);
+              if (e > 0) { last = e; b = T[last].b; }
+              if (gluedTail(last) > 0) tail = true;
+            }
+          }
+        } else return bad('no denominator');
+        if (!tail) {
+          const nx = nextSig(last);
+          if (nx < n && T[nx].k === 'word') return bad('the denominator may continue in the next word');
+        }
+        return finish(t.a, b, drop, 'tight', nextSig(last), 1);
+      }
+
+      function leftStrict(d) {
+        let i = prevSig(d);
+        if (i < 0) return bad('no numerator');
+        const t = T[i];
+        let a = t.a, b = t.b, drop = null, first = i;
+        if (t.k === 'close' || (t.k === 'word' && i > 0 && T[i - 1].k === 'close' && T[i - 1].b === t.a && EXP_ONLY.test(txt(t)))) {
+          const close = t.k === 'close' ? i : i - 1;
+          if (T[close].m < 0) return bad('unbalanced bracket');
+          first = T[close].m;
+          a = T[first].a;
+          if (t.k === 'close') drop = [a, T[close].a];
+          if (first > 0 && T[first - 1].k === 'word' && T[first - 1].b === a && !splitTail(txt(T[first - 1]), 1)[1]) { first -= 1; a = T[first].a; drop = null; }
+        } else if (t.k === 'word') {
+          const w = txt(t);
+          if (!NUM_FULL.test(w) && UNIT_FULL.test(w)) {
+            const sp = T[i - 1], nw = T[i - 2];
+            if (sp && sp.k === 'sp' && nw && nw.k === 'word') {
+              const m = NUM_RE.exec(txt(nw));
+              if (m && m[0] === txt(nw) && (!m[2] || MULT_ONLY.test(m[2]))) { first = i - 2; a = nw.a; }
+            }
+          }
+        } else return bad('no numerator');
+        const pv = prevSig(first);
+        if (pv >= 0 && T[pv].k === 'word' && !clauseEnd(txt(T[pv]))) return bad('the numerator may begin in the previous word');
+        return finish(a, b, drop, 'tight', pv, 1);
+      }
+
+      const explicitLeft = far => far === 'op' || far === 'open' || far === 'start' || far === 'nl' || far === 'div' || far === 'ender';
+      const explicitRight = far => far === 'op' || far === 'close' || far === 'end' || far === 'tail' || far === 'punct' || far === 'nl' || far === 'div' || far === 'open';
+
+      const unmatchedOnLine = d => {
+        let a = d, b = d;
+        while (a > 0 && T[a - 1].k !== 'nl') a -= 1;
+        while (b < n - 1 && T[b + 1].k !== 'nl') b += 1;
+        return T.slice(a, b + 1).some(t => (t.k === 'open' || t.k === 'close') && t.m < 0);
+      };
+      const results = [];
+      T.forEach((t, d) => {
+        if (t.k !== 'div') return;
+        if (unmatchedOnLine(d)) { results.push({ d, pos: t.a, L: bad('unbalanced bracket'), R: bad('unbalanced bracket') }); return; }
+        let L, R;
+        if (mode === 'prose') {
+          L = leftStrict(d);
+          if (!L.ok) { const alt = leftMulti(d); if (alt.ok && explicitLeft(alt.far)) L = alt; }
+          R = rightStrict(d);
+          if (!R.ok) { const alt = rightMulti(d); if (alt.ok && explicitRight(alt.far)) R = alt; }
+        } else { L = leftMulti(d); R = rightMulti(d); }
+        results.push({ d, pos: t.a, L, R });
+      });
+      const span = r => [r.L.a, r.R.b];
+      const inside = (x, o) => { const [a, b] = span(x); return o.a <= a && b <= o.b && (o.a < a || b < o.b); };
+      for (let i = 0; i < results.length; i += 1) {
+        for (let j = i + 1; j < results.length; j += 1) {
+          const x = results[i], y = results[j];
+          if (!x.L.ok || !x.R.ok || !y.L.ok || !y.R.ok) continue;
+          const [xa, xb] = span(x), [ya, yb] = span(y);
+          if (xb <= ya || yb <= xa) continue;
+          const nested = inside(y, x.L) || inside(y, x.R) || inside(x, y.L) || inside(x, y.R);
+          if (!nested) { x.R = bad('chained division'); y.L = bad('chained division'); }
+        }
+      }
+      return results;
+    }
+
+    const attr = s => s.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().replace(/"/g, '&quot;');
+    const trimMarkup = s => s.replace(/^[ \t\r\n\u00a0]+|[ \t\r\n\u00a0]+$/g, '');
+    const plainText = s => s.replace(/<[^>]*>/g, '');
+
+    function stackedFraction(n, d) {
+      const open = INTERACTIVE.test(n) || INTERACTIVE.test(d)
+        ? '<span class="v2-frac">'
+        : '<span class="v2-frac" role="math" aria-label="' + attr(n) + ' 나누기 ' + attr(d) + '">';
+      const hide = open.includes('role=') ? ' aria-hidden="true"' : '';
+      return open + '<span class="v2-frac-n"' + hide + '>' + n + '</span><span class="v2-sr-only v2-frac-op"' + hide + '> ÷ </span><span class="v2-frac-d"' + hide + '>' + d + '</span></span>';
+    }
+
+    const looksLikeSentence = text =>
+      /[가-힣][.!?]+(?:[”’"')\]]*)(?:\s|$)/.test(text) || /[\d%)][.!?]\s*$/.test(text) || /[가-힣](?:다|요)\s*$/.test(text);
+
+    function segment(S, tags, context, options, report) {
+      if (!S) return '';
+      const restoreAll = () => {
+        let k = 0;
+        return S.replace(/[\ue000\ue001]/g, c => (c === TAG ? tags[k++].raw : '÷'));
+      };
+      if (!S.includes('÷')) return restoreAll();
+
+      let plain = '';
+      const map = [];
+      for (let i = 0; i < S.length; i += 1) if (S[i] !== TAG) { plain += S[i]; map.push(i); }
+      const forced = options.mode === 'formula' || options.mode === 'calc' ? options.mode : '';
+      const mode = context.formula ? 'formula' : forced || (looksLikeSentence(plain) ? 'prose' : 'shaped');
+      const rowsOn = Boolean(options.rows || context.rows) && (mode === 'formula' || mode === 'calc');
+      const found = analyse(plain, mode);
+
+      const tagAt = new Array(S.length + 1);
+      let count = 0;
+      for (let i = 0; i <= S.length; i += 1) { tagAt[i] = count; if (S[i] === TAG) count += 1; }
+      const html = (from, to, skip) => {
+        let out = '';
+        for (let i = from; i < to; i += 1) {
+          if (skip && skip.includes(i)) continue;
+          const c = S[i];
+          out += c === TAG ? tags[tagAt[i]].raw : c === DEAD ? '÷' : c;
+        }
+        return out;
+      };
+      const balanced = (from, to) => {
+        const open = [];
+        for (let i = from; i < to; i += 1) {
+          if (S[i] !== TAG) continue;
+          const tag = tags[tagAt[i]];
+          if (tag.void) continue;
+          if (!tag.close) open.push(tag.name);
+          else if (open.pop() !== tag.name) return false;
+        }
+        return open.length === 0;
+      };
+
+      const piece = (from, to, skip) => {
+        let sub = '';
+        const subTags = [];
+        for (let i = from; i < to; i += 1) {
+          if (skip && skip.includes(i)) continue;
+          if (S[i] === TAG) subTags.push(tags[tagAt[i]]);
+          sub += S[i];
+        }
+        return trimMarkup(segment(sub, subTags, context, { ...options, rows: false }, null));
+      };
+      const candidates = [];
+      for (const r of found) {
+        const entry = { mode, ok: false, why: '', index: r.pos, snippet: plain.slice(Math.max(0, r.pos - 28), r.pos + 29), num: '', den: '' };
+        if (report) report.push(entry);
+        if (!r.L.ok || !r.R.ok) { entry.why = !r.L.ok ? r.L.why : r.R.why; continue; }
+        entry.num = plain.slice(r.L.a, r.L.b);
+        entry.den = plain.slice(r.R.a, r.R.b);
+        if (r.L.drop) entry.num = plain.slice(r.L.drop[0] + 1, r.L.drop[1]).trim();
+        if (r.R.drop) entry.den = plain.slice(r.R.drop[0] + 1, r.R.drop[1]).trim();
+        let from = map[r.L.a], to = map[r.R.b - 1] + 1;
+        const op = map[r.pos];
+        const fits = (f, t) => balanced(f, t) && balanced(f, op) && balanced(op + 1, t);
+        if (!fits(from, to)) {
+          let f = from, t = to;
+          while (f > 0 && S[f - 1] === TAG) f -= 1;
+          while (t < S.length && S[t] === TAG) t += 1;
+          if (fits(f, to)) from = f;
+          else if (fits(from, t)) to = t;
+          else if (fits(f, t)) { from = f; to = t; }
+          else { entry.why = 'markup is not nested around the division'; continue; }
+        }
+        entry.far = [r.L.far, r.R.far];
+        candidates.push({ entry, from, to, op, skipL: r.L.drop && [map[r.L.drop[0]], map[r.L.drop[1]]], skipR: r.R.drop && [map[r.R.drop[0]], map[r.R.drop[1]]] });
+      }
+      const edits = [];
+      for (const c of candidates) {
+        const nested = candidates.some(o => o !== c && o.from <= c.from && c.to <= o.to && (o.from < c.from || c.to < o.to));
+        if (nested) { c.entry.ok = true; continue; }
+        if (edits.length && c.from < edits[edits.length - 1].to) { c.entry.why = 'overlaps the previous fraction'; continue; }
+        const num = piece(c.from, c.op, c.skipL), den = piece(c.op + 1, c.to, c.skipR);
+        if (!num || !den) { c.entry.why = 'empty operand'; continue; }
+        c.entry.ok = true;
+        edits.push({ from: c.from, to: c.to, markup: stackedFraction(num, den) });
+      }
+      if (!edits.length) return restoreAll();
+
+      if (!rowsOn) {
+        let out = '', at = 0;
+        for (const e of edits) { out += html(at, e.from) + e.markup; at = e.to; }
+        return out + html(at, S.length);
+      }
+
+      const lines = [];
+      let start = 0;
+      for (let i = 0; i <= S.length; i += 1) {
+        if ((i === S.length || S[i] === '\n') && !edits.some(e => e.from < i && i < e.to)) { lines.push([start, i]); start = i + 1; }
+      }
+      const rowOf = (ls, le, own) => {
+        const runs = [];
+        let at = ls;
+        for (const e of own) { runs.push(html(at, e.from)); at = e.to; }
+        runs.push(html(at, le));
+        const lengths = runs.map(r => plainText(r).trim().length);
+        if (lengths.some(x => x > ROW_RUN) || lengths.reduce((s, x) => s + x, 0) > ROW_TOTAL) return null;
+        const parts = [];
+        runs.forEach((r, idx) => {
+          const t = trimMarkup(r);
+          if (t) parts.push('<span class="v2-frac-t">' + t + '</span>');
+          if (idx < own.length) parts.push(own[idx].markup);
+        });
+        return '<span class="v2-frac-row">' + parts.join(' ') + '</span>';
+      };
+      let out = '';
+      lines.forEach(([ls, le], idx) => {
+        const own = edits.filter(e => e.from >= ls && e.to <= le);
+        let text = own.length ? rowOf(ls, le, own) : null;
+        if (text === null) {
+          text = '';
+          let at = ls;
+          for (const e of own) { text += html(at, e.from) + e.markup; at = e.to; }
+          text += html(at, le);
+        }
+        if (idx > 0) out += '\n';
+        out += text;
+      });
+      return out;
+    }
+
+    function markup(source, options = {}, report = null) {
+      if (typeof source !== 'string' || !source.includes('÷')) return source;
+      const pieces = source.split(MARKUP);
+      const stack = [];
+      const out = [];
+      let S = '', tags = [];
+      const shielded = () => stack.some(e => e.shield);
+      const state = () => ({ formula: stack.some(e => e.formula), rows: stack.some(e => e.rows) });
+      const flush = () => { out.push(segment(S, tags, state(), options, report)); S = ''; tags = []; };
+      pieces.forEach((piece, i) => {
+        if (i % 2 === 0) {
+          S += shielded() ? piece.replace(/÷/g, DEAD) : piece;
+          return;
+        }
+        const m = /^<(\/?)([a-z][\w:-]*)/i.exec(piece);
+        if (!m) { S += TAG; tags.push({ raw: piece, name: '', close: false, void: true }); return; }
+        const name = m[2].toLowerCase(), close = m[1] === '/', isVoid = VOID.has(name) || piece.endsWith('/>');
+        const formulaClass = /\bformula-(?:block|display)\b/.test(piece);
+        if (BREAKING.has(name) || (!close && formulaClass)) {
+          flush();
+          out.push(piece);
+        } else {
+          S += TAG;
+          tags.push({ raw: piece, name, close, void: isVoid });
+        }
+        if (isVoid) return;
+        if (!close) {
+          stack.push({
+            name,
+            shield: SHIELDED.has(name) || /\bv2-frac(?:-[a-z]+)?\b/.test(piece),
+            formula: name === 'pre' || name === 'code' || name === 'kbd' || name === 'samp' || formulaClass,
+            rows: name === 'pre' || (formulaClass && name !== 'code'),
+          });
+        } else {
+          for (let j = stack.length - 1; j >= 0; j -= 1) if (stack[j].name === name) { stack.length = j; break; }
+        }
+      });
+      flush();
+      return out.join('');
+    }
+
+    const scan = (source, options) => { const report = []; markup(source, options, report); return report; };
+    return { markup, scan };
+  })();
+
+  return { forTerm, render, scene, collisions, registry, kinds, math, models, textWidth, fractions, captions: Object.fromEntries(kinds.map(k => [k, FIG[k].caption])), labels: Object.fromEntries(kinds.map(k => [k, FIG[k].label])) };
 });

@@ -1,5 +1,6 @@
 (()=>{'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fraction=(html,options)=>globalThis.TermFigures?.fractions?.markup(html,options)??html;
 function displayStem(q,fallback=''){return q?.displayStem||fallback||q?.statement||q?.stem||''}
 function promptMarkup(q,answered=false){
  const extra=q?.displayStemHtml||'';
@@ -37,7 +38,7 @@ function holdChoiceHeights(before){
 }
 window.addEventListener('resize',()=>{for(const el of heldHeights.splice(0))if(el.style)el.style.minHeight=''});
 function explanationMarkup(html,text){
- return html?richTermsMarkup(html,{normalize:true}):`<p>${readerTermsMarkup(text||'',true)}</p>`;
+ return fraction(html?richTermsMarkup(html,{normalize:true}):`<p>${readerTermsMarkup(text||'',true)}</p>`);
 }
 function quizEasyReasons(q){
  return window.QuizEasyReasons?.[q.id];
@@ -350,14 +351,14 @@ function termNoteMarkup(term,note,{definitionMarkup,includeWorkedExample=true}={
  const calculation=note?.calculation||term.calculation;
  const example=formula?(note?.interpretation||term.interpretation):note?.example;
  const omit=new Set([term.title,term.displayTitle,note?.name]);
- const definitionText=definitionMarkup??readerTermsMarkup(definition,false,omit);
+ const definitionText=definitionMarkup??fraction(readerTermsMarkup(definition,false,omit));
  return `${definitionText?`<p>${definitionText}</p>`:''}
   ${formula?`<div class="v2-term-formula">
-   <b>공식</b><p>${basicTermsMarkup(formula,esc,omit)}</p>
-   ${includeWorkedExample&&calculation?`<b>숫자 대입</b><p>${basicTermsMarkup(calculation,esc,omit)}</p>`:''}
+   <b>공식</b><p>${fraction(basicTermsMarkup(formula,esc,omit),{mode:'formula',rows:true})}</p>
+   ${includeWorkedExample&&calculation?`<b>숫자 대입</b><p>${fraction(basicTermsMarkup(calculation,esc,omit),{mode:'calc',rows:true})}</p>`:''}
   </div>`:''}
   ${includeWorkedExample&&example?`<div class="v2-peek-example">
-   <b>${formula?'예시 해석':'예시'}</b><p>${readerTermsMarkup(example,false,omit)}</p>
+   <b>${formula?'예시 해석':'예시'}</b><p>${fraction(readerTermsMarkup(example,false,omit))}</p>
   </div>`:''}`;
 }
 
@@ -485,7 +486,7 @@ function dictionaryDefinitionMarkup(value,term,linkedIds){
   linkedIds.add(id);
   cursor=end;
  }
- return markup+readerTermsMarkup(value.slice(cursor),false,omit);
+ return fraction(markup+readerTermsMarkup(value.slice(cursor),false,omit));
 }
 
 function studyNote(label,content){
@@ -548,7 +549,7 @@ function studyQuestionMarkup({checks,index,selected},fresh=false){
  const question=checks[index],answered=selected!==null,right=answered&&selected===question.answer;
  const feedback=answered?`<div class="dict-check-feedback ${right?'correct':'incorrect'}" tabindex="-1">
   <strong>${markMarkup(right,fresh)}<span>${right?'맞았어요':'다시 짚어봐요'}. 정답은 ${question.answer?'O':'X'}예요.</span></strong>
-  <p>${readerTermsMarkup(question.explanation)}</p></div>`:'';
+  <p>${fraction(readerTermsMarkup(question.explanation))}</p></div>`:'';
  const answerButton=value=>{
   const mark=value?'O':'X',meaning=value?'맞다':'틀리다',mine=answered&&selected===value,key=answered&&question.answer===value;
   const state=key?'정답':mine?'오답':'';
@@ -622,17 +623,17 @@ function dictionaryTermMarkup(term,selected){
  };
  const omit=new Set([term.title,term.displayTitle,note?.name]);
  const exampleMarkup=[
-  unique(calculation)?`<div class="v2-term-formula dict-calculation"><b>숫자 대입</b><p>${basicTermsMarkup(calculation,esc,omit)}</p></div>`:'',
+  unique(calculation)?`<div class="v2-term-formula dict-calculation"><b>숫자 대입</b><p>${fraction(basicTermsMarkup(calculation,esc,omit),{mode:'calc',rows:true})}</p></div>`:'',
   unique(interpretation)?studyNoteText(interpretation,term,linkedIds):'',
   unique(example)?studyNoteText(example,term,linkedIds):'',
  ].join('');
  const point=unique(term.studyPoint)?studyNoteText(term.studyPoint,term,linkedIds):'';
  const source=term.bodyMarkdown?.trim()!==definition.trim()?term.bodyHtml||'':'';
  const {comparison,body}=dictionaryComparison(term,title,source);
- const formatBody=html=>richTermsMarkup(
+ const formatBody=html=>fraction(richTermsMarkup(
   html.replace(/href="#(?:glossary|dictionary)\/([\w.-]+)"/g,(_,id)=>`href="${esc(dictionaryHref(id))}"`),
   {linked:false,basic:true,normalize:true,omit},
- );
+ ));
  const extraBody=body.replace(/<(p|li|pre)\b[^>]*>([\s\S]*?)<\/\1>/g,(block,_,content)=>
   !/<a\b/.test(content)&&visible.has(dictionaryTextKey(content))?'':block)
   .replace(/<(?:ul|ol)>\s*<\/(?:ul|ol)>/g,'').trim();
@@ -877,7 +878,7 @@ function graphCalculationMarkup(steps){
    const label=esc(part.label);
    return part.href?`<a href="${esc(part.href)}">${label}</a>`:`<strong>${label}</strong>`;
   }).join(' ');
-  return `<li><p class="v2-graph-equation">${expression}</p>${value?`<p class="v2-graph-calculation-value">${esc(value)}</p>`:''}</li>`;
+  return `<li><p class="v2-graph-equation">${expression}</p>${value?`<p class="v2-graph-calculation-value">${fraction(esc(value),{mode:'calc'})}</p>`:''}</li>`;
  }).join('');
  return `<section class="v2-graph-calculation" aria-labelledby="graphCalculationTitle">
   <h3 id="graphCalculationTitle">계산 순서</h3>
@@ -899,7 +900,7 @@ function graphCopyMarkup(term,steps){
  const intro=plain(definition);
  let lead=intro.shift()||'';
  const paragraphs=parts=>parts.map(part=>`<p>${part}</p>`).join('');
- const details=[paragraphs(intro)];
+ const details=[fraction(paragraphs(intro))];
  const equationKey=html=>key(html).replace(/\s/g,'');
  const shownEquations=new Set(steps.flatMap(({parts,value})=>[
   parts.map(part=>typeof part==='string'?part:part.label).join(''),value,
@@ -913,7 +914,7 @@ function graphCopyMarkup(term,steps){
   ['예시',example],['주의할 점',term.studyPoint]]){
   const isEquation=label==='공식'||label==='계산 예시';
   const parts=plain(text).filter(part=>!isEquation||!repeatsCalculation(part));
-  if(parts.length)details.push(`<h3>${label}</h3>${paragraphs(parts)}`);
+  if(parts.length)details.push(`<h3>${label}</h3>${fraction(paragraphs(parts),isEquation?{mode:label==='공식'?'formula':'calc',rows:true}:undefined)}`);
  }
  const extra=graphLinksMarkup(term.bodyHtml||'')
  .replace(/<(pre|div) class="formula-(?:block|display)"(?: role="math")?>([\s\S]*?)<\/\1>/g,(block,_,content)=>
@@ -925,10 +926,10 @@ function graphCopyMarkup(term,steps){
   if(tag==='p')return paragraphs(parts);
   return `<li>${parts.length===1?parts[0]:paragraphs(parts)}</li>`;
  }).replace(/<(ul|ol|blockquote)>\s*<\/\1>/g,'').trim();
- if(extra)details.push(extra);
+ if(extra)details.push(fraction(extra));
  const body=details.join('');
  return {
-  lead:lead?`<p class="v2-graph-lead">${lead}</p>`:'',
+  lead:lead?`<p class="v2-graph-lead">${fraction(lead)}</p>`:'',
   reading:body?`<details class="v2-graph-reading"><summary>더 읽기</summary><div class="v2-graph-copy">${body}</div></details>`:'',
  };
 }
@@ -1219,7 +1220,7 @@ function renderQuestionBank(){
   $(`[data-qid="${CSS.escape(firstNew.id)}"]`)?.focus();
  };
 }
-function renderStandaloneOx(id){let q=allOxQuestions().find(x=>x.id===id);if(!q){$('#app').innerHTML=header('문제를 찾을 수 없어요','OX');return}let ans=record.answers[q.id]?.selected,u=unitFor(q.unitId),fresh=ans!==undefined&&freshAnswerId===q.id;freshAnswerId='';$('#app').innerHTML=`<article class="v2-question"><div class="v2-qmeta">${esc(u?.title||'OX')}</div>${promptMarkup(q,ans!==undefined)}${ans===undefined?`<div class="v2-ox"><button data-answer="true" aria-label="O, 맞다">O</button><button data-answer="false" aria-label="X, 틀리다">X</button></div>`:`<div class="v2-result ${ans===q.answer?'right':'wrong'}"><b>${markMarkup(ans===q.answer,fresh)}<span>${ans===q.answer?'정답이에요':'다시 확인해 보세요'}. 정답은 ${q.answer?'O':'X'}예요.</span></b><div class="v2-explanation-copy">${solutionMarkup(q)}</div>${q.trap?`<p><b>헷갈리기 쉬운 점</b> ${readerTermsMarkup(q.trap,true)}</p>`:''}<button class="text-btn" id="retryOx">다시 풀기</button></div>`}</article>`;$$('[data-answer]').forEach(b=>b.onclick=()=>{record.answers[q.id]={selected:b.dataset.answer==='true',correct:(b.dataset.answer==='true')===q.answer,at:new Date().toISOString()};freshAnswerId=q.id;queueSave();renderStandaloneOx(id)});if($('#retryOx'))$('#retryOx').onclick=()=>retry(q.id,()=>renderStandaloneOx(id))}
+function renderStandaloneOx(id){let q=allOxQuestions().find(x=>x.id===id);if(!q){$('#app').innerHTML=header('문제를 찾을 수 없어요','OX');return}let ans=record.answers[q.id]?.selected,u=unitFor(q.unitId),fresh=ans!==undefined&&freshAnswerId===q.id;freshAnswerId='';$('#app').innerHTML=`<article class="v2-question"><div class="v2-qmeta">${esc(u?.title||'OX')}</div>${promptMarkup(q,ans!==undefined)}${ans===undefined?`<div class="v2-ox"><button data-answer="true" aria-label="O, 맞다">O</button><button data-answer="false" aria-label="X, 틀리다">X</button></div>`:`<div class="v2-result ${ans===q.answer?'right':'wrong'}"><b>${markMarkup(ans===q.answer,fresh)}<span>${ans===q.answer?'정답이에요':'다시 확인해 보세요'}. 정답은 ${q.answer?'O':'X'}예요.</span></b><div class="v2-explanation-copy">${solutionMarkup(q)}</div>${q.trap?`<p><b>헷갈리기 쉬운 점</b> ${fraction(readerTermsMarkup(q.trap,true))}</p>`:''}<button class="text-btn" id="retryOx">다시 풀기</button></div>`}</article>`;$$('[data-answer]').forEach(b=>b.onclick=()=>{record.answers[q.id]={selected:b.dataset.answer==='true',correct:(b.dataset.answer==='true')===q.answer,at:new Date().toISOString()};freshAnswerId=q.id;queueSave();renderStandaloneOx(id)});if($('#retryOx'))$('#retryOx').onclick=()=>retry(q.id,()=>renderStandaloneOx(id))}
 const choiceTopicFallbacks = {
  '01':'세금', '02':'금융상품', '03':'펀드와 신탁', '04':'부동산', '05':'금융투자업',
  '06':'운용과 투자자 보호', '07':'대체투자와 해외투자', '08':'기업분석', '09':'투자분석',
@@ -1284,7 +1285,7 @@ function renderUnit(){
    body=body.replace(`<td>${label}</td>`,`<td><a href="${graphHref(termId)}">${label}</a></td>`);
   }
  }
- $('#app').innerHTML=header(u.title,u.chapterTitle)+`<article class="v2-longtext">${richTermsMarkup(body,{linked:false,basic:true})}</article><p class="v2-actions"><button class="primary" data-route="#units">학습 경로로 돌아가기</button></p>`;
+ $('#app').innerHTML=header(u.title,u.chapterTitle)+`<article class="v2-longtext">${fraction(richTermsMarkup(body,{linked:false,basic:true}))}</article><p class="v2-actions"><button class="primary" data-route="#units">학습 경로로 돌아가기</button></p>`;
  $$('[data-route]').forEach(b=>b.onclick=()=>setHash(b.dataset.route));
 }
 function renderLab(){const curves={callLong:{name:'콜 매수',tone:'up',dashed:false,points:[[0,-5],[100,-5],[200,95]]},callShort:{name:'콜 매도',tone:'down',dashed:true,points:[[0,5],[100,5],[200,-95]]},putLong:{name:'풋 매수',tone:'down',dashed:false,points:[[0,95],[100,-5],[200,-5]]},putShort:{name:'풋 매도',tone:'up',dashed:true,points:[[0,-95],[100,5],[200,5]]}};$('#app').innerHTML=header('만기 주가로 옵션 손익 살펴보기','옵션 실습')+`<article class="v2-question"><p>행사가격 100, 콜과 풋 프리미엄은 각각 5로 둔 예시입니다. 수수료와 조달비용은 빼고 계산합니다.</p><label>만기 주가 <b id="labValue">100</b><input id="labRange" type="range" min="0" max="200" value="100"></label><div class="v2-labgrid" id="labCards"></div><p id="labInsight" aria-live="polite"></p></article>`;let range=$('#labRange'),update=()=>{let price=Number(range.value),p=window.OptionLab.payoffs(price),X=x=>30+x*1.55,Y=y=>81.5-y*.675,status=n=>n>0?`이익 +${n}`:n<0?`손실 ${n}`:'손익 0';$('#labValue').textContent=price;$('#labCards').innerHTML=Object.entries(curves).map(([key,c])=>{let d=c.points.map((point,i)=>`${i?'L':'M'}${X(point[0])},${Y(point[1])}`).join(' '),cx=X(price),cy=Y(p[key]);return `<section><h3>${c.name}</h3><strong class="v2-number">${status(p[key])}</strong><svg class="v2-labchart is-${c.tone}" viewBox="0 0 360 190" role="img" aria-label="${c.name} 만기 손익선"><title>${c.name} 손익</title><desc>가로축 만기 주가 0부터 200. 세로축 손익 -100부터 100. 현재 주가 ${price}에서 ${status(p[key])}.</desc><line class="lab-grid" x1="30" y1="${Y(0)}" x2="340" y2="${Y(0)}"/><line class="lab-current" x1="${cx}" y1="14" x2="${cx}" y2="149"/><path class="v2-labcurve${c.dashed?' is-dashed':''}" d="${d}"/><circle class="v2-labdot" cx="${cx}" cy="${cy}" r="5"/><text x="30" y="169">0</text><text x="178" y="169">100</text><text x="319" y="169">200</text><text x="2" y="17">+100</text><text x="13" y="${Y(0)+4}">0</text><text x="2" y="147">-100</text><text x="320" y="185">주가</text><text x="34" y="10">손익</text></svg></section>`}).join('');$('#labInsight').textContent=price>100?`주가 ${price}: 콜 내재가치 ${p.callIntrinsic}에서 프리미엄 5를 빼 콜 매수 손익은 ${status(p.callLong)}입니다.`:price<100?`주가 ${price}: 풋 내재가치 ${p.putIntrinsic}에서 프리미엄 5를 빼 풋 매수 손익은 ${status(p.putLong)}입니다.`:'주가 100에서는 콜과 풋 내재가치가 0입니다. 매수자는 프리미엄 5를 잃고 매도자는 5를 얻습니다.'};range.oninput=update;update()}
