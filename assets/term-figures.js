@@ -244,7 +244,7 @@
   const mapPts = (f, pts) => pts.map(([u, v]) => [f.X(u), f.Y(v)]);
   const closed = pts => [...pts, pts[0]];
 
-  const LINE_CLASS = { main: 'v2-fig-main', sub: 'v2-fig-sub', dash: 'v2-fig-sub v2-fig-dash', axis: 'v2-fig-axis', wick: 'v2-fig-wick', wickMuted: 'v2-fig-wick v2-fig-muted' };
+  const LINE_CLASS = { main: 'v2-fig-main', sub: 'v2-fig-sub', dash: 'v2-fig-sub v2-fig-dash', axis: 'v2-fig-axis', link: 'v2-fig-link', wick: 'v2-fig-wick', wickMuted: 'v2-fig-wick v2-fig-muted' };
   function addLine(s, kind, pts) {
     if (pts.length < 2) return;
     s.items.push({ k: 'line', cls: LINE_CLASS[kind], pts, kind });
@@ -255,9 +255,9 @@
     s.items.push({ k: 'dot', x, y, r });
     s.obst.push({ k: 'circle', x, y, r });
   }
-  function addRect(s, x, y, w, h, cls, rx) {
+  function addRect(s, x, y, w, h, cls, rx, id) {
     s.items.push({ k: 'rect', x, y, w, h, cls, rx });
-    s.obst.push({ k: 'box', box: { x0: x, x1: x + w, y0: y, y1: y + h } });
+    s.obst.push({ k: 'box', id, box: { x0: x, x1: x + w, y0: y, y1: y + h } });
   }
   function addHead(s, tip, dir, len = 8, half = 3.6) {
     const n = Math.hypot(dir[0], dir[1]), d = [dir[0] / n, dir[1] / n];
@@ -304,8 +304,8 @@
     for (const piece of clipPolyline(mapPts(f, dataPts), box)) addLine(s, kind, piece);
   }
 
-  const SIZE = { note: 12, name: 11, title: 12, small: 10.5 };
-  const BOLD = { note: true, name: false, title: true, small: true };
+  const SIZE = { note: 12, name: 11, title: 12, small: 10.5, box: 13, boxb: 13, edge: 12, op: 16 };
+  const BOLD = { note: true, name: false, title: true, small: true, box: false, boxb: true, edge: false, op: true };
   function textWidth(text, size, bold) {
     let units = 0;
     for (const ch of String(text)) {
@@ -314,6 +314,7 @@
       else if (ch === ' ') units += 0.3;
       else if (ch >= '0' && ch <= '9') units += 0.66;
       else if (ch === '%') units += 0.98;
+      else if (c >= 0x4e00 && c <= 0x9fff || c >= 0x2460 && c <= 0x2473 || c === 0x25cb) units += 0.9;
       else if (ch === '(' || ch === ')') units += 0.38;
       else if (ch >= 'A' && ch <= 'Z') units += 0.72;
       else units += 0.58;
@@ -335,8 +336,8 @@
     return t;
   }
   function firstHit(s, box, ignore) {
-    if (box.x0 < MARGIN || box.x1 > W - MARGIN || box.y0 < MARGIN || box.y1 > H - MARGIN) return 'outside the figure';
-    for (const t of s.texts) if (t !== ignore && overlap(inflate(box, PAD_TEXT), t.box)) return 'text ' + t.text;
+    if (box.x0 < MARGIN || box.x1 > (s.width || W) - MARGIN || box.y0 < MARGIN || box.y1 > (s.height || H) - MARGIN) return 'outside the figure';
+    for (const t of s.texts) if (t !== ignore && !(ignore && ignore.owner !== undefined && t.owner === ignore.owner) && overlap(inflate(box, PAD_TEXT), t.box)) return 'text ' + t.text;
     const line = inflate(box, PAD_LINE);
     for (const o of s.obst) {
       if (o.k === 'poly') {
@@ -348,7 +349,7 @@
       } else if (o.k === 'circle') {
         const nx = Math.min(Math.max(o.x, box.x0), box.x1), ny = Math.min(Math.max(o.y, box.y0), box.y1);
         if (Math.hypot(nx - o.x, ny - o.y) < o.r + PAD_DOT) return 'dot';
-      } else if (o.k === 'box' && overlap(inflate(box, PAD_TEXT), o.box)) return 'bar';
+      } else if (o.k === 'box' && !(ignore && ignore.owner !== undefined && o.id === ignore.owner) && overlap(inflate(box, PAD_TEXT), o.box)) return 'bar';
     }
     return null;
   }
@@ -1041,6 +1042,557 @@
       return s;
     });
 
+  const DIA = { margin: 6, padX: 8, padY: 6, line: 16, ascent: 11.9, gapX: 26, gapY: 28, spacer: 28, labelLine: 14, laneMin: 26 };
+  const DW = 260;
+  const DIA_W = DW - 2 * DIA.margin;
+  const widthOf = (text, cls) => textWidth(text, SIZE[cls], BOLD[cls]);
+  const natural = (text, cls) => Math.max(0, ...String(text).split('\n').map(part => widthOf(part, cls)));
+  const longest = (text, cls) => Math.max(0, ...String(text).split(/[\s\n]+/).map(word => widthOf(word, cls)));
+  function wrapLines(text, cls, maxW) {
+    const out = [];
+    for (const para of String(text).split('\n')) {
+      let line = '';
+      for (const word of para.split(' ')) {
+        const joined = line ? line + ' ' + word : word;
+        if (widthOf(joined, cls) <= maxW + 0.01) { line = joined; continue; }
+        if (line) { out.push(line); line = ''; }
+        let part = '';
+        for (const ch of word) {
+          if (part && widthOf(part + ch, cls) > maxW + 0.01) { out.push(part); part = ch; } else part += ch;
+        }
+        line = part;
+      }
+      out.push(line);
+    }
+    return out;
+  }
+  const N = (id, text, row, col, o = {}) => ({ id, text, row, col, ...o });
+  const E = (from, to, label, o = {}) => ({ from, to, label, ...o });
+
+  function addLink(s, pts, head) {
+    const drawn = pts.map(p => p.slice()), n = pts.length;
+    const unit = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]); return [(b[0] - a[0]) / d, (b[1] - a[1]) / d]; };
+    if (head === 'end' || head === 'both') {
+      const u = unit(pts[n - 2], pts[n - 1]);
+      drawn[n - 1] = [pts[n - 1][0] - u[0] * 6, pts[n - 1][1] - u[1] * 6];
+    }
+    if (head === 'both') {
+      const u = unit(pts[1], pts[0]);
+      drawn[0] = [pts[0][0] - u[0] * 6, pts[0][1] - u[1] * 6];
+    }
+    addLine(s, 'link', drawn);
+    if (head === 'end' || head === 'both') addHead(s, pts[n - 1], unit(pts[n - 2], pts[n - 1]));
+    if (head === 'both') addHead(s, pts[0], unit(pts[1], pts[0]));
+  }
+
+  function routeEdge(e, dir) {
+    const a = e.a, b = e.b, off = e.offset || 0;
+    if (e.route === 'tree') {
+      const tx = a.x + (e.trunk ?? 14), cy = b.y + b.h / 2;
+      return [[tx, a.y + a.h], [tx, cy], [b.x, cy]];
+    }
+    const oy0 = Math.max(a.y, b.y), oy1 = Math.min(a.y + a.h, b.y + b.h);
+    const ox0 = Math.max(a.x, b.x), ox1 = Math.min(a.x + a.w, b.x + b.w);
+    if (oy1 - oy0 >= 8) {
+      const y = (oy0 + oy1) / 2 + off, right = b.x > a.x;
+      return [[right ? a.x + a.w : a.x, y], [right ? b.x : b.x + b.w, y]];
+    }
+    if (ox1 - ox0 >= 12 && !(e.bus && Math.abs(a.x + a.w / 2 - b.x - b.w / 2) > 1)) {
+      const x = (ox0 + ox1) / 2 + off, down = b.y > a.y;
+      return [[x, down ? a.y + a.h : a.y], [x, down ? b.y : b.y + b.h]];
+    }
+    if ((e.via || dir) === 'h') {
+      const right = b.x > a.x, x1 = right ? a.x + a.w : a.x, x2 = right ? b.x : b.x + b.w, xm = (x1 + x2) / 2;
+      const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2;
+      return [[x1, y1], [xm, y1], [xm, y2], [x2, y2]];
+    }
+    const down = b.y > a.y, y1 = down ? a.y + a.h : a.y, y2 = down ? b.y : b.y + b.h, ym = (y1 + y2) / 2;
+    const x1 = a.x + a.w / 2, x2 = b.x + b.w / 2;
+    return [[x1, y1], [x1, ym], [x2, ym], [x2, y2]];
+  }
+
+  function drawGrid(s, g, y0) {
+    const pre = g.idPrefix || '';
+    const nodes = g.nodes.map(n => ({ cs: 1, rs: 1, kind: 'box', ...n, id: pre + n.id }));
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    const edges = (g.edges || []).map(e => ({ head: 'end', ...e, from: pre + e.from, to: pre + e.to, a: byId.get(pre + e.from), b: byId.get(pre + e.to) }));
+    for (const e of edges) if (!e.a || !e.b) throw new Error('diagram edge ' + e.from + ' > ' + e.to + ' has no box');
+    const ncol = Math.max(...nodes.map(n => n.col + n.cs)), nrow = Math.max(...nodes.map(n => n.row + n.rs));
+    const dir = g.dir || 'v';
+    const inset = nodes.some(n => n.kind === 'group') ? 8 : 0;
+    for (const n of nodes) {
+      const cls = n.cls || (n.kind === 'op' ? 'op' : 'box'), pad = n.kind === 'box' ? DIA.padX : 0;
+      n.cls = cls;
+      if (n.kind === 'group') { n.natW = n.minW = 0; continue; }
+      n.natW = Math.max(n.head ? natural(n.head, 'boxb') : 0, natural(n.text, cls)) + 2 * pad;
+      n.minW = Math.max(n.head ? longest(n.head, 'boxb') : 0, longest(n.text, cls)) + 2 * pad;
+    }
+    const pairs = new Map();
+    for (const e of edges) {
+      const key = [e.from, e.to].sort().join('|');
+      if (!pairs.has(key)) pairs.set(key, []);
+      pairs.get(key).push(e);
+    }
+    for (const list of pairs.values()) list.forEach((e, i) => { e.lane = i - (list.length - 1) / 2; e.lanes = list.length; });
+    const sameRow = e => e.a.row === e.b.row;
+    const labelNat = e => (e.label ? Math.min(natural(e.label, 'edge'), 140) : 0);
+    const gaps = Array.from({ length: ncol - 1 }, (_, i) => (g.gaps && g.gaps[i] !== undefined ? g.gaps[i] : (g.gapX ?? DIA.gapX)));
+    const floors = gaps.slice();
+    for (const e of edges) {
+      if (sameRow(e) && Math.abs(e.a.col - e.b.col) === 1 && e.label) {
+        const i = Math.min(e.a.col, e.b.col);
+        gaps[i] = Math.max(gaps[i], labelNat(e) + 24);
+        floors[i] = Math.max(floors[i], Math.min(labelNat(e) + 24, 74));
+      }
+    }
+    const fixed = g.colW || [];
+    const nat = Array(ncol).fill(0), min = Array(ncol).fill(0);
+    for (let c = 0; c < ncol; c++) if (fixed[c] != null) nat[c] = min[c] = fixed[c];
+    for (const n of nodes) if (n.kind !== 'group' && n.cs === 1 && fixed[n.col] == null) { nat[n.col] = Math.max(nat[n.col], n.natW); min[n.col] = Math.max(min[n.col], n.minW); }
+    for (const n of nodes) {
+      if (n.cs === 1 || n.kind === 'group') continue;
+      const cols = Array.from({ length: n.cs }, (_, i) => n.col + i);
+      const have = sum(cols.map(c => nat[c])) + sum(gaps.slice(n.col, n.col + n.cs - 1));
+      const flex = cols.filter(c => fixed[c] == null).pop();
+      if (n.natW > have && flex !== undefined) nat[flex] += n.natW - have;
+      const haveMin = sum(cols.map(c => min[c])) + sum(gaps.slice(n.col, n.col + n.cs - 1));
+      if (n.minW > haveMin && flex !== undefined) min[flex] += n.minW - haveMin;
+    }
+    const tight = DIA_W - 2 * inset - sum(min);
+    if (sum(gaps) > tight) {
+      const spare = Math.max(0, tight - sum(floors)), want = sum(gaps.map((v, i) => v - floors[i]));
+      gaps.forEach((v, i) => { gaps[i] = floors[i] + (want ? (v - floors[i]) * Math.min(1, spare / want) : 0); });
+    }
+    if (g.equal) {
+      const flexCols = nat.map((_, c) => c).filter(c => fixed[c] == null && nat[c] > 0), top = Math.max(...flexCols.map(c => nat[c]));
+      for (const c of flexCols) nat[c] = top;
+    }
+    const avail = DIA_W - 2 * inset - sum(gaps);
+    let widths = nat.slice();
+    if (sum(nat) > avail) {
+      const spare = Math.max(0, avail - sum(min)), room = sum(nat.map((v, c) => v - min[c]));
+      widths = nat.map((v, c) => min[c] + (room ? (v - min[c]) * spare / room : 0));
+    } else if (g.fill) {
+      const flexCols = nat.map((_, c) => c).filter(c => fixed[c] == null), extra = (avail - sum(nat)) / flexCols.length;
+      for (const c of flexCols) widths[c] += extra;
+    }
+    const totalW = sum(widths) + sum(gaps), x0 = g.left ? DIA.margin : (DW - totalW) / 2;
+    const colX = [];
+    widths.reduce((x, w, c) => { colX[c] = x; return x + w + (gaps[c] ?? 0); }, x0);
+    for (const n of nodes) {
+      if (n.kind === 'group') { n.lines = []; n.h = 0; continue; }
+      const spanW = sum(widths.slice(n.col, n.col + n.cs)) + sum(gaps.slice(n.col, n.col + n.cs - 1)), w = n.fit ? Math.min(spanW, n.natW) : spanW;
+      n.spanW = spanW;
+      const pad = n.kind === 'box' ? DIA.padX : 0, inner = Math.max(10, (n.kind === 'box' ? w : Math.min(w, n.natW + 1)) - 2 * pad);
+      n.lines = [...(n.head ? wrapLines(n.head, 'boxb', inner).map(t => ({ t, cls: 'boxb' })) : []), ...(n.text ? wrapLines(n.text, n.cls, inner).map(t => ({ t, cls: n.cls })) : [])];
+      n.w = n.kind === 'box' ? w : Math.max(...n.lines.map(l => widthOf(l.t, l.cls)));
+      n.h = n.natH = n.lines.length * (n.cls === 'op' ? 20 : DIA.line) + (n.kind === 'box' ? 2 * DIA.padY : 0);
+    }
+    const rowH = Array(nrow).fill(0);
+    for (const n of nodes) if (n.rs === 1 && n.kind !== 'group') rowH[n.row] = Math.max(rowH[n.row], n.h);
+    for (const e of edges) {
+      if (sameRow(e)) {
+        const lines = e.label ? wrapLines(e.label, 'edge', Math.max(10, gaps[Math.min(e.a.col, e.b.col)] - 22)).length : 0;
+        e.laneH = Math.max(DIA.laneMin, lines * DIA.labelLine + 10);
+        rowH[e.a.row] = Math.max(rowH[e.a.row], e.laneH * e.lanes + 6);
+      }
+    }
+    const gapY = Array.from({ length: nrow - 1 }, (_, i) => (g.gapsY && g.gapsY[i] !== undefined ? g.gapsY[i] : (g.gapY ?? DIA.gapY)));
+    for (const e of edges) {
+      if (!sameRow(e) && e.label && Math.abs(e.a.row - e.b.row) === 1) {
+        const i = Math.min(e.a.row, e.b.row);
+        gapY[i] = Math.max(gapY[i], wrapLines(e.label, 'edge', 128).length * DIA.labelLine + 14);
+      }
+    }
+    const rowY = [];
+    rowH.reduce((y, h, r) => { rowY[r] = y; return y + h + (gapY[r] ?? 0); }, y0);
+    for (const n of nodes) {
+      n.x = colX[n.col];
+      if (n.kind === 'group') {
+        const gw = sum(widths.slice(n.col, n.col + n.cs)) + sum(gaps.slice(n.col, n.col + n.cs - 1));
+        n.h = sum(rowH.slice(n.row, n.row + n.rs)) + sum(gapY.slice(n.row, n.row + n.rs - 1)) + 12;
+        n.x -= 6; n.w = gw + 12; n.y = rowY[n.row] - 6;
+        continue;
+      }
+      const span = sum(rowH.slice(n.row, n.row + n.rs)) + sum(gapY.slice(n.row, n.row + n.rs - 1));
+      if (n.kind === 'box' && n.short) { n.h = n.natH; n.y = rowY[n.row] + (span - n.natH) / 2; }
+      else if (n.kind === 'box') { n.h = n.rs === 1 ? rowH[n.row] : span; n.y = rowY[n.row]; } else n.y = rowY[n.row] + (span - n.h) / 2;
+      if (n.kind !== 'box' && n.align === 'start') n.x = colX[n.col];
+      else if (n.kind !== 'box' || n.fit) n.x = colX[n.col] + (n.spanW - n.w) / 2;
+    }
+    for (const n of nodes.filter(m => m.kind === 'group')) {
+      s.items.push({ k: 'rect', x: n.x, y: n.y, w: n.w, h: n.h, cls: 'v2-fig-group', rx: 8 });
+      s.nodes.push({ id: n.id, text: '', x: n.x, y: n.y, w: n.w, h: n.h, kind: 'group' });
+    }
+    for (const n of nodes.filter(m => m.kind !== 'group')) {
+      if (n.kind === 'box') addRect(s, n.x, n.y, n.w, n.h, 'v2-fig-node', 6, n.id);
+      const top = n.y + (n.h - n.lines.length * (n.cls === 'op' ? 20 : DIA.line)) / 2;
+      const left = n.align === 'start' && n.kind === 'box';
+      n.lines.forEach((l, i) => {
+        const lineH = n.cls === 'op' ? 20 : DIA.line;
+        const t = addText(s, l.t, left ? n.x + DIA.padX : n.x + n.w / 2, top + i * lineH + (n.cls === 'op' ? 15 : DIA.ascent), left ? 'start' : 'middle', l.cls);
+        t.owner = n.id;
+      });
+      s.nodes.push({ id: n.id, text: [n.head, n.text].filter(Boolean).join(' ').replace(/\n/g, ' '), x: n.x, y: n.y, w: n.w, h: n.h, kind: n.kind });
+    }
+    for (const e of edges) {
+      e.offset = e.lanes > 1 ? e.lane * (sameRow(e) ? e.laneH : 30) : 0;
+      const pts = routeEdge(e, dir);
+      for (const [end, other, node] of [[0, 1, e.a], [pts.length - 1, pts.length - 2, e.b]]) {
+        if (node.kind === 'box' || node.kind === 'group') continue;
+        const d = Math.hypot(pts[other][0] - pts[end][0], pts[other][1] - pts[end][1]);
+        pts[end] = [pts[end][0] + (pts[other][0] - pts[end][0]) / d * 5, pts[end][1] + (pts[other][1] - pts[end][1]) / d * 5];
+      }
+      if (e.head === 'none') addLine(s, 'link', pts); else addLink(s, pts, e.head === 'both' ? 'both' : 'end');
+      s.edges.push({ from: e.from, to: e.to, label: e.label || '', pts, head: e.head });
+      if (!e.label) continue;
+      const last = pts.length - 1, [p, q] = [pts[last - 1], pts[last]];
+      if (pts.length === 2 && Math.abs(p[1] - q[1]) < 0.5) {
+        const lines = wrapLines(e.label, 'edge', Math.abs(q[0] - p[0]) - 10), below = e.side === 'below';
+        lines.forEach((t, i) => { addText(s, t, (p[0] + q[0]) / 2, below ? p[1] + 16 + i * DIA.labelLine : p[1] - 7 - (lines.length - 1 - i) * DIA.labelLine, 'middle', 'edge').owner = 'label' + s.edges.length; });
+      } else {
+        const x = p[0], ymid = (p[1] + q[1]) / 2;
+        const side = e.side || (e.lanes > 1 && e.lane < 0 ? 'l' : 'r');
+        const room = side === 'l' ? x - 8 - DIA.margin : DW - DIA.margin - x - 8;
+        const lines = wrapLines(e.label, 'edge', Math.min(room, 128));
+        lines.forEach((t, i) => { addText(s, t, side === 'l' ? x - 8 : x + 8, ymid - (lines.length - 1) * 7 + i * DIA.labelLine + 4, side === 'l' ? 'end' : 'start', 'edge').owner = 'label' + s.edges.length; });
+      }
+    }
+    return rowY[nrow - 1] + rowH[nrow - 1];
+  }
+
+  function drawNumberLine(s, nl, y0) {
+    const left = DIA.margin + 1, right = DW - DIA.margin - 1, [lo, hi] = nl.domain;
+    const X = v => (nl.reverse ? right - (v - lo) * (right - left) / (hi - lo) : left + (v - lo) * (right - left) / (hi - lo));
+    const barY = y0 + 36, barH = 14, top = nl.top || {};
+    if (top.left) addText(s, top.left, left, y0 + 13, 'start', 'edge');
+    if (top.right) addText(s, top.right, right, y0 + 13, 'end', 'edge');
+    if (top.label) addText(s, top.label, (left + right) / 2, y0 + 13, 'middle', 'edge');
+    if (top.arrow !== false) addArrow(s, [left, y0 + 25], [right, y0 + 25], 'link');
+    let bottom = barY + barH + 34;
+    const zoneNames = [], zoneRanges = [];
+    nl.zones.forEach((z, i) => {
+      const a = X(z.from ?? lo), b = X(z.to ?? hi), x0 = Math.min(a, b), w = Math.abs(b - a);
+      addRect(s, x0, barY, w, barH, 'v2-fig-node', 0, (nl.idPrefix || '') + 'zone' + i);
+      s.nodes.push({ id: (nl.idPrefix || '') + 'zone' + i, text: [z.name, z.range].filter(Boolean).join(' ').replace(/\n/g, ' '), x: x0, y: barY, w, h: barH, kind: 'zone' });
+      const names = z.name ? wrapLines(z.name, 'boxb', w - 4) : [];
+      names.forEach((t, k) => { addText(s, t, x0 + w / 2, barY + barH + 38 + k * 16, 'middle', 'boxb').owner = (nl.idPrefix || '') + 'zone' + i; });
+      zoneNames.push(names.length);
+      zoneRanges.push({ z, x: x0 + w / 2 });
+    });
+    const rangeY = barY + barH + 38 + Math.max(0, ...zoneNames) * 16;
+    zoneRanges.forEach((r, i) => { if (r.z.range) { addText(s, r.z.range, r.x, rangeY, 'middle', 'edge').owner = (nl.idPrefix || '') + 'zone' + i; bottom = rangeY + 6; } });
+    bottom = Math.max(bottom, rangeY - 10);
+    for (const t of nl.ticks) {
+      const x = X(t.v);
+      addLine(s, 'link', [[x, barY + barH], [x, barY + barH + 4]]);
+      addText(s, t.label, x, barY + barH + 21, 'middle', 'edge');
+      s.ticks.push({ v: t.v, label: t.label, x });
+    }
+    return bottom;
+  }
+
+  function drawLedger(s, lg, y0) {
+    const rowH = 24, pad = DIA.padX + 2, valueW = Math.max(...lg.rows.map(r => widthOf(r.value, 'boxb'))), labelW = Math.max(...lg.rows.map(r => widthOf(r.label, 'box')));
+    const w = Math.min(DIA_W, labelW + valueW + 3 * pad + 8), x = (DW - w) / 2, h = lg.rows.length * rowH + 2 * DIA.padY;
+    addRect(s, x, y0, w, h, 'v2-fig-node', 6, 'ledger');
+    s.nodes.push({ id: 'ledger', text: lg.rows.map(r => r.label + ' ' + r.value).join(' '), x, y: y0, w, h, kind: 'ledger' });
+    lg.rows.forEach((r, i) => {
+      const y = y0 + DIA.padY + i * rowH;
+      if (r.rule) addLine(s, 'link', [[x + pad, y], [x + w - pad, y]]);
+      const a = addText(s, r.label, x + pad, y + 16, 'start', r.bold ? 'boxb' : 'box'), b = addText(s, r.value, x + w - pad, y + 16, 'end', 'boxb');
+      a.owner = b.owner = 'ledger';
+    });
+    return y0 + h;
+  }
+
+  const newDiagram = kind => Object.assign(newScene(kind), { diagram: true, width: DW, nodes: [], edges: [], ticks: [] });
+  function diagram(kind, panels) {
+    const s = newDiagram(kind);
+    let y = 8;
+    panels.forEach((p, i) => {
+      if (i && !p.title) { y += 10; addLine(s, 'sub', [[DIA.margin + 2, y], [DW - DIA.margin - 2, y]]); y += 14; } else if (i) y += 14;
+      if (p.title) { addText(s, p.title, DIA.margin + 2, y + 12, 'start', 'title'); y += 32; }
+      const prefix = panels.length > 1 ? 'p' + i + '-' : '';
+      y = p.numberLine ? drawNumberLine(s, { ...p.numberLine, idPrefix: prefix }, y) : p.ledger ? drawLedger(s, p.ledger, y) : drawGrid(s, { ...p, idPrefix: prefix }, y);
+    });
+    s.height = Math.ceil(y + 8);
+    return s;
+  }
+
+  math.pchip = pts => {
+    const n = pts.length, h = [], del = [];
+    for (let i = 0; i < n - 1; i++) { h.push(pts[i + 1][0] - pts[i][0]); del.push((pts[i + 1][1] - pts[i][1]) / h[i]); }
+    const d = Array(n).fill(0);
+    for (let i = 1; i < n - 1; i++) {
+      if (del[i - 1] * del[i] > 0) {
+        const w1 = 2 * h[i] + h[i - 1], w2 = h[i] + 2 * h[i - 1];
+        d[i] = (w1 + w2) / (w1 / del[i - 1] + w2 / del[i]);
+      }
+    }
+    const end = (h0, h1, d0, d1) => {
+      let v = ((2 * h0 + h1) * d0 - h0 * d1) / (h0 + h1);
+      if (Math.sign(v) !== Math.sign(d0)) v = 0;
+      else if (Math.sign(d0) !== Math.sign(d1) && Math.abs(v) > 3 * Math.abs(d0)) v = 3 * d0;
+      return v;
+    };
+    if (n === 2) { d[0] = d[1] = del[0]; } else {
+      d[0] = end(h[0], h[1], del[0], del[1]);
+      d[n - 1] = end(h[n - 2], h[n - 3], del[n - 2], del[n - 3]);
+    }
+    return x => {
+      let i = 0;
+      while (i < n - 2 && x > pts[i + 1][0]) i++;
+      const t = (x - pts[i][0]) / h[i], t2 = t * t, t3 = t2 * t;
+      return (2 * t3 - 3 * t2 + 1) * pts[i][1] + (t3 - 2 * t2 + t) * h[i] * d[i] + (-2 * t3 + 3 * t2) * pts[i + 1][1] + (t3 - t2) * h[i] * d[i + 1];
+    };
+  };
+  models.supply = { q0: 0.52, high: 0.78, low: 0.3 };
+  models.yieldSamples = {
+    rising: { points: [[1, 3.0], [3, 3.5], [10, 4.0]], x: [0, 11], y: [2.8, 4.2] },
+    humped: { points: [[1, 4.5], [5, 5.0], [10, 4.5]], x: [0, 11], y: [4.3, 5.2] },
+  };
+  define('supply-inelastic', '가격을 세로축, 공급량을 가로축으로 한 평면에서 공급곡선 S는 고정된 양의 위치에 선 수직선이고, 가격이 높아도 낮아도 공급량은 같다.',
+    '가격이 달라져도 공급량은 같으므로 공급곡선이 수직선이다.', s0 => {
+      const s = plot(s0.kind, '공급량 Q', '가격 P', { box: { left: 48 } }), f = s.frame, m = models.supply;
+      addCurve(s, f, 'main', linspace(0.04, 0.96, 24).map(p => [m.q0, p]));
+      for (const p of [m.high, m.low]) {
+        addCurve(s, f, 'dash', [[0, p], [m.q0, p]]);
+        addDot(s, f.X(m.q0), f.Y(p));
+      }
+      place(s, '높음', [f.left, f.Y(m.high)], { dirs: ['W'], gap: 6 });
+      place(s, '낮음', [f.left, f.Y(m.low)], { dirs: ['W'], gap: 6 });
+      place(s, '공급곡선 S', [f.X(m.q0), f.Y(0.96)], { dirs: ['E', 'NE'], gap: 8 });
+      place(s, '고정된 양', [f.X(m.q0), f.bottom], { dirs: ['S'], gap: 5 });
+      return s;
+    });
+  define('yield-curve-samples', '잔존만기를 가로축, 수익률을 세로축으로 한 두 평면에서 왼쪽은 1년 3.0%, 3년 3.5%, 10년 4.0%로 오르는 곡선이고 오른쪽은 1년 4.5%, 5년 5.0%, 10년 4.5%로 중간이 솟은 낙타형 곡선이다.',
+    '숫자는 모양을 보여주는 가상 예시다. 곡선이 중간에서 솟은 모양이 낙타형이다.', s0 => {
+      const sets = [models.yieldSamples.rising, models.yieldSamples.humped];
+      const s = panels(s0.kind, sets.map((m, i) => ({ title: i ? '낙타형' : '우상향', xName: '잔존만기', yName: '수익률', dx: m.x, dy: m.y })),
+        withRows([{ left: 40, right: 130 }, { left: 186, right: 280 }]));
+      sets.forEach((m, i) => {
+        const f = s.frames[i], fn = math.pchip(m.points);
+        addCurve(s, f, 'main', sample(fn, m.points[0][0], m.points[m.points.length - 1][0], 48));
+        for (const [x, y] of m.points) {
+          addDot(s, f.X(x), f.Y(y));
+          addCurve(s, f, 'dash', [[m.x[0], y], [x, y]]);
+          if (m.points.findIndex(pt => pt[1] === y) === m.points.findIndex(pt => pt === m.points.find(q => q[0] === x))) place(s, y.toFixed(1) + '%', [f.left, f.Y(y)], { dirs: ['W'], gap: 5, cls: 'small' });
+          place(s, x + '년', [f.X(x), f.Y(y)], { dirs: ['N', 'S', 'NE', 'SE'], gap: 7, cls: 'small' });
+        }
+      });
+      return s;
+    });
+
+  const DIAGRAM_CAPTIONS = {
+    'pca-steps': '적기시정조치 뒤의 후속 절차',
+    'debt-claim': '채무증권의 뜻',
+    'debt-vs-private': '채무증권과 일반 금전채권',
+    'self-dealing': '자기계약의 예',
+    'mtf-matching': '다자간매매체결회사의 주문 체결',
+    'self-dealing-exception': '일대일 장외거래와 장내시장, 다자간매매체결회사의 비교',
+    'cco-oversight': '감독 주체의 구성',
+    'cco-insider-cases': '내부자와 준내부자 판단 사례',
+    'cco-bonus-conflict': '성과급과 판매 제지 유인',
+    'cco-dual-role': '영업책임자 겸직의 이해상충',
+    'cco-fines': '3천만원 이하 과태료 사유의 예',
+    'benefit-disclosure': '공시 기준',
+    'benefit-records': '보고와 기록 보관',
+    'unsolicited-basic': '요청받은 권유와 불초청권유',
+    'unsolicited-cases': '권유 상황별 판단',
+    'dr-flow': '증권예탁증권이 만들어지는 순서',
+    'dr-underlying': '예탁 가능한 원증권',
+    'fund-trust-example': '투자신탁의 예',
+    'fund-llp-example': '사모투자합자회사의 예',
+    'claim-money': '금전채권(債權)',
+    'bond-issue': '채권(債券)',
+    'securities-kinds': '증권의 종류',
+    'inclusive-test': '투자성 기준',
+    'inclusive-kinds': '추가지급의무에 따른 구분',
+    'withdraw-flow': '청약철회의 흐름',
+    'withdraw-no-fault': '잘못이 없어도 청약철회 가능',
+    'withdraw-returns': '철회 뒤의 청구와 반환',
+  };
+  const dia = (kind, label, panels) => define(kind, label, DIAGRAM_CAPTIONS[kind] || '', () => diagram(kind, panels));
+  const chain = (texts, labels = []) => ({
+    nodes: texts.map((t, i) => (typeof t === 'string' ? N('n' + i, t, i, 0) : N('n' + i, t.text, i, 0, { head: t.head }))),
+    edges: texts.slice(1).map((_, i) => E('n' + i, 'n' + (i + 1), labels[i])),
+  });
+  const pairs = rows => ({
+    dir: 'h',
+    nodes: rows.flatMap((r, i) => [N('l' + i, r[0], i, 0), N('r' + i, r[1], i, 1)]),
+    edges: rows.map((_, i) => E('l' + i, 'r' + i)),
+  });
+  const tree = (root, kids, o = {}) => {
+    const withTo = kids.some(k => k.to);
+    return {
+      gapY: 8, colW: [DIA.spacer], dir: 'h', gaps: [0, 20], ...o,
+      nodes: [N('root', root.text, 0, 0, { cs: withTo ? 3 : 2, head: root.head }),
+        ...kids.flatMap((k, i) => [N('k' + i, k.text, i + 1, 1, { head: k.head }), ...(k.to ? [N('t' + i, k.to, i + 1, 2)] : [])])],
+      edges: kids.flatMap((k, i) => [E('root', 'k' + i, '', { route: 'tree', head: 'none' }), ...(k.to ? [E('k' + i, 't' + i)] : [])]),
+    };
+  };
+  const bracketIn = (sources, target, head = 'none') => ({
+    dir: 'h',
+    nodes: [...sources.map((t, i) => N('s' + i, t, i, 0)), N('t', target, 0, 1, { rs: sources.length, short: true })],
+    edges: sources.map((_, i) => E('s' + i, 't', '', { head })),
+  });
+  const fanIn = (sources, rest, extra = []) => ({
+    equal: true,
+    nodes: [...sources.map((t, i) => N('s' + i, t, 0, i)), ...rest.map((t, i) => N('r' + i, t, i + 1, 0, { cs: sources.length, fit: true })), ...extra],
+    edges: [...sources.map((_, i) => E('s' + i, 'r0', '', { bus: true })), ...rest.slice(1).map((_, i) => E('r' + i, 'r' + (i + 1)))],
+  });
+
+  dia('trust-flow', '신탁에서 위탁자가 재산을 수탁자에게 맡기고, 수탁자는 이익을 수익자에게 지급한다.', [chain(['위탁자', '수탁자', '수익자'], ['재산을 맡김', '이익을 지급'])]);
+  dia('cma-flow', '고객 A, B, C의 자금이 종금사 CMA로 모이고, 어음 등 단기자산으로 운용되며, 그 수익이 고객에게 지급된다.',
+    [fanIn(['고객 A의 자금', '고객 B의 자금', '고객 C의 자금'], ['종금사 CMA', '어음 등 단기자산 운용', '수익을 고객에게 지급'])]);
+  dia('fund-pooling', '투자자 A, B, C의 돈이 펀드라는 공동 돈주머니에 모여 주식과 채권 등에 투자되고, 각 투자자가 가진 펀드 지분이나 수익권의 증표가 집합투자증권이다.',
+    [{ ...fanIn(['투자자 A의 돈', '투자자 B의 돈', '투자자 C의 돈'], ['펀드라는 공동 돈주머니', '주식, 채권 등에 투자'], [N('note', '각 투자자가 가진 펀드 지분, 수익권의 증표 = 집합투자증권', 3, 0, { cs: 3 })]), gapsY: [28, 28, 22] }]);
+  dia('master-feeder', '투자자 A는 자펀드 A에, 투자자 B는 자펀드 B에 가입하고, 두 자펀드가 모펀드에 투자하며, 모펀드가 주식과 채권 등에 투자한다.', [{
+    equal: true,
+    nodes: [N('a', '투자자 A', 0, 0), N('b', '투자자 B', 0, 1), N('fa', '자펀드 A', 1, 0), N('fb', '자펀드 B', 1, 1), N('m', '모펀드', 2, 0, { cs: 2, fit: true }), N('x', '주식, 채권 등', 3, 0, { cs: 2, fit: true })],
+    edges: [E('a', 'fa'), E('b', 'fb'), E('fa', 'm', '', { bus: true }), E('fb', 'm', '', { bus: true }), E('m', 'x')],
+  }]);
+  dia('porter', '산업경쟁력을 가운데 두고 위쪽에 수요조건, 아래쪽에 요소조건, 왼쪽에 관련과 지원산업, 오른쪽에 기업전략과 구조와 경쟁이 있다.', [{
+    gaps: [20, 20],
+    nodes: [N('t', '수요조건', 0, 1), N('l', '관련, 지원산업', 1, 0), N('c', '산업경쟁력', 1, 1), N('r', '기업전략, 구조, 경쟁', 1, 2), N('b', '요소조건', 2, 1)],
+    edges: [E('c', 't'), E('c', 'l'), E('c', 'r'), E('c', 'b')],
+  }]);
+  dia('fs-tree', '재무제표라는 회사 돈을 보여주는 공식 표의 묶음 아래에 재무상태표, 손익계산서, 현금흐름표, 자본변동표, 주석이 있다.', [tree({ head: '재무제표', text: '회사 돈을 보여주는 공식 표의 묶음' }, [
+    { head: '재무상태표', text: '특정 날짜의 재산 사진' }, { head: '손익계산서', text: '일정 기간의 장사 성적표' }, { head: '현금흐름표', text: '일정 기간의 현금 출입 기록' },
+    { head: '자본변동표', text: '일정 기간의 자본 변동' }, { head: '주석', text: '보고서 내용을\n이해하기 위한 추가 설명' }])]);
+  dia('securities-lending', '대여자가 차입자에게 증권을 빌려주고 담보와 대차수수료를 받으며, 만기에 차입자가 같은 종목과 수량의 증권을 대여자에게 돌려준다.', [{
+    nodes: [N('a', '대여자\n(증권 보유자)', 0, 0), N('b', '차입자', 0, 1)],
+    edges: [E('a', 'b', '증권 대여'), E('b', 'a', '담보와 대차수수료'), E('b', 'a', '만기: 같은 종목과 수량의 증권 반환')],
+  }]);
+  dia('abs-flow', '카드회사가 카드대금 채권을 SPC에 양도하고 SPC는 매입대금을 주며, SPC가 ABS를 발행해 투자자가 매수대금을 내고, 고객의 카드대금 상환으로 SPC가 ABS 원리금을 지급한다.', [{
+    gaps: [16, 16],
+    nodes: [N('card', '카드회사', 0, 1), N('cust', '고객의 카드대금 상환', 1, 0), N('spc', 'SPC', 1, 1), N('pay', 'ABS 원리금 지급', 1, 2), N('inv', '투자자', 2, 1)],
+    edges: [E('card', 'spc', '카드대금 채권 양도'), E('spc', 'card', '자산 매입대금'), E('spc', 'inv', 'ABS 발행'), E('inv', 'spc', '매수대금'), E('cust', 'spc'), E('spc', 'pay')],
+  }]);
+  dia('debt-claim', '투자자가 발행자에게 돈을 빌려주고, 발행자는 투자자에게 원금과 이자를 지급한다.', [{
+    nodes: [N('a', '투자자', 0, 0), N('b', '발행자', 0, 1)],
+    edges: [E('a', 'b', '돈을 빌려줌'), E('b', 'a', '원금과 이자')],
+  }]);
+  dia('debt-vs-private', '회사채는 지급청구권이 증권으로 발행되어 채무증권이고, 친구에게 빌려준 돈은 사적인 지급청구권이어서 일반 금전채권이다.', [{
+    equal: true,
+    nodes: [N('a0', '회사채', 0, 0), N('a1', '지급청구권이 증권으로 발행됨', 1, 0), N('a2', '채무증권', 2, 0), N('b0', '친구에게\n빌려준 돈', 0, 1), N('b1', '사적인 지급청구권', 1, 1), N('b2', '일반 금전채권', 2, 1)],
+    edges: [E('a0', 'a1'), E('a1', 'a2'), E('b0', 'b1'), E('b1', 'b2')],
+  }]);
+  dia('solicitation-agent', '금융투자회사가 투자권유대행인에게 권유업무를 위탁하고 관리하며, 대행인이 고객에게 상품을 설명하고 계약체결을 권유하지만, 실제 계약은 고객과 금융투자회사 사이에 이루어진다.', [{
+    nodes: [N('co', '금융투자회사', 0, 0), N('ag', '투자권유대행인', 1, 0), N('cu', '고객', 2, 0), N('co2', '금융투자회사', 2, 1)],
+    edges: [E('co', 'ag', '권유업무 위탁, 관리'), E('ag', 'cu', '상품 설명, 계약체결 권유'), E('cu', 'co2', '실제 계약', { head: 'none' })],
+  }]);
+  dia('cross-trade', '고객 A의 일임재산이 매도하고 고객 B의 일임재산이 매수하면서 두 일임재산이 서로 직접 거래하는 모습이다.', [{
+    nodes: [N('a', '고객 A의 일임재산', 0, 0), N('ta', '매도', 0, 1, { kind: 'text', align: 'start' }), N('b', '고객 B의 일임재산', 1, 0), N('tb', '매수', 1, 1, { kind: 'text', align: 'start' })],
+    edges: [E('a', 'ta', '', { head: 'none' }), E('b', 'tb', '', { head: 'none' }), E('a', 'b', '직접 거래', { head: 'both' })],
+  }]);
+
+  dia('self-dealing', '회사가 자기 보유 B채권을 고객에게 판매하면서 동시에 그 고객의 매수 중개인 역할을 하여, 판매자와 구매자 측 중개인을 한 회사가 동시에 맡는다.', [{
+    gaps: [30], gapsY: [26, 8],
+    nodes: [N('co', '회사', 0, 0), N('cu', '고객', 0, 1), N('role', '동시에 고객의 매수 중개인 역할', 1, 0, { cs: 2 }), N('both', '= 판매자와 구매자 측 중개인을 한 회사가 동시에 담당', 2, 0, { cs: 2, kind: 'text' })],
+    edges: [E('co', 'cu', '자기 보유 B채권 판매'), E('co', 'role', '', { head: 'none' })],
+  }]);
+  dia('mtf-matching', 'A, E, F의 매도 주문과 B, C, D의 매수 주문이 전자 체결시스템으로 모이고, 가격 등 조건이 맞는 주문끼리 거래된다.', [{
+    equal: true,
+    nodes: [N('s0', 'A, E, F의 매도 주문', 0, 0), N('s1', 'B, C, D의 매수 주문', 0, 1), N('sys', '전자 체결시스템', 1, 0, { cs: 2, fit: true }), N('end', '가격 등 조건이 맞는 주문끼리 거래', 2, 0, { cs: 2, fit: true })],
+    edges: [E('s0', 'sys', '', { bus: true }), E('s1', 'sys', '', { bus: true }), E('sys', 'end')],
+  }]);
+  dia('self-dealing-exception', '일대일 장외거래에서는 회사가 특정 고객을 골라 가격을 제시해 이해상충 위험이 있고, 장내시장과 다자간매매체결회사에서는 다수 주문이 정해진 규칙으로 체결되어 특정 고객을 거래상대방으로 삼기 어렵다.', [
+    { title: '일대일 장외거래', gapsY: [26], nodes: [N('co', '회사', 0, 0), N('cu', '고객', 0, 1), N('risk', '회사가 자기 재고를 고객에게 불리하게 처분할 이해상충 위험', 1, 0, { cs: 2 })],
+      edges: [E('co', 'cu', '특정 고객 선택, 가격 제시'), E('co', 'risk')], gaps: [60] },
+    { title: '장내시장, 다자간매매체결회사', equal: true,
+      nodes: [N('o0', '회사 주문', 0, 0), N('o1', '고객 주문', 0, 1), N('o2', '기타 주문', 0, 2), N('m', '다수 주문을 정해진 규칙으로 체결', 1, 0, { cs: 3, fit: true }), N('r', '특정 고객을 골라 거래상대방으로 삼기 어려움', 2, 0, { cs: 3, fit: true })],
+      edges: [E('o0', 'm', '', { bus: true }), E('o1', 'm', '', { bus: true }), E('o2', 'm', '', { bus: true }), E('m', 'r')] }]);
+
+  dia('cco-oversight', '이사회 또는 내부통제위원회에 대표이사를 더하는 구조에서, 이사회 또는 내부통제위원회는 감독기관 중 하나를 선택하는 자리이고 대표이사는 항상 포함된다.', [{
+    gaps: [12, 12],
+    nodes: [N('b1', '이사회 또는 내부통제위원회', 0, 0), N('plus', '+', 0, 1, { kind: 'op' }), N('b2', '대표이사', 0, 2), N('n1', '감독기관 중 하나 선택', 1, 0, { kind: 'text', cls: 'edge' }), N('n2', '항상 포함', 1, 2, { kind: 'text', cls: 'edge' })],
+    edges: [E('n1', 'b1'), E('n2', 'b2')],
+  }]);
+  dia('cco-insider-cases', 'A증권사 준법감시인이 A증권사의 미공개 경영정보를 직무상 알면 A증권사의 내부자에 해당할 수 있고, A증권사가 B회사의 인수합병 자문으로 B회사의 미공개정보를 알면 B회사와의 관계에서는 준내부자에 해당할 수 있다.', [
+    chain(['A증권사 준법감시인이 A증권사의 미공개 경영정보를 직무상 알게 됨', 'A증권사의 내부자에 해당할 수 있음']),
+    chain(['A증권사가 B회사의 인수합병 자문을 맡아 B회사의 미공개정보를 업무상 알게 됨', 'B회사 임직원은 아니므로 B회사와의 관계에서는 준내부자에 해당할 수 있음'])]);
+  dia('cco-bonus-conflict', '영업부서가 위험한 상품을 많이 판매하면 회사 이익이 늘고, 준법감시인의 성과급도 늘어 판매를 제지해야 할 유인이 약해질 수 있다.',
+    [chain(['영업부서가 위험한 상품을 많이 판매', '회사 이익 증가', '준법감시인의 성과급도 증가', '판매를 제지해야 할 유인이 약해질 수 있음'])]);
+  dia('cco-dual-role', '오전에는 영업책임자로서 상품판매를 지시하고 오후에는 준법감시인으로서 그 판매가 적절했는지 검사하면, 자기 업무를 자기가 검사하는 이해상충이 생긴다.', [{
+    equal: true,
+    nodes: [N('am', '오전: 영업책임자로서 상품판매를 지시', 0, 0), N('pm', '오후: 준법감시인으로서 그 판매가 적절했는지 검사', 0, 1), N('r', '자기 업무를 자기가 검사하는 이해상충', 1, 0, { cs: 2, fit: true })],
+    edges: [E('am', 'r', '', { bus: true }), E('pm', 'r', '', { bus: true })],
+  }]);
+  dia('cco-fines', '별도 보수와 평가기준 미운영, 금지업무 겸직, 임면 사실 미보고는 모두 3천만원 이하 과태료 사유의 예다.',
+    [bracketIn(['별도 보수와 평가기준 미운영', '금지업무 겸직', '임면 사실 미보고'], '3천만원 이하', 'end')]);
+
+  dia('benefit-disclosure', '최근 5개 사업연도 동안 동일한 투자자 또는 거래상대방과 주고받은 재산상 이익 합계가 10억원을 초과하면 홈페이지 등에 공시한다.',
+    [chain(['최근 5개 사업연도 동안 동일한 투자자 또는 거래상대방과 주고받은 재산상 이익 합계', '10억원 초과', '홈페이지 등에 공시'])]);
+  dia('benefit-records', '1년차부터 5년차까지 매년 한 번씩 한 보고의 각 기록은 5년 이상 보관한다.',
+    [bracketIn(['1년차 보고', '2년차 보고', '3년차 보고', '4년차 보고', '5년차 보고'], '각 기록은 5년 이상 보관')]);
+  dia('unfair-solicit', '일반금융소비자는 전문지식과 경험 부족을 보완하는 보호가 특히 필요하고 전문금융소비자도 거짓과 기만의 대상이 되어서는 안 되므로, 부당권유행위 금지는 둘 다에게 적용된다.', [{
+    equal: true, gapsY: [10, 28],
+    nodes: [N('g', '일반금융소비자', 0, 0), N('p', '전문금융소비자', 0, 1), N('g2', '전문지식과 경험 부족을 보완하는 보호가 특히 필요', 1, 0), N('p2', '분석능력이 크더라도 거짓과 기만의 대상이 되어서는 안 됨', 1, 1),
+      N('c1', '따라서 부당권유행위 금지', 2, 0), N('c2', '둘 다 적용', 2, 1)],
+    edges: [E('g', 'g2', '', { head: 'none' }), E('p', 'p2', '', { head: 'none' }), E('c1', 'c2')],
+  }]);
+  dia('unsolicited-basic', '고객이 상품 상담을 받고 싶다고 하면 요청받은 권유이고, 회사가 먼저 전화해 이 상품에 가입하라고 하면 불초청권유다.',
+    [pairs([['고객: “상품 상담을 받고 싶어요.”', '요청받은 권유'], ['회사: 먼저 전화하여 “이 상품에 가입하세요.”', '불초청권유']])]);
+  dia('unsolicited-cases', '고객이 먼저 추천을 요청하면 초청된 투자권유이고, 회사가 먼저 가입을 권하면 불초청권유이며, 회사가 먼저 권유 수신 의사를 확인하고 고객이 동의하면 법정 조건과 상품 범위 안에서만 예외가 가능하다.',
+    [pairs([['고객이 먼저\n“추천해 주세요”', '초청된 투자권유'], ['회사가 먼저\n“이 상품에 가입하세요”', '불초청권유'], ['회사가 먼저 권유 수신 의사를 확인하고 고객이 동의', '법정 조건과 상품 범위 안에서만 예외 가능']])]);
+  dia('appointment-report', '김○○를 준법감시인으로 선임하면 선임 사실을, 기존 준법감시인이 해임, 퇴임, 사임하면 직에서 물러난 사실을 각각 금융위원회에 보고한다.',
+    [pairs([['김○○를 준법감시인으로 선임', '선임 사실을 금융위원회에 보고'], ['기존 준법감시인이 해임, 퇴임, 사임', '직에서 물러난 사실을 금융위원회에 보고']])]);
+
+  dia('dr-flow', '원주를 보관기관에 예탁하면 그 권리를 표시한 DR이 발행되고, DR은 해외시장에서 거래된다.',
+    [chain(['원주를 보관기관에 예탁', '예탁된 원주의 권리를 표시한 DR 발행', '해외시장에서 DR 거래'])]);
+  dia('dr-underlying', '채무증권, 지분증권, 수익증권, 투자계약증권, 파생결합증권이 예탁 가능한 원증권이고, 이를 바탕으로 발행국 외의 국가에서 권리증서를 발행한 것이 증권예탁증권 DR이다.', [{
+    colW: [DIA.spacer], dir: 'h', gaps: [0], gapsY: [8, 8, 8, 8, 8, 30, 28],
+    nodes: [N('grp', '', 0, 0, { kind: 'group', cs: 2, rs: 6 }), N('root', '예탁 가능한 원증권', 0, 0, { cs: 2 }),
+      ...['채무증권', '지분증권', '수익증권', '투자계약증권', '파생결합증권'].map((t, i) => N('k' + i, t, i + 1, 1)),
+      N('x', '발행국 외의 국가에서 권리증서 발행', 6, 0, { cs: 2, fit: true }), N('dr', '증권예탁증권(DR)', 7, 0, { cs: 2, fit: true })],
+    edges: [...[0, 1, 2, 3, 4].map(i => E('root', 'k' + i, '', { route: 'tree', head: 'none' })), E('grp', 'x'), E('x', 'dr')],
+  }]);
+  dia('fund-trust-example', '미래에셋TIGER200증권상장지수투자신탁(주식)의 집합투자업자는 미래에셋자산운용, 신탁업자는 KB국민은행, 법적 형태는 투자신탁이다.',
+    [tree({ text: '미래에셋TIGER200\n증권상장지수투자신탁(주식)' }, [{ head: '집합투자업자', text: '미래에셋자산운용' }, { head: '신탁업자', text: 'KB국민은행' }, { head: '법적 형태', text: '투자신탁' }])]);
+  dia('fund-llp-example', '2024큐씨피17호 사모투자합자회사의 업무집행사원은 큐캐피탈파트너스, 출자자는 기관과 전문투자자 등, 법적 형태는 합자회사이다.',
+    [tree({ text: '2024큐씨피17호 사모투자합자회사' }, [{ head: '업무집행사원', text: '큐캐피탈파트너스' }, { head: '출자자', text: '기관, 전문투자자 등' }, { head: '법적 형태', text: '합자회사' }])]);
+
+  dia('claim-money', '친구에게 100만원을 빌려주면 100만원을 돌려달라고 요구할 권리가 생기고, 이것이 금전채권이다.',
+    [chain(['친구에게 100만원을 빌려줌', '100만원을 돌려달라고 요구할 권리', '금전채권(債權)'])]);
+  dia('bond-issue', '회사가 투자자에게 돈을 빌리고 회사채를 발행하면 그것이 채권, 곧 채무증권이다.',
+    [chain(['회사가 투자자에게 돈을 빌림', '회사채를 발행', '채권(債券), 즉 채무증권'])]);
+  dia('securities-kinds', '증권 아래에 지분증권은 주식, 채무증권은 국채와 회사채와 기업어음이고, 수익증권, 투자계약증권, 파생결합증권, 증권예탁증권이 있다.',
+    [tree({ text: '증권' }, [{ text: '지분증권', to: '주식' }, { text: '채무증권', to: '국채, 회사채, 기업어음' }, { text: '수익증권' }, { text: '투자계약증권' }, { text: '파생결합증권' }, { text: '증권예탁증권' }])]);
+  dia('inclusive-test', '상품명이 기존 목록에 있는지는 핵심 기준이 아니고, 투자성이 있는지가 금융투자상품 판단의 핵심이다.',
+    [pairs([['상품명이 기존 목록에 있는가?', '핵심 기준이 아님'], ['투자성이 있는가?', '금융투자상품 판단의 핵심']])]);
+  dia('inclusive-kinds', '투자성이 있는 금융투자상품 가운데 추가지급의무가 없으면 증권이고, 추가지급의무가 있을 수 있으면 파생상품 영역이다.',
+    [tree({ text: '투자성 있음' }, [{ text: '추가지급의무 없음', to: '증권' }, { text: '추가지급의무 가능', to: '파생상품 영역' }])]);
+
+  dia('withdraw-flow', '금융상품을 청약하거나 계약한 뒤 다시 생각할 숙려기간이 있고, 법정기간 안에 청약철회를 하면 원칙적으로 계약 전 상태로 복원된다.',
+    [chain(['금융상품 청약, 계약', '다시 생각할 숙려기간', '법정기간 안에 청약철회', '원칙적으로 계약 전 상태로 복원'])]);
+  dia('withdraw-no-fault', '금융회사에 잘못이 없어도 소비자가 대상 상품, 기간, 절차를 충족하면 청약철회가 가능하다.', [{
+    gapsY: [4, 4, 28],
+    nodes: [N('a', '금융회사에 잘못이 없음', 0, 0), N('plus', '+', 1, 0, { kind: 'op' }), N('b', '소비자가 대상 상품, 기간, 절차를 충족', 2, 0), N('c', '청약철회 가능', 3, 0)],
+    edges: [E('b', 'c')],
+  }]);
+  dia('withdraw-returns', '적법한 청약철회에서는 철회했다는 이유의 손해배상과 위약금은 청구할 수 없고, 이미 서로 주고받은 것의 반환은 필요할 수 있다.',
+    [tree({ text: '적법한 청약철회' }, [{ head: '철회했다는 이유의 손해배상과 위약금', text: '청구 불가' }, { head: '이미 서로 주고받은 것의 반환', text: '필요할 수 있음' }])]);
+  dia('display-kinds', '표시는 내용을 상대방에게 나타내는 모든 표현이고, 말로 설명, 문서에 기재, 광고 문구, 명함과 프로필의 경력과 자격, 도표와 수익률 화면과 발표자료를 모두 포함한다.',
+    [tree({ text: '표시 = 내용을 상대방에게\n나타내는 모든 표현' }, [{ text: '말로 설명' }, { text: '문서에 기재' }, { text: '광고 문구' }, { text: '명함, 프로필의 경력과 자격' }, { text: '도표, 수익률 화면, 발표자료' }])]);
+  dia('direct-method', '고객에게 실제로 받은 현금 +100에서 재료비와 급여로 실제 지급한 현금 -60을 빼면 영업활동 현금흐름은 +40이다.', [{
+    ledger: { rows: [{ label: '고객에게 실제로 받은 현금', value: '+100' }, { label: '재료비와 급여로 실제 지급한 현금', value: '−60' }, { label: '영업활동 현금흐름', value: '+40', rule: true, bold: true }] },
+  }]);
+
+  dia('pca-capital', '순자본비율이 100% 이상이면 정상, 50% 이상 100% 미만이면 경영개선권고, 0% 이상 50% 미만이면 경영개선요구, 0% 미만이면 경영개선명령이다.', [{
+    title: '순자본비율 기준', numberLine: { domain: [-50, 150], reverse: true, top: { left: '건전', right: '위험', label: '위험 증가' },
+      ticks: [{ v: 100, label: '100%' }, { v: 50, label: '50%' }, { v: 0, label: '0%' }],
+      zones: [{ from: 100, name: '정상', range: '100% 이상' }, { from: 50, to: 100, name: '경영개선\n권고', range: '50~100%' }, { from: 0, to: 50, name: '경영개선\n요구', range: '0~50%' }, { to: 0, name: '경영개선\n명령', range: '0% 미만' }] },
+  }]);
+  dia('pca-leverage', '레버리지비율이 2년 연속 적자인 회사는 900% 초과에서 경영개선권고, 1,100% 초과에서 경영개선요구이고, 적자 여부와 관계없는 경우에는 1,100% 초과에서 경영개선권고, 1,300% 초과에서 경영개선요구이다.', [
+    { title: '2년 연속 적자인 경우', numberLine: { domain: [700, 1300], top: { left: '레버리지비율' }, ticks: [{ v: 900, label: '900%' }, { v: 1100, label: '1,100%' }],
+      zones: [{ to: 900 }, { from: 900, to: 1100, name: '경영개선\n권고', range: '900% 초과' }, { from: 1100, name: '경영개선\n요구', range: '1,100% 초과' }] } },
+    { title: '적자 여부와 관계없는 경우', numberLine: { domain: [900, 1500], top: { left: '레버리지비율' }, ticks: [{ v: 1100, label: '1,100%' }, { v: 1300, label: '1,300%' }],
+      zones: [{ to: 1100 }, { from: 1100, to: 1300, name: '경영개선\n권고', range: '1,100% 초과' }, { from: 1300, name: '경영개선\n요구', range: '1,300% 초과' }] } }]);
+  dia('pca-steps', '적기시정조치 자체는 권고, 요구, 명령이고, 그 뒤 후속 절차로 경영개선계획 제출, 계획 평가와 승인, 계획 이행, 분기별 이행실적 보고, 이행결과 보고, 종료 또는 추가 조치가 이어진다.',
+    [chain([{ head: '적기시정조치 자체', text: '권고, 요구, 명령' }, { head: '후속 절차', text: '경영개선계획 제출' }, '계획 평가와 승인', '계획 이행', '분기별 이행실적 보고', '이행결과 보고', '종료 또는 추가 조치'])]);
+
   const pathOf = (pts, close) => pts.map((p, i) => (i ? 'L' : 'M') + fmt(p[0]) + ' ' + fmt(p[1])).join('') + (close ? 'Z' : '');
   function markup(s, def) {
     const body = s.items.map(it => {
@@ -1051,7 +1603,8 @@
       return `<rect class="${it.cls || 'v2-fig-bar'}" x="${fmt(it.x)}" y="${fmt(it.y)}" width="${fmt(it.w)}" height="${fmt(it.h)}" rx="${it.rx ?? 2}"/>`;
     }).join('');
     const texts = s.texts.map(t => `<text class="v2-fig-${t.cls}" x="${fmt(t.x)}" y="${fmt(t.y)}"${t.anchor === 'start' ? '' : ` text-anchor="${t.anchor}"`}>${esc(t.text)}</text>`).join('');
-    return `<figure class="v2-figure" data-figure="${def.kind}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(def.label)}">${body}${texts}</svg><figcaption>${esc(def.caption)}</figcaption></figure>`;
+    const caption = def.caption ? `<figcaption>${esc(def.caption)}</figcaption>` : '';
+    return `<figure class="v2-figure" data-figure="${def.kind}"><svg viewBox="0 0 ${s.width || W} ${s.height || H}" role="img" aria-label="${esc(def.label)}">${body}${texts}</svg>${caption}</figure>`;
   }
 
   const kinds = Object.keys(FIG);
@@ -1077,7 +1630,7 @@
   ['term-8a591af40b145e90', '증권시장선', 'sml'],
   ['glossary-73843b33fd3e68011c5d', 'CML과 SML 비교', 'cml-sml'],
   ['term-5cb8638c83dda6e8', '분산투자', 'diversification'], ['glossary-2fc2998209e927c30ea2', '체계적 위험', 'diversification'], ['glossary-6446f9e0217040bd9bad', '비체계적 위험', 'diversification'],
-  ['term-20aa821eb7df84ad', '수익률곡선', 'yield-curve'], ['glossary-b0cc820a82565c3ba5a3', '채권수익률곡선', 'yield-curve'], ['term-d8ab16eeac8836de', '기간구조', 'yield-curve'],
+  ['term-20aa821eb7df84ad', '수익률곡선', 'yield-curve'], ['glossary-b0cc820a82565c3ba5a3', '채권수익률곡선', ['yield-curve', 'yield-curve-samples']], ['term-d8ab16eeac8836de', '기간구조', 'yield-curve'],
   ['atlas-c-curve-steepening', '수익률곡선 가팔라짐', 'steepen'],
   ['atlas-c-curve-flattening', '수익률곡선 완만화', 'flatten'],
   ['term-38d09f81f7271b92', '수익률곡선타기', 'rolldown'], ['glossary-3ca73bd59fbca65cbe32', '수익률곡선타기전략', 'rolldown'], ['glossary-4e258369813107531b6c', '롤링효과', 'rolldown'],
@@ -1131,18 +1684,44 @@
   ['glossary-28c4816ec2b60afe24f2', '엘리어트 파동이론', 'elliott'],
   ['glossary-46606bd7fdca7db61420', '골든크로스', 'golden-cross'],
   ['glossary-cbee9f87dd1add3b01b8', '데드크로스', 'dead-cross'],
+  ['glossary-ced4aa20ba44275fd793', '공급의 가격탄력성과 완전 비탄력성', 'supply-inelastic'],
+  ['glossary-c042367b95e67671e026', '적기시정조치', ['pca-capital', 'pca-leverage', 'pca-steps']],
+  ['glossary-a35480115abe79a21581', '포터의 다이아몬드 모형', 'porter'],
+  ['glossary-ab7448c1924cf77261bc', 'CMA와 어음관리계좌', 'cma-flow'],
+  ['glossary-39e6418c9818a1519a54', '관리형신탁의 수익권', 'trust-flow'],
+  ['glossary-d4df64d62d0c2fb7a334', '증권 대차거래', 'securities-lending'],
+  ['glossary-0df3505933d1beeed00a', '모자형펀드', 'master-feeder'],
+  ['glossary-ff475208863a41d0dc1e', '자산유동화증권', 'abs-flow'],
+  ['glossary-14cd42fc3002d0e8a657', '집합투자증권', 'fund-pooling'],
+  ['glossary-e4cea2a8d67d55b9ff61', '채무증권', ['debt-claim', 'debt-vs-private']],
+  ['glossary-36e4bc8ac65b27f5698d', '투자권유대행인', 'solicitation-agent'],
+  ['glossary-b42d3fe1861f2f53056a', '투자일임재산 간 교차거래 금지', 'cross-trade'],
+  ['glossary-4295f24c3671bd4b4109', '자기계약금지', ['self-dealing', 'mtf-matching', 'self-dealing-exception']],
+  ['glossary-2060c797342496a9c513', '준법감시인', ['cco-oversight', 'cco-insider-cases', 'cco-bonus-conflict', 'cco-dual-role', 'cco-fines']],
+  ['glossary-c713807846782c664ae7', '재산상 이익 제공, 수령과 공시', ['benefit-disclosure', 'benefit-records']],
+  ['glossary-c53b35ca3079aa71c1af', '부당권유행위', 'unfair-solicit'],
+  ['glossary-7408ea115cf67e6da600', '불초청권유금지', ['unsolicited-basic', 'unsolicited-cases']],
+  ['glossary-eb50e290d6de1dca85c8', '임면', 'appointment-report'],
+  ['glossary-45705cee9d0a0279f4c7', '재무제표', 'fs-tree'],
+  ['glossary-aaf109fa7c045eed3910', '증권예탁증권', ['dr-flow', 'dr-underlying']],
+  ['glossary-8d99561286e6992d7689', '집합투자기구의 법적 형태와 등록주체', ['fund-trust-example', 'fund-llp-example']],
+  ['glossary-f45581a8fbb4b19deab0', '채권과 증권의 차이', ['claim-money', 'bond-issue', 'securities-kinds']],
+  ['glossary-f5441ce161e06a690b8a', '포괄주의', ['inclusive-test', 'inclusive-kinds']],
+  ['glossary-6a519646ce14f374ada3', '청약철회권', ['withdraw-flow', 'withdraw-no-fault', 'withdraw-returns']],
+  ['glossary-e32ae823e0893911b02c', '허위, 과장, 부실표시', 'display-kinds'],
+  ['glossary-7c8205159204a7b270a7', '현금흐름표의 간접법', 'direct-method'],
   ['c69', '재화시장 균형곡선–화폐시장 균형곡선, 구축효과, 피구, 리카르도 구분', 'is-lm'],
   ['c72', '자본시장선, 증권시장선, 베타, 알파', 'cml-sml'],
   ['c71', '효율적, 최적, 기대수익, 최소분산', 'optimal'],
   ['c57', '볼록성: 0.01을 제곱한다', 'price-yield-convexity'],
   ['c46', '최대예상손실액: 초과확률과 계산 단위', 'normal-var', '신뢰수준을 99%로 높이면 선이 더 왼쪽으로 가고 넘을 확률은 1%가 된다.'],
   ];
-  const registry = ROWS.map(([id, title, kind, note]) => ({ id, title, kind, note: note || '' }));
+  const registry = ROWS.map(([id, title, kind, note]) => ({ id, title, kind: [].concat(kind)[0], kinds: [].concat(kind), note: note || '' }));
   const byId = new Map(registry.map(row => [row.id, row]));
   function forTerm(id) {
     const row = byId.get(id);
-    if (!row || !FIG[row.kind]) return null;
-    return { kind: row.kind, markup: render(row.kind, row.note) };
+    if (!row || !row.kinds.every(kind => FIG[kind])) return null;
+    return { kind: row.kind, kinds: row.kinds, markup: row.kinds.map(kind => render(kind, row.note)).join('') };
   }
 
   return { forTerm, render, scene, collisions, registry, kinds, math, models, textWidth, captions: Object.fromEntries(kinds.map(k => [k, FIG[k].caption])), labels: Object.fromEntries(kinds.map(k => [k, FIG[k].label])) };

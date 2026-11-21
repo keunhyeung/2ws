@@ -255,6 +255,13 @@ body{margin:0;background:var(--color-bg);color:var(--color-ink);font-family:var(
 .v2-fig-note,.v2-fig-title{fill:var(--color-ink);font-size:12px;font-weight:var(--weight-bold)}
 .v2-fig-small{fill:var(--color-ink);font-size:10.5px;font-weight:var(--weight-bold)}
 .v2-fig-name{fill:var(--color-ink-3);font-size:11px;font-weight:var(--weight-regular)}
+.v2-fig-group{fill:none;stroke:var(--color-ink-3);stroke-width:1.25;stroke-dasharray:4 3}
+.v2-fig-link{fill:none;stroke:var(--color-ink);stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.v2-fig-node{fill:var(--color-surface);stroke:var(--color-ink-3);stroke-width:1.5}
+.v2-fig-box,.v2-fig-boxb{fill:var(--color-ink);font-size:13px;font-weight:var(--weight-regular)}
+.v2-fig-boxb,.v2-fig-op{font-weight:var(--weight-bold)}
+.v2-fig-edge{fill:var(--color-ink-2);font-size:12px;font-weight:var(--weight-regular)}
+.v2-fig-op{fill:var(--color-ink);font-size:16px}
 .v2-fig-wick{fill:none;stroke:var(--color-ink);stroke-width:2;stroke-linecap:butt}
 .v2-fig-body{stroke:var(--color-ink);stroke-width:2}
 .v2-fig-rise{fill:none}
