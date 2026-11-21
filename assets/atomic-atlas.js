@@ -30,6 +30,7 @@
     const singles = terms.filter(term => !bundles.has(term.id));
     const neighbors = new Map(singles.map(term => [term.id, new Map()]));
     const topicNames = new Map(singles.map(term => [term.id, new Set()]));
+    const layoutTopics = new Map(singles.map(term => [term.id, []]));
     const normalize = text => String(text).toLowerCase().replace(/\s+/g, '');
     function link(a, b, priority) {
       if (a === b) return;
@@ -48,9 +49,12 @@
       }
     }
     for (const [id, children] of expanded) {
-      const oldNames = namesOf(byId.get(id)).filter(Boolean).map(normalize);
+      const topic = byId.get(id);
+      const oldNames = namesOf(topic).filter(Boolean).map(normalize);
+      const layoutTopic = {id, chapter: topic.chapterId || topic.chapter, unitIds: topic.unitIds};
       for (const child of children) {
         for (const name of oldNames) topicNames.get(child).add(name);
+        layoutTopics.get(child).push(layoutTopic);
       }
       const blocks = connections[id] ? connections[id].map(block =>
         [...new Set(block.flatMap(child => expand(canonical(child))))]
@@ -65,7 +69,9 @@
       return [...neighbors.get(id)].sort((a,b)=>a[1]-b[1]).map(([other])=>byId.get(other));
     }
     const graphTerms = singles.map(term => ({
-      ...term, links: [...neighbors.get(term.id).keys()].map(target => ({target})),
+      ...term,
+      layoutTopics: layoutTopics.get(term.id),
+      links: [...neighbors.get(term.id)].map(([target, priority]) => ({target, priority})),
     }));
     const keys = singles.map(term => ({
       term, title: normalize(titleOf(term)), names: namesOf(term).filter(Boolean).map(normalize),

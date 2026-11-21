@@ -94,7 +94,7 @@ function replaceHash(hash){
  return true;
 }
 function leaveEntry(){if(entryKey)navMemo.y[entryKey]=Math.round(window.scrollY||0)}
-function enterEntry(){
+function enterEntry(initialY=0){
  if(!tracksEntries())return 0;
  const previous=entryKey;
  let key=history.state?.v2key||'';
@@ -103,15 +103,15 @@ function enterEntry(){
   key=key||Date.now().toString(36)+Math.random().toString(36).slice(2,8);
   try{history.replaceState({...(typeof history.state==='object'?history.state:null),v2key:key},'')}catch(_){}
   navMemo.p[key]=previous;
-  navMemo.y[key]=0;
+  navMemo.y[key]=initialY;
  }
  entryKey=key;
  navMemo.h[key]=location.hash||'#choices';
- return known?navMemo.y[key]||0:0;
+ return navMemo.y[key]||0;
 }
 const previousHash=()=>(entryKey&&navMemo.h[navMemo.p[entryKey]])||'';
 window.addEventListener('click',event=>{
- const link=event.target?.closest?.('a.dict-return,a.graph-overview-return');
+ const link=event.target?.closest?.('a.dict-return,a.graph-overview-return,a.graph-dictionary-return');
  if(!link||event.defaultPrevented||event.button||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
  const href=link.getAttribute('href');
  if(href&&href===previousHash()&&history.length>1){event.preventDefault();history.back()}
@@ -343,7 +343,7 @@ function choiceOptionsMarkup(q,answer,fresh){
  }).join('')}</div>`;
 }
 
-function termNoteMarkup(term,note,{definitionMarkup}={}){
+function termNoteMarkup(term,note,{definitionMarkup,includeWorkedExample=true}={}){
  const summary=term.summary||term.description||'';
  const definition=term.definition||note?.definition||summary.replace(/^\s*-\s+/,'').split(/\s+-\s+/)[0];
  const formula=note?.formula||term.formula;
@@ -354,9 +354,9 @@ function termNoteMarkup(term,note,{definitionMarkup}={}){
  return `${definitionText?`<p>${definitionText}</p>`:''}
   ${formula?`<div class="v2-term-formula">
    <b>공식</b><p>${basicTermsMarkup(formula,esc,omit)}</p>
-   ${calculation?`<b>숫자 대입</b><p>${basicTermsMarkup(calculation,esc,omit)}</p>`:''}
+   ${includeWorkedExample&&calculation?`<b>숫자 대입</b><p>${basicTermsMarkup(calculation,esc,omit)}</p>`:''}
   </div>`:''}
-  ${example?`<div class="v2-peek-example">
+  ${includeWorkedExample&&example?`<div class="v2-peek-example">
    <b>${formula?'예시 해석':'예시'}</b><p>${readerTermsMarkup(example,false,omit)}</p>
   </div>`:''}`;
 }
@@ -447,7 +447,9 @@ function browseTerms(){
  }).join('');
  const chip=(key,label)=>`<button type="button" class="dict-chip" id="dictChip-${key}" data-dict-chip="${key}" aria-pressed="${dictOpenChip===key}" aria-controls="dictPanel-${key}">${label}</button>`;
  const panel=(key,body)=>`<div class="dict-panel" id="dictPanel-${key}"${dictOpenChip===key?'':' hidden'}>${body}</div>`;
- return `<section class="dict-index"><div class="dict-chips" role="group" aria-label="사전 둘러보기">${chip('numbers','숫자와 기간')}${chip('compare','함께 비교하기')}<a class="dict-chip" href="#graph">개념 지도</a><a class="dict-chip" href="#questions">문제 목록</a></div>${panel('numbers',`<div class="dict-folds">${numbers}</div>`)}${panel('compare',list(groups))}${list(singles)}</section>`;
+ const dictionary=dictionaryReturnTarget(location.hash);
+ const map=graphHref(undefined,dictionary==='#dictionary'?'':dictionary);
+ return `<section class="dict-index"><div class="dict-chips" role="group" aria-label="사전 둘러보기">${chip('numbers','숫자와 기간')}${chip('compare','함께 비교하기')}<a class="dict-chip" href="${esc(map)}">개념 지도</a><a class="dict-chip" href="#questions">문제 목록</a></div>${panel('numbers',`<div class="dict-folds">${numbers}</div>`)}${panel('compare',list(groups))}${list(singles)}</section>`;
 }
 function termSearchNames(term){
  const entry=getPeekIndex().byId.get(term.id);
@@ -486,10 +488,42 @@ function dictionaryDefinitionMarkup(value,term,linkedIds){
  return markup+readerTermsMarkup(value.slice(cursor),false,omit);
 }
 
-function studyNotes(item,linkedIds,{example,point}){
- const note=(label,text)=>text?`<section class="dict-study-note"><h3>${label}</h3>
-  <p>${dictionaryDefinitionMarkup(text,item,linkedIds)}</p></section>`:'';
- return {example:note('예시',example),point:note('주의할 점',point)};
+function studyNote(label,content){
+ return content?`<section class="dict-study-note"><h3>${label}</h3>${content}</section>`:'';
+}
+function studyNoteText(text,item,linkedIds){
+ return text?.trim()?`<p>${dictionaryDefinitionMarkup(text,item,linkedIds)}</p>`:'';
+}
+
+function dictionaryReadingMarkup(notes,{body='',resources=''}={}){
+ if(!notes&&!body&&!resources)return '';
+ const label=body?(resources?'추가 설명 및 관련 자료':'추가 설명'):'관련 자료';
+ const details=body||resources?`<details class="dict-reading-details"><summary>${label}</summary>
+  ${body}${resources}</details>`:'';
+ return `<article class="dict-reading"><h2>개념 해설</h2>${notes}${details}</article>`;
+}
+
+const dictionaryTextKey=html=>html.replace(/<[^>]+>/g,'').trim()
+ .replace(/^(?:예시?|예를 들어)\s*[:：]?\s+/,'').replace(/\s+/g,'').replace(/[.!?]+$/,'');
+
+function dictionaryComparison(term,title,body){
+ const table=term.studyTable;
+ if(!table?.length)return {comparison:'',body};
+ const keys=table.flat().map(cell=>dictionaryTextKey(esc(cell)));
+ let sourceCells=[];
+ const sourceTable=[...body.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g)].find(([html])=>{
+  const cells=[...html.matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/g)].map(match=>match[1]);
+  if(cells.length!==keys.length||!cells.every((cell,i)=>dictionaryTextKey(cell)===keys[i]))return false;
+  sourceCells=cells;
+  return true;
+ });
+ let index=0;
+ const cellText=cell=>sourceCells[index++]??readerTermsMarkup(cell);
+ const comparison=`<div class="dict-comparison" tabindex="0" role="region" aria-label="${esc(title)} 비교표"><table${table[0].length>2?' class="is-wide"':''} aria-label="${esc(title)} 비교"><thead><tr>
+  ${table[0].map(cell=>`<th scope="col">${cellText(cell)}</th>`).join('')}</tr></thead><tbody>
+  ${table.slice(1).map(row=>`<tr>${row.map((cell,i)=>i===0?`<th scope="row">${cellText(cell)}</th>`:`<td>${cellText(cell)}</td>`).join('')}</tr>`).join('')}
+ </tbody></table></div>`;
+ return {comparison,body:sourceTable?body.replace(sourceTable[0],''):body};
 }
 
 let findStudyChecks;
@@ -518,7 +552,7 @@ function studyQuestionMarkup({checks,index,selected},fresh=false){
  const answerButton=value=>{
   const mark=value?'O':'X',meaning=value?'맞다':'틀리다',mine=answered&&selected===value,key=answered&&question.answer===value;
   const state=key?'정답':mine?'오답':'';
-  return `<button type="button" ${state?`class="${key?'is-correct':'is-wrong'}" `:''}data-study-action="${value}" aria-label="${mark}, ${meaning}${mine?', 내가 고른 답':''}${state?', '+state:''}"${answered?' disabled':''}><b>${mark}</b><small>${state||meaning}</small></button>`;
+  return `<button type="button" ${state?`class="${key?'is-correct':'is-wrong'}" `:''}data-study-action="${value}" aria-label="${mark}, ${meaning}${mine?', 내가 고른 답':''}${state?', '+state:''}"${answered?' disabled':''}><b>${mark}</b></button>`;
  };
  const next=answered
   ?`<button type="button" class="text-btn" data-study-action="${index+1<checks.length?'next':'restart'}">${index+1<checks.length?'다음으로 →':checks.length>1?'처음부터 다시 풀기':'다시 풀기'}</button>`:'';
@@ -547,9 +581,22 @@ function bindDictionaryCheck(){
 
 const termFigureMarkup=id=>globalThis.TermFigures?.forTerm?.(id)?.markup||'';
 
+const dictionaryTermTitle=term=>term.id==='c50'?'전략적 자산배분과 전술적 자산배분':peekTermTitle(term);
+
+function dictionaryNeighborhoodMarkup(term,page=1){
+ const members=getAtlasCatalog().members(term.id);
+ if(members?.length>1){
+  return graphDiagramMarkup(dictionaryTermTitle(term),members,{
+   page,neighborHref:dictionaryHref,relationFor:()=>'구성 개념',collectionLabel:'구성 개념',
+  });
+ }
+ const node=members?.length===1?members[0]:term;
+ return graphNeighborhoodMarkup(node,{page,neighborHref:dictionaryHref});
+}
+
 function dictionaryTermMarkup(term,selected){
  const note=getPeekIndex().byId.get(term.id)?.note;
- const title=term.id==='c50'?'전략적 자산배분과 전술적 자산배분':peekTermTitle(term);
+ const title=dictionaryTermTitle(term);
  const rawDefinition=term.id==='c50'
   ?'전략적 자산배분은 장기 목표에 맞춰 자산별 기준 비중을 정한다. 전술적 자산배분은 시장 전망에 따라 그 비중을 잠시 조정한다.'
   :term.definition||note?.definition||term.summary||term.description||'';
@@ -560,22 +607,35 @@ function dictionaryTermMarkup(term,selected){
  }
  const linkedIds=new Set();
  const definitionMarkup=dictionaryDefinitionMarkup(definition,term,linkedIds);
- const explanation=termNoteMarkup(term,note,{definitionMarkup});
- const hasWorkedExample=Boolean(note?.example||note?.calculation||term.calculation);
- const study=studyNotes(term,linkedIds,{
-  example:term.studyChecks?.length||!hasWorkedExample?term.studyExample:null,
-  point:term.studyPoint,
- });
- const table=term.studyTable;
- const comparison=table&&!study.example&&!study.point&&!note?.formula&&!term.formula
-  ?`<div class="dict-comparison" tabindex="0"><table${table[0].length>2?' class="is-wide"':''} aria-label="${esc(title)} 비교"><thead><tr>
-   ${table[0].map(cell=>`<th scope="col">${esc(cell)}</th>`).join('')}</tr></thead><tbody>
-   ${table.slice(1).map(row=>`<tr>${row.map((cell,i)=>i===0?`<th scope="row">${esc(cell)}</th>`:`<td>${readerTermsMarkup(cell)}</td>`).join('')}</tr>`).join('')}
-  </tbody></table></div>`:'';
+ const explanation=termNoteMarkup(term,note,{definitionMarkup,includeWorkedExample:false});
+ const formula=note?.formula||term.formula;
+ const calculation=formula?(note?.calculation||term.calculation):'';
+ const interpretation=formula?(note?.interpretation||term.interpretation):'';
+ const example=term.studyExample&&(!calculation||term.studyChecks?.length)?term.studyExample
+  :!formula||(!calculation&&!interpretation)?note?.example:'';
+ const visible=new Set([definition,formula].filter(Boolean).map(value=>dictionaryTextKey(esc(value))));
+ const unique=text=>{
+  const key=dictionaryTextKey(esc(text));
+  if(!key||visible.has(key))return false;
+  visible.add(key);
+  return true;
+ };
  const omit=new Set([term.title,term.displayTitle,note?.name]);
- const body=term.bodyMarkdown?.trim()!==definition.trim()&&term.bodyHtml
-  ?richTermsMarkup(term.bodyHtml.replace(/href="#(?:glossary|dictionary)\/([\w.-]+)"/g,(_,id)=>`href="${esc(dictionaryHref(id))}"`),{linked:false,basic:true,normalize:true,omit})
-  :'';
+ const exampleMarkup=[
+  unique(calculation)?`<div class="v2-term-formula dict-calculation"><b>숫자 대입</b><p>${basicTermsMarkup(calculation,esc,omit)}</p></div>`:'',
+  unique(interpretation)?studyNoteText(interpretation,term,linkedIds):'',
+  unique(example)?studyNoteText(example,term,linkedIds):'',
+ ].join('');
+ const point=unique(term.studyPoint)?studyNoteText(term.studyPoint,term,linkedIds):'';
+ const source=term.bodyMarkdown?.trim()!==definition.trim()?term.bodyHtml||'':'';
+ const {comparison,body}=dictionaryComparison(term,title,source);
+ const formatBody=html=>richTermsMarkup(
+  html.replace(/href="#(?:glossary|dictionary)\/([\w.-]+)"/g,(_,id)=>`href="${esc(dictionaryHref(id))}"`),
+  {linked:false,basic:true,normalize:true,omit},
+ );
+ const extraBody=body.replace(/<(p|li|pre)\b[^>]*>([\s\S]*?)<\/\1>/g,(block,_,content)=>
+  !/<a\b/.test(content)&&visible.has(dictionaryTextKey(content))?'':block)
+  .replace(/<(?:ul|ol)>\s*<\/(?:ul|ol)>/g,'').trim();
  const related=[...new Set((term.links||[]).map(link=>link.target||link.id))]
   .filter(id=>id!==term.id&&!linkedIds.has(id)).map(getTerm).filter(Boolean).slice(0,3);
  const unitLinks=(term.unitIds||[]).map(unitFor).filter(Boolean)
@@ -584,15 +644,21 @@ function dictionaryTermMarkup(term,selected){
   ...related.map(item=>`<a href="${esc(dictionaryHref(item.id))}">${esc(peekTermTitle(item))}</a>`),
   ...unitLinks,
  ];
- const mapLink=`<a class="v2-dict-map" href="#graph/${esc(encodeURIComponent(term.id))}">개념 지도에서 보기 →</a>`;
- const practice=data.concepts.some(item=>item.id===term.id)
-  ?`<button type="button" class="primary" data-practice="${esc(term.id)}">관련 문제 풀기</button>`:'';
- const more=body||extraLinks.length?`<details><summary>더 보기</summary>
-   ${body?`<div class="v2-longtext">${body}</div>`:''}
-   ${extraLinks.length?`<div class="v2-dict-links">${extraLinks.join('')}</div>`:''}
-  </details>`:'';
+ const neighborhood=dictionaryNeighborhoodMarkup(term);
+ const mapLink=`<a class="v2-dict-map" href="${esc(graphAtlasHref(term.id,dictionaryReturnTarget(location.hash)))}">개념 지도에서 보기 →</a>`;
+ if(data.concepts.some(item=>item.id===term.id)){
+  extraLinks.push(`<a href="${esc(practiceConceptHref(term.id))}">관련 문제 풀기</a>`);
+ }
+ const reading=dictionaryReadingMarkup(
+  studyNote('예시',exampleMarkup)+studyNote('비교',formatBody(comparison))+studyNote('주의할 점',point),{
+   body:extraBody?`<div class="v2-longtext">${formatBody(extraBody)}</div>`:'',
+   resources:extraLinks.length?`<div class="v2-dict-links">${extraLinks.join('')}</div>`:'',
+  },
+ );
  return `<article class="v2-dict-card${title.length>16?' is-long':''}"><h2>${esc(title)}</h2>
-  ${explanation}${termFigureMarkup(term.id)}${broaderConceptsMarkup(term,dictionaryHref)}${window.OptionLab.conceptMarkup(term.id)}${mapLink}</article>${study.example}${comparison}${more}${study.point}${dictionaryCheckMarkup(term)}${practice}`;
+  ${explanation}${termFigureMarkup(term.id)}${broaderConceptsMarkup(term,dictionaryHref)}${window.OptionLab.conceptMarkup(term.id)}
+  ${neighborhood?'':mapLink}</article>${reading}${dictionaryCheckMarkup(term)}
+  ${neighborhood?`<section class="v2-dict-neighborhood" aria-label="연결 개념"><div id="dictionaryNeighborhood">${neighborhood}</div>${mapLink}</section>`:''}`;
 }
 
 function registryFields(item){
@@ -621,7 +687,7 @@ function dictionaryMarkup(query,selectedId){
  const results=/\d/.test(search)?numbersHtml+conceptsHtml:conceptsHtml+numbersHtml;
  return `<div class="v2-dictionary v2-dict-results">${results||'<p>검색 결과가 없어요.</p>'}</div>`;
 }
-function practiceConcept(id){const q=orderedChoiceQuestions().find(x=>(x.conceptIds||[]).includes(id));setHash(q?'#choice/'+encodeURIComponent(q.id):'#questions')}
+function practiceConceptHref(id){const q=orderedChoiceQuestions().find(x=>(x.conceptIds||[]).includes(id));return q?'#choice/'+encodeURIComponent(q.id):'#questions'}
 function quizOrigin(hash){
  if(!/^#(?:dictionary|registry)(?:[/?]|$)/.test(hash))return '';
  const origin=new URLSearchParams(hash.split('?')[1]||'').get('from')||'';
@@ -629,9 +695,20 @@ function quizOrigin(hash){
 }
 function renderDictionary(){let selectedId=decodeURIComponent(location.hash.startsWith('#dictionary/')?location.hash.slice(12).split('?')[0]:''),params=new URLSearchParams(location.hash.split('?')[1]||''),query=params.get('q')||'',selected=selectedId&&getTerm(selectedId),origin=quizOrigin(location.hash);
  const back=origin?`<a class="dict-return" href="${esc(origin)}">← 문제로 돌아가기</a>`:selected?'<a class="dict-return" href="#dictionary">← 전체 개념 보기</a>':'';
- $('#app').innerHTML=`<div class="v2-dict-page${selected?' is-entry':''}">${back}${header('개념과 숫자 사전')}<label class="v2-dict-search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="dictSearch" type="search" aria-label="개념, 숫자와 기간 검색" placeholder="개념, 숫자와 기간 검색" value="${esc((selected?peekTermTitle(selected):query))}"></label><div id="dictionaryResults"></div></div>`;
+ $('#app').innerHTML=`<div class="v2-dict-page${selected?' is-entry':''}">${back}${header('개념 사전')}<label class="v2-dict-search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="dictSearch" type="search" aria-label="개념, 숫자와 기간 검색" placeholder="개념, 숫자와 기간 검색" value="${esc((selected?peekTermTitle(selected):query))}"></label><div id="dictionaryResults"></div></div>`;
  let input=$('#dictSearch'),results=$('#dictionaryResults');
- results.onclick=event=>{const chip=event.target?.closest?.('[data-dict-chip]');if(chip)toggleDictChip(chip.dataset.dictChip)};
+ results.onclick=event=>{
+  const chip=event.target?.closest?.('[data-dict-chip]');
+  if(chip)toggleDictChip(chip.dataset.dictChip);
+  const button=event.target?.closest?.('[data-dict-graph-prev],[data-dict-graph-next]');
+  if(!button)return;
+  const neighborhood=button.closest('#dictionaryNeighborhood');
+  const direction=button.hasAttribute('data-dict-graph-prev')?'data-dict-graph-prev':'data-dict-graph-next';
+  const offset=window.scrollY;
+  neighborhood.innerHTML=dictionaryNeighborhoodMarkup(selected,Number(button.getAttribute(direction)));
+  jumpTo(offset);
+  (neighborhood.querySelector(`[${direction}]`)||neighborhood.querySelector('.v2-graph-pages'))?.focus({preventScroll:true});
+ };
  const refresh=()=>{
   const value=input.value,raw=selectedId&&value===(selected?peekTermTitle(selected):'')?'':value;
   const isEntry=Boolean(selected&&selectedId&&!raw);
@@ -640,13 +717,14 @@ function renderDictionary(){let selectedId=decodeURIComponent(location.hash.star
   if(isEntry)window.OptionLab.bindConcept(results);
   bindDictionaryCheck();
   $$('[data-concept-link]').forEach(b=>b.onclick=()=>setHash('#dictionary/'+encodeURIComponent(b.dataset.conceptLink)));
-  $$('[data-practice]').forEach(b=>b.onclick=()=>practiceConcept(b.dataset.practice));
   $$('[data-unit]').forEach(b=>b.onclick=()=>setHash('#unit/'+encodeURIComponent(b.dataset.unit)));
  };input.oninput=()=>{selectedId='';const search=new URLSearchParams();
  if(input.value)search.set('q',input.value);
  if(origin)search.set('from',origin);
  replaceHash('#dictionary'+(search.size?'?'+search:''));
- refresh()};refresh()}
+ refresh()};refresh();
+ if(!selectedId&&params.get('search')==='1')return input;
+}
 function renderRegistry(id){
  const item=data.registry.find(number=>number.id===id);
  if(!item){renderDictionary();return}
@@ -654,22 +732,62 @@ function renderRegistry(id){
  const frontPoint=item.studyPoint||item.contrast;
  const fields=registryFields(item).filter(([label,value])=>label!=='기준'&&value!==frontPoint);
  const units=(item.unitIds||[]).map(unitFor).filter(Boolean);
- const details=fields.length||units.length||item.related?.length;
- const notes=studyNotes(item,new Set(),{example:item.studyExample,point:frontPoint});
- const more=details?`<details><summary>더 보기</summary>
-   <div class="v2-number-fields">${fields.map(([label,value])=>`<div><b>${label}</b><span>${esc(value)}</span></div>`).join('')}</div>
-   ${item.related?.length?`<p>${item.related.map(esc).join(', ')}</p>`:''}
-   <div class="v2-dict-links">${units.map(u=>`<a href="#unit/${esc(encodeURIComponent(u.id))}">${esc(u.title)}</a>`).join('')}</div>
-  </details>`:'';
+ const linkedIds=new Set();
+ const notes=studyNote('예시',studyNoteText(item.studyExample,item,linkedIds))
+  +studyNote('주의할 점',studyNoteText(frontPoint,item,linkedIds));
+ const reading=dictionaryReadingMarkup(notes,{
+  body:fields.length?`<div class="v2-number-fields">${fields.map(([label,value])=>`<div><b>${label}</b><span>${esc(value)}</span></div>`).join('')}</div>`:'',
+  resources:(item.related?.length?`<p>${item.related.map(esc).join(', ')}</p>`:'')
+   +(units.length?`<div class="v2-dict-links">${units.map(u=>`<a href="#unit/${esc(encodeURIComponent(u.id))}">${esc(u.title)}</a>`).join('')}</div>`:''),
+ });
  $('#app').innerHTML=`<div class="v2-dict-page is-number">${origin?`<a class="dict-return" href="${esc(origin)}">← 문제로 돌아가기</a>`:'<a class="dict-return" href="#dictionary">← 사전</a>'}${header(item.title)}<div class="v2-dictionary"><article class="v2-dict-card">
   <strong class="v2-number${String(item.value).length>12?' is-long':''}">${esc(item.value)}</strong>
   ${item.meaning?`<p>${esc(item.meaning)}</p>`:''}
   ${item.rule?`<p>${esc(item.rule)}</p>`:''}
- </article>${notes.example}${more}${notes.point}${dictionaryCheckMarkup(item)}
+ </article>${reading}${dictionaryCheckMarkup(item)}
  </div></div>`;
  bindDictionaryCheck();
 }
-const graphHref=id=>'#graph/'+encodeURIComponent(id);
+function dictionaryReturnTarget(route){
+ const [path,...query]=(route||'').split('?');
+ const params=new URLSearchParams(query.join('?'));
+ const origin=params.get('from')||'';
+ if(path==='#dictionary'){
+  const indexParams=new URLSearchParams();
+  const search=params.get('q');
+  if(search)indexParams.set('q',search);
+  if(quizRoute.test(origin))indexParams.set('from',origin);
+  return path+(indexParams.size?'?'+indexParams:'');
+ }
+ const match=path.match(/^#dictionary\/([\w.%-]+)$/);
+ if(!match)return '';
+ let id;
+ try{id=decodeURIComponent(match[1])}catch(_){return ''}
+ if(!getTerm(id))return '';
+ return dictionaryHref(id,origin);
+}
+function graphDictionaryOrigin(){
+ const [path,...query]=location.hash.split('?');
+ if(!/^#(?:graph|map)(?:\/|$)/.test(path))return '';
+ return dictionaryReturnTarget(new URLSearchParams(query.join('?')).get('dictionary'));
+}
+function graphHref(id,dictionary=graphDictionaryOrigin(),page=1){
+ const path=id?'#graph/'+encodeURIComponent(id):'#graph';
+ const params=new URLSearchParams();
+ if(dictionary)params.set('dictionary',dictionary);
+ if(page>1)params.set('page',page);
+ return path+(params.size?'?'+params:'');
+}
+function graphAtlasHref(focus,dictionary=graphDictionaryOrigin()){
+ const params=new URLSearchParams();
+ if(focus)params.set('focus',focus);
+ if(dictionary)params.set('dictionary',dictionary);
+ return '#graph'+(params.size?'?'+params:'');
+}
+function graphDictionaryReturnMarkup(term){
+ const target=graphDictionaryOrigin()||(term?dictionaryHref(term.id,''):'#dictionary');
+ return `<a class="graph-dictionary-return" href="${esc(target)}">← 개념 사전으로 돌아가기</a>`;
+}
 const graphSourceNames={
  'law.go.kr':'국가법령정보센터',
  'kofia.or.kr':'금융투자협회',
@@ -680,7 +798,7 @@ function graphSourceLink(href,label=''){
  if(internal){
   const [,section,id]=internal;
   const term=getTerm(id);
-  const target=term?graphHref(term.id):internal[0];
+  const target=term?graphHref(term.id):section==='graph'?graphHref(id):internal[0];
   const name=label||(term?esc(peekTermTitle(term)):section==='unit'?'단원 보기':'관련 항목 보기');
   return `<a href="${esc(target)}">${name}</a>`;
  }
@@ -829,14 +947,19 @@ function getAtlasModel(){
  atlasModel??=window.AtlasLayout.build(getAtlasCatalog().graphTerms,{titleOf:peekTermTitle,chapters:data.course.chapters});
  return atlasModel;
 }
-function renderAtlas(){
+function renderAtlas(focusId){
  const catalog=getAtlasCatalog();
  getAtlasModel();
+ const focusTerm=getTerm(focusId);
+ const members=focusId?catalog.members(focusId):undefined;
+ const initialTerm=members?.[0]||focusTerm;
+ const groupTitle=members?.length>1&&focusTerm?peekTermTitle(focusTerm):'';
+ const camera=focusId?{}:atlasCamera;
  const root=$('#app');
  root.innerHTML=`<section class="atlas-screen" aria-labelledby="atlasTitle">
   <canvas data-atlas-canvas tabindex="0" aria-label="전체 개념 지도. 화살표 키로 이동하고 더하기와 빼기 키로 확대 또는 축소합니다.">검색창에서 개념을 골라 읽을 수 있어요.</canvas>
   <div class="atlas-top">
-   <div class="atlas-heading" data-atlas-overlay="top"><h1 id="atlasTitle">개념 지도</h1><p>${atlasModel.nodes.length.toLocaleString('ko-KR')}개 개념 <span aria-hidden="true">/</span> ${atlasModel.edges.length.toLocaleString('ko-KR')}개 연결</p></div>
+   <div class="atlas-heading" data-atlas-overlay="top">${graphDictionaryReturnMarkup(focusTerm)}<h1 id="atlasTitle">개념 지도</h1><p>${atlasModel.nodes.length.toLocaleString('ko-KR')}개 개념 <span aria-hidden="true">/</span> ${atlasModel.edges.length.toLocaleString('ko-KR')}개 연결</p></div>
    <div class="atlas-finder">
     <div class="atlas-search" data-atlas-overlay="top"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="atlasSearch" aria-label="지도에서 개념 찾기" placeholder="개념 찾기" autocomplete="off" aria-controls="atlasMatches"></div>
     <div id="atlasMatches" class="atlas-matches" hidden></div>
@@ -848,21 +971,23 @@ function renderAtlas(){
    </div>
   </div></section>`;
  const screen=root.querySelector('.atlas-screen');
- const open=id=>setHash('#graph/'+encodeURIComponent(id));
- atlasViewer=window.ConceptAtlas.mount(screen,atlasModel,{state:atlasCamera,onOpen:open});
+ const open=id=>setHash(graphHref(id));
+ atlasViewer=window.ConceptAtlas.mount(screen,atlasModel,{state:camera,onOpen:open});
  const input=$('#atlasSearch'),results=$('#atlasMatches');
  const read=screen.querySelector('.atlas-read'),help=screen.querySelector('.atlas-help');
  function showSelection(term){
   help.hidden=Boolean(term);
   read.hidden=!term;
-  if(term){read.href='#graph/'+encodeURIComponent(term.id);read.innerHTML='<span class="atlas-read-name">'+esc(peekTermTitle(term))+'</span><span class="atlas-read-go">읽기 →</span>'}
+  if(term){read.href=graphHref(term.id);read.innerHTML='<span class="atlas-read-name">'+esc(peekTermTitle(term))+'</span><span class="atlas-read-go">읽기 →</span>'}
  }
- if(atlasCamera.selectedId)showSelection(getTerm(atlasCamera.selectedId));
+ if(initialTerm)atlasViewer.focus(initialTerm.id);
+ if(camera.selectedId)showSelection(getTerm(camera.selectedId));
+ if(groupTitle)input.value=groupTitle;
  function hideMatches(){results.hidden=true;results.replaceChildren()}
  function search(){
-  const query=input.value.trim().toLowerCase();
+  const query=input.value.trim();
   if(!query){hideMatches();return}
-  const matches=catalog.search(query);
+  const matches=groupTitle&&query===groupTitle?members:catalog.search(query);
   results.innerHTML=matches.length?matches.map(term=>`<button type="button" data-atlas-term="${esc(term.id)}">${esc(peekTermTitle(term))}</button>`).join(''):'<p role="status">찾은 개념이 없어요.</p>';
   results.hidden=false;
  }
@@ -874,6 +999,7 @@ function renderAtlas(){
   screen.querySelector('canvas').focus({preventScroll:true});
  }
  input.oninput=search;
+ if(groupTitle)input.onfocus=()=>{if(input.value===groupTitle)search()};
  input.onkeydown=event=>{
   if(event.key==='Escape'){hideMatches();input.blur();return}
   if(event.key!=='ArrowDown'&&event.key!=='Enter')return;
@@ -883,53 +1009,108 @@ function renderAtlas(){
  results.onclick=event=>{const button=event.target.closest('button[data-atlas-term]');if(button)choose(button)};
  results.onkeydown=event=>{
   const button=event.target.closest('button');
-  if(event.key==='Escape'){hideMatches();input.focus();return}
+  if(event.key==='Escape'){input.focus();hideMatches();return}
   if(!button||!['ArrowDown','ArrowUp'].includes(event.key))return;
   event.preventDefault();(event.key==='ArrowDown'?(button.nextElementSibling||button):(button.previousElementSibling||input)).focus();
  };
  screen.addEventListener('pointerdown',event=>{if(!event.target.closest('.atlas-finder'))hideMatches()});
- screen.querySelector('[data-atlas-zoom="fit"]').addEventListener('click',()=>{input.value='';showSelection(null)});
+ screen.querySelector('[data-atlas-zoom="fit"]').addEventListener('click',()=>{input.value='';hideMatches();showSelection(null)});
 }
-function renderGraph(){
- if(location.hash==='#graph'){renderAtlas();return}
- const id=decodeURIComponent(location.hash.split('/')[1]||'');
+function graphNeighborhoodMarkup(term,options){
+ const catalog=getAtlasCatalog();
+ if(!catalog.graphTerms.some(node=>node.id===term.id))return '';
+ const neighbors=catalog.adjacent(term.id);
+ if(!neighbors.length)return '';
+ const broader=new Set(term.broaderIds||[]);
+ const parents=neighbors.filter(item=>broader.has(item.id));
+ const children=neighbors.filter(item=>!broader.has(item.id)&&item.broaderIds?.includes(term.id));
+ const narrower=new Set(children.map(item=>item.id));
+ const authoredIds=(term.links||[]).map(link=>{
+  const id=typeof link==='string'?link:link.target||link.id;
+  const members=catalog.members(id);
+  return members?.length===1?members[0].id:getTerm(id)?.id;
+ });
+ const authoredRanks=new Map([...new Set(authoredIds)].map((id,index)=>[id,index]));
+ const rank=item=>authoredRanks.get(item.id)??authoredRanks.size;
+ const other=neighbors.filter(item=>!broader.has(item.id)&&!narrower.has(item.id)).sort((a,b)=>rank(a)-rank(b));
+ const relationFor=node=>broader.has(node.id)?'상위 개념':narrower.has(node.id)?'하위 개념':'관련 개념';
+ return graphDiagramMarkup(peekTermTitle(term),[...parents,...children,...other],{...options,relationFor});
+}
+function graphDiagramMarkup(title,ordered,{page:requested=1,neighborHref,pageHref,relationFor,collectionLabel='연결 개념'}){
+ const positions=[[1,1],[3,1],[1,3],[3,3],[2,1],[2,3]];
+ const pageSize=positions.length;
+ const pageCount=Math.ceil(ordered.length/pageSize);
+ const page=Number.isInteger(requested)?Math.max(1,Math.min(requested,pageCount)):1;
+ const neighborLink=(node,attributes)=>{
+  const relation=relationFor(node);
+  const label=esc(peekTermTitle(node));
+  return `<a${attributes} href="${esc(neighborHref(node.id))}" aria-label="${label}, ${relation}">${label}</a>`;
+ };
+ const connections=ordered.slice((page-1)*pageSize,page*pageSize).map((node,index)=>{
+  const [column,row]=positions[index];
+  return {node,column,row};
+ });
+ const diagramLabel=collectionLabel==='구성 개념'?collectionLabel:'개념 지도';
+ const diagram=`<div class="v2-graph-diagram" role="group" aria-label="${esc(title)} ${diagramLabel}">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${connections.map(({column,row})=>
+   `<line x1="50" y1="50" x2="${(column-.5)*100/3}" y2="${(row-.5)*100/3}"/>`).join('')}</svg>
+  <span class="v2-graph-node v2-graph-center">${esc(title)}</span>
+  ${connections.map(({node,column,row})=>neighborLink(node,` class="v2-graph-node" style="grid-area:${row}/${column}"`)).join('')}
+ </div>`;
+ if(pageCount===1)return diagram;
+ const countId=pageHref?'graphPageCount':'dictionaryGraphPageCount';
+ const pageControl=(number,direction,label,text)=>pageHref
+  ?`<a href="${esc(pageHref(number))}" rel="${direction}" aria-label="${label}">${text}</a>`
+  :`<button type="button" data-dict-graph-${direction}="${number}" aria-label="${label}">${text}</button>`;
+ const pageLabel=collectionLabel+' 페이지';
+ return diagram+`<nav class="v2-graph-pages" aria-label="${pageLabel}" aria-describedby="${countId}" tabindex="-1">
+  ${page>1?pageControl(page-1,'prev','이전 '+pageLabel,'← 이전'):''}
+  <span id="${countId}">${page} / ${pageCount}</span>
+  ${page<pageCount?pageControl(page+1,'next','다음 '+pageLabel,'다음 →'):''}
+ </nav>`;
+}
+function graphPageChanged(previous,current){
+ const [oldPath,oldQuery]=previous.split('?'),[path,query]=current.split('?');
+ if(oldPath!==path||!path.startsWith('#graph/'))return false;
+ const before=new URLSearchParams(oldQuery),after=new URLSearchParams(query);
+ return before.get('dictionary')===after.get('dictionary')&&before.get('page')!==after.get('page');
+}
+function renderGraph(paging=false){
+ const [path,query]=location.hash.split('?');
+ const params=new URLSearchParams(query);
+ if(path==='#graph'){renderAtlas(params.get('focus'));return}
+ let id='';
+ try{id=decodeURIComponent(path.split('/')[1]||'')}catch(_){}
  const catalog=getAtlasCatalog();
  const members=catalog.members(id);
- const back='<a class="graph-overview-return" href="#graph">← 전체 지도</a>';
+ const term=members?.length===1?members[0]:getTerm(id);
+ const focusId=term?.id||(members?.length?id:undefined);
+ const back=`<nav class="v2-graph-returns" aria-label="개념 지도 이동">${graphDictionaryReturnMarkup(term)}
+  <a class="graph-overview-return" href="${esc(graphAtlasHref(focusId))}">전체 지도 보기 →</a></nav>`;
  if(members?.length>1){
   $('#app').innerHTML=back+header('개념 선택')+`<nav class="v2-graph-members" aria-label="개념 선택">${members.map(item=>
    `<a href="${esc(graphHref(item.id))}">${esc(peekTermTitle(item))}</a>`).join('')}</nav>`;
   return;
  }
- const term=members?members[0]:getTerm(id);
- if(!term){$('#app').innerHTML=back+header('개념을 찾을 수 없어요');return}
- const neighbors=catalog.adjacent(term.id);
- const broader=new Set(term.broaderIds||[]);
- const parents=neighbors.filter(item=>broader.has(item.id));
- const children=neighbors.filter(item=>item.broaderIds?.includes(term.id));
- const family=new Set([...parents,...children].map(item=>item.id));
- const other=neighbors.filter(item=>!family.has(item.id));
- const nodes=[...parents,...children,...other].slice(0,6);
+ if(!term){$('#app').innerHTML=back+header('개념을 찾을 수 없습니다');return}
  const title=peekTermTitle(term);
- const connections=nodes.map((node,index)=>{
-  const [column,row]=[[1,1],[3,1],[1,3],[3,3],[2,1],[2,3]][index];
-  return {node,column,row};
+ const dictionary=graphDictionaryOrigin();
+ const neighborhood=graphNeighborhoodMarkup(term,{
+  page:Number(params.get('page')),
+  neighborHref:id=>graphHref(id,dictionary),
+  pageHref:number=>graphHref(term.id,dictionary,number),
  });
- const diagram=nodes.length?`<div class="v2-graph-diagram" role="group" aria-label="${esc(title)} 개념 지도">
-  <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${connections.map(({column,row})=>
-   `<line x1="50" y1="50" x2="${(column-.5)*100/3}" y2="${(row-.5)*100/3}"/>`).join('')}</svg>
-  <span class="v2-graph-node v2-graph-center">${esc(title)}</span>
-  ${connections.map(({node,column,row})=>`<a class="v2-graph-node" href="${esc(graphHref(node.id))}" style="grid-area:${row}/${column}">${esc(peekTermTitle(node))}</a>`).join('')}
- </div>`:'';
- const list=items=>`<ul>${items.map(item=>`<li><a href="${esc(graphHref(item.id))}">${esc(peekTermTitle(item))}</a></li>`).join('')}</ul>`;
- const groupedLinks=children.length
-  ?[['하위 개념',children],['상위 개념',parents],['관련 개념',other]].filter(([,items])=>items.length)
-   .map(([label,items])=>`<h3>${label}</h3>${list(items)}`).join('')
-  :list(neighbors);
+ if(paging){$('#graphNeighborhood').innerHTML=neighborhood;return}
  const steps=graphCalculationSteps(term);
  const copy=graphCopyMarkup(term,steps);
  const root=$('#app');
- root.innerHTML=back+header('개념 지도')+`<div class="v2-graph-wrap">
+ const search=new URLSearchParams({search:'1'});
+ const origin=quizOrigin(dictionary);
+ if(origin)search.set('from',origin);
+ root.innerHTML=back+`<header class="v2-hero v2-graph-heading">
+  <h1>개념 지도</h1>
+  <a class="graph-dictionary-search" href="#dictionary?${esc(search.toString())}">사전 검색</a>
+ </header><div class="v2-graph-wrap">
   <article class="v2-graph-definition">
    <h2><a href="${esc(dictionaryHref(term.id))}">${esc(title)}</a></h2>
    ${copy.lead}
@@ -939,20 +1120,11 @@ function renderGraph(){
    ${window.OptionLab.conceptMarkup(term.id)}
    ${copy.reading}
   </article>
-  <section class="v2-graph-navigation" aria-label="개념 지도 탐색">
-   <input id="graphSearch" type="search" placeholder="개념 검색" aria-label="개념 검색">
-   <div id="graphResults" aria-live="polite"></div>
-   ${diagram}
-   ${neighbors.length?`<details><summary>연결된 개념 ${neighbors.length}개</summary>${groupedLinks}</details>`:''}
-  </section>
+  ${neighborhood?`<section class="v2-graph-navigation" aria-label="개념 지도 탐색">
+   <div id="graphNeighborhood">${neighborhood}</div>
+  </section>`:''}
  </div>`;
  window.OptionLab.bindConcept(root);
- const search=$('#graphSearch');
- search.oninput=()=>{
-  const query=search.value.trim().toLowerCase();
-  const matches=query?catalog.search(query):[];
-  $('#graphResults').innerHTML=matches.length?list(matches):query?'<p>검색 결과가 없어요.</p>':'';
- };
 }
 function allOxQuestions(){let legacy=units.flatMap(u=>(u.quiz||[]).map(q=>({...q,unitId:u.id,conceptIds:q.conceptIds||u.conceptIds||[]})));return [...legacy,...(data.course.extraOxQuestions||[])]}
 function friendlyTime(value){
@@ -1027,7 +1199,7 @@ function renderQuestionBank(){
   $(`[data-qid="${CSS.escape(firstNew.id)}"]`)?.focus();
  };
 }
-function renderStandaloneOx(id){let q=allOxQuestions().find(x=>x.id===id);if(!q){$('#app').innerHTML=header('문제를 찾을 수 없어요','OX');return}let ans=record.answers[q.id]?.selected,u=unitFor(q.unitId),fresh=ans!==undefined&&freshAnswerId===q.id;freshAnswerId='';$('#app').innerHTML=`<article class="v2-question"><div class="v2-qmeta">${esc(u?.title||'OX')}</div>${promptMarkup(q,ans!==undefined)}${ans===undefined?`<div class="v2-ox"><button data-answer="true">O <small>맞다</small></button><button data-answer="false">X <small>틀리다</small></button></div>`:`<div class="v2-result ${ans===q.answer?'right':'wrong'}"><b>${markMarkup(ans===q.answer,fresh)}<span>${ans===q.answer?'정답이에요':'다시 확인해 보세요'}. 정답은 ${q.answer?'O':'X'}예요.</span></b><div class="v2-explanation-copy">${solutionMarkup(q)}</div>${q.trap?`<p><b>헷갈리기 쉬운 점</b> ${readerTermsMarkup(q.trap,true)}</p>`:''}<button class="text-btn" id="retryOx">다시 풀기</button></div>`}</article>`;$$('[data-answer]').forEach(b=>b.onclick=()=>{record.answers[q.id]={selected:b.dataset.answer==='true',correct:(b.dataset.answer==='true')===q.answer,at:new Date().toISOString()};freshAnswerId=q.id;queueSave();renderStandaloneOx(id)});if($('#retryOx'))$('#retryOx').onclick=()=>retry(q.id,()=>renderStandaloneOx(id))}
+function renderStandaloneOx(id){let q=allOxQuestions().find(x=>x.id===id);if(!q){$('#app').innerHTML=header('문제를 찾을 수 없어요','OX');return}let ans=record.answers[q.id]?.selected,u=unitFor(q.unitId),fresh=ans!==undefined&&freshAnswerId===q.id;freshAnswerId='';$('#app').innerHTML=`<article class="v2-question"><div class="v2-qmeta">${esc(u?.title||'OX')}</div>${promptMarkup(q,ans!==undefined)}${ans===undefined?`<div class="v2-ox"><button data-answer="true" aria-label="O, 맞다">O</button><button data-answer="false" aria-label="X, 틀리다">X</button></div>`:`<div class="v2-result ${ans===q.answer?'right':'wrong'}"><b>${markMarkup(ans===q.answer,fresh)}<span>${ans===q.answer?'정답이에요':'다시 확인해 보세요'}. 정답은 ${q.answer?'O':'X'}예요.</span></b><div class="v2-explanation-copy">${solutionMarkup(q)}</div>${q.trap?`<p><b>헷갈리기 쉬운 점</b> ${readerTermsMarkup(q.trap,true)}</p>`:''}<button class="text-btn" id="retryOx">다시 풀기</button></div>`}</article>`;$$('[data-answer]').forEach(b=>b.onclick=()=>{record.answers[q.id]={selected:b.dataset.answer==='true',correct:(b.dataset.answer==='true')===q.answer,at:new Date().toISOString()};freshAnswerId=q.id;queueSave();renderStandaloneOx(id)});if($('#retryOx'))$('#retryOx').onclick=()=>retry(q.id,()=>renderStandaloneOx(id))}
 const choiceTopicFallbacks = {
  '01':'세금', '02':'금융상품', '03':'펀드와 신탁', '04':'부동산', '05':'금융투자업',
  '06':'운용과 투자자 보호', '07':'대체투자와 해외투자', '08':'기업분석', '09':'투자분석',
@@ -1116,12 +1288,12 @@ function retiredTarget(h){
  return first?'#choice/'+encodeURIComponent(first.id):'#choices';
 }
 function render(){
- let h=location.hash||'#choices';
+ let h=location.hash||'#choices',focus;
  choiceNav=null;
  if(atlasViewer){atlasViewer.destroy();atlasViewer=null}
  if(h==='#learn'||h==='#home'||h.startsWith('#episode/')){h=retiredTarget(h);redirect(h)}
  updatePrimaryNav(h);
- if(h==='#choices')renderStandaloneChoice();else if(h.startsWith('#dictionary'))renderDictionary();else if(h.startsWith('#concept/')){setHash('#dictionary/'+encodeURIComponent(decodeURIComponent(h.slice(9))));renderDictionary()}else if(h.startsWith('#glossary/')){setHash('#dictionary/'+encodeURIComponent(decodeURIComponent(h.slice(10))));renderDictionary()}else if(h==='#map'||h.startsWith('#map/')){if(h==='#map')setHash('#graph');else setHash('#graph/'+h.slice(5));renderGraph()}else if(h.startsWith('#registry/'))renderRegistry(decodeURIComponent(h.slice(10).split('?')[0]));else if(h.startsWith('#graph'))renderGraph();else if(h.startsWith('#choice/'))renderStandaloneChoice();else if(h.startsWith('#ox/'))renderStandaloneOx(decodeURIComponent(h.slice(4)));else if(h==='#questions')renderQuestionBank();else if(h==='#history')renderHistory();else if(h==='#units')renderUnits();else if(h==='#lab')renderLab();else if(h.startsWith('#unit/'))renderUnit();else{redirect('#choices');updatePrimaryNav('#choices');renderStandaloneChoice()}$('#app').focus({preventScroll:true})}
+ if(h==='#choices')renderStandaloneChoice();else if(h.startsWith('#dictionary'))focus=renderDictionary();else if(h.startsWith('#concept/')){setHash('#dictionary/'+encodeURIComponent(decodeURIComponent(h.slice(9))));renderDictionary()}else if(h.startsWith('#glossary/')){setHash('#dictionary/'+encodeURIComponent(decodeURIComponent(h.slice(10))));renderDictionary()}else if(/^#map(?:[/?]|$)/.test(h)){setHash('#graph'+h.slice(4));renderGraph()}else if(h.startsWith('#registry/'))renderRegistry(decodeURIComponent(h.slice(10).split('?')[0]));else if(h.startsWith('#graph'))renderGraph();else if(h.startsWith('#choice/'))renderStandaloneChoice();else if(h.startsWith('#ox/'))renderStandaloneOx(decodeURIComponent(h.slice(4)));else if(h==='#questions')renderQuestionBank();else if(h==='#history')renderHistory();else if(h==='#units')renderUnits();else if(h==='#lab')renderLab();else if(h.startsWith('#unit/'))renderUnit();else{redirect('#choices');updatePrimaryNav('#choices');renderStandaloneChoice()}(focus||$('#app')).focus({preventScroll:true})}
 const swipeSkip='table,pre,input,select,textarea,.v2-prompt-extra';
 const swipeSlop=8,swipeLean=1.2,swipeDistance=48;
 function bindChoiceSwipe(){
@@ -1218,11 +1390,15 @@ async function start(){
  jumpTo(enterEntry());
  warmUp();
 }
-window.addEventListener('hashchange',()=>{
+window.addEventListener('hashchange',event=>{
  const dialog=$('#conceptPeek');if(dialog?.open)dialog.close();
+ const paging=Boolean(event?.oldURL&&$('#graphNeighborhood')&&graphPageChanged(new URL(event.oldURL).hash,location.hash));
+ const focusPager=paging&&document.activeElement?.closest('.v2-graph-pages');
  leaveEntry();
- render();
- jumpTo(enterEntry());
+ const offset=paging?navMemo.y[entryKey]||0:0;
+ if(paging)renderGraph(true);else render();
+ jumpTo(enterEntry(offset));
+ if(focusPager)$('.v2-graph-pages')?.focus({preventScroll:true});
  saveNavMemo();
-});if(globalThis.__TEXTBOOK_TEST__)globalThis.__textbookTest={getState:()=>JSON.parse(JSON.stringify(record)),getData:()=>data,getAtlasCatalog,queueSave,getAllOx:()=>allOxQuestions(),getFirstEpisode:()=>firstEpisode(),getEpisodeChoices:id=>epChoices(allEpisodes().find(e=>e.id===id)||{}),practiceConcept,getTerm,dictionaryMarkup:(q,id)=>dictionaryMarkup(q,id),searchTerms:q=>allTerms().filter(x=>matchesDictionaryTerm(x,q.toLowerCase()))};bindConceptPeek();bindChoiceSwipe();start();
+});if(globalThis.__TEXTBOOK_TEST__)globalThis.__textbookTest={getState:()=>JSON.parse(JSON.stringify(record)),getData:()=>data,getAtlasCatalog,queueSave,getAllOx:()=>allOxQuestions(),getFirstEpisode:()=>firstEpisode(),getEpisodeChoices:id=>epChoices(allEpisodes().find(e=>e.id===id)||{}),practiceConceptHref,getTerm,dictionaryMarkup:(q,id)=>dictionaryMarkup(q,id),searchTerms:q=>allTerms().filter(x=>matchesDictionaryTerm(x,q.toLowerCase()))};bindConceptPeek();bindChoiceSwipe();start();
 })();

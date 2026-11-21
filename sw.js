@@ -1,13 +1,13 @@
 'use strict';
 
-const BUILD = 'ce7c6c0c6ae6';
+const BUILD = 'f33b7766b420';
 const PRECACHE = [
   "./",
   "./about.html",
   "./data/concepts.json",
   "./data/course.json",
   "./data/registry.json",
-  "./assets/app.css?v=9be797b7f737",
+  "./assets/app.css?v=eb916a846868",
   "./host/host.css?v=4fa2018c4d85",
   "./host/progress-store.js?v=7854702d7a5d",
   "./host/backup.js?v=912d7a4b9199",
@@ -26,11 +26,11 @@ const PRECACHE = [
   "./assets/basic-hints.js?v=085bcf7c5a63",
   "./assets/quiz-references.js?v=65f07dfeb45a",
   "./assets/dictionary-ox.js?v=4fb486a55191",
-  "./assets/atomic-atlas.js?v=cfc1d066430e",
-  "./assets/atlas-layout.js?v=d87d9da1745d",
-  "./assets/concept-atlas.js?v=28278f2cd912",
+  "./assets/atomic-atlas.js?v=5688493e4ae2",
+  "./assets/atlas-layout.js?v=3321b36c4459",
+  "./assets/concept-atlas.js?v=b11351f279d3",
   "./assets/term-figures.js?v=416a4d07945e",
-  "./assets/app.js?v=427ec71cbcfe",
+  "./assets/app.js?v=af68fa3b0286",
   "./assets/fonts/OFL.txt",
   "./assets/fonts/PretendardVariable.woff2",
   "./manifest.webmanifest",

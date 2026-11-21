@@ -38587,7 +38587,7 @@
         "ROA"
       ],
       "summary": "총자산이익률(ROA, Return on Assets)은 기업이 보유한 총자산을 활용해 얼마의 순이익을 냈는지 보여 준다.",
-      "bodyMarkdown": "- **ROA**(Return on Assets): 총자산으로 얼마의 순이익을 냈는지 보는 총자산이익률.\n\n`ROA = 순이익 ÷ 총자산`\n\n[ROI](#glossary/glossary-23c8f1bdd488e9bc079b) — 정의와 설명 참고.\n\n- **R&D**(Research & Development)는 연구, 개발 투자다. 신제품, 신기술, 미래 경쟁력을 위한 지출이다.\n- R&D를 많이 하면 당기 연구개발비로 순이익이 줄거나, 개발, 설비 투자로 총자산이 늘어 단기 ROA가 낮아질 수 있다.\n- 반대로 R&D가 부족하면 현재 비용과 투자자산이 적어 순이익은 높고 총자산은 낮아 보여 ROA가 과도하게 높게 나타날 수 있다.\n- **⚠ ROA가 높다고 R&D 부족이라고 단정하지는 않는다.** 업종, 경쟁사, 설비 노후화, R&D 규모를 함께 확인한다.\n\n- 총자산을 투자원금으로 보는 경우에는 ROA와 ROI를 같은 의미로 쓰기도 한다. 이때 `순이익 ÷ 총자산 = 순이익률 × 총자산회전율`이다.\n- 암기: **ROA는 이익률 × 회전율. 높은 ROA는 미래 투자 부족 가능성도 확인.**\n\n- [ROI](#glossary/glossary-23c8f1bdd488e9bc079b)",
+      "bodyMarkdown": "- **ROA**(Return on Assets): 총자산으로 얼마의 순이익을 냈는지 보는 총자산이익률.\n\n`ROA = 순이익 ÷ 총자산`\n\nROA는 총자산을 기준으로 수익성을 보고, [ROI](#glossary/glossary-23c8f1bdd488e9bc079b)는 특정 투자에 들인 금액을 기준으로 수익성을 볼 때도 쓴다.\n\n- **R&D**(Research & Development)는 연구, 개발 투자다. 신제품, 신기술, 미래 경쟁력을 위한 지출이다.\n- R&D를 많이 하면 당기 연구개발비로 순이익이 줄거나, 개발, 설비 투자로 총자산이 늘어 단기 ROA가 낮아질 수 있다.\n- 반대로 R&D가 부족하면 현재 비용과 투자자산이 적어 순이익은 높고 총자산은 낮아 보여 ROA가 과도하게 높게 나타날 수 있다.\n- **⚠ ROA가 높다고 R&D 부족이라고 단정하지는 않는다.** 업종, 경쟁사, 설비 노후화, R&D 규모를 함께 확인한다.\n\n- 총자산을 투자원금으로 보는 경우에는 ROA와 ROI를 같은 의미로 쓰기도 한다. 이때 `순이익 ÷ 총자산 = 순이익률 × 총자산회전율`이다.\n- 암기: **ROA는 이익률 × 회전율. 높은 ROA는 미래 투자 부족 가능성도 확인.**\n\n- [ROI](#glossary/glossary-23c8f1bdd488e9bc079b)",
       "links": [
         {
           "target": "glossary-23c8f1bdd488e9bc079b",
@@ -38598,11 +38598,12 @@
           "label": "상위 개념"
         }
       ],
-      "bodyHtml": "<ul><li><strong>ROA</strong>(Return on Assets): 총자산으로 얼마의 순이익을 냈는지 보는 총자산이익률.</li></ul>\n<p><code>ROA = 순이익 ÷ 총자산</code></p>\n<p><a href=\"#glossary/glossary-23c8f1bdd488e9bc079b\">ROI</a> — 정의와 설명 참고.</p>\n<ul><li><strong>R&amp;D</strong>(Research &amp; Development)는 연구, 개발 투자다. 신제품, 신기술, 미래 경쟁력을 위한 지출이다.</li><li>R&amp;D를 많이 하면 당기 연구개발비로 순이익이 줄거나, 개발, 설비 투자로 총자산이 늘어 단기 ROA가 낮아질 수 있다.</li><li>반대로 R&amp;D가 부족하면 현재 비용과 투자자산이 적어 순이익은 높고 총자산은 낮아 보여 ROA가 과도하게 높게 나타날 수 있다.</li><li><strong>⚠ ROA가 높다고 R&amp;D 부족이라고 단정하지는 않는다.</strong> 업종, 경쟁사, 설비 노후화, R&amp;D 규모를 함께 확인한다.</li></ul>\n<ul><li>총자산을 투자원금으로 보는 경우에는 ROA와 ROI를 같은 의미로 쓰기도 한다. 이때 <code>순이익 ÷ 총자산 = 순이익률 × 총자산회전율</code>이다.</li><li>암기: <strong>ROA는 이익률 × 회전율. 높은 ROA는 미래 투자 부족 가능성도 확인.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-23c8f1bdd488e9bc079b\">ROI</a></li></ul>",
+      "bodyHtml": "<ul><li><strong>ROA</strong>(Return on Assets): 총자산으로 얼마의 순이익을 냈는지 보는 총자산이익률.</li></ul>\n<p><code>ROA = 순이익 ÷ 총자산</code></p>\n<p>ROA는 총자산을 기준으로 수익성을 보고, <a href=\"#glossary/glossary-23c8f1bdd488e9bc079b\">ROI</a>는 특정 투자에 들인 금액을 기준으로 수익성을 볼 때도 쓴다.</p>\n<ul><li><strong>R&amp;D</strong>(Research &amp; Development)는 연구, 개발 투자다. 신제품, 신기술, 미래 경쟁력을 위한 지출이다.</li><li>R&amp;D를 많이 하면 당기 연구개발비로 순이익이 줄거나, 개발, 설비 투자로 총자산이 늘어 단기 ROA가 낮아질 수 있다.</li><li>반대로 R&amp;D가 부족하면 현재 비용과 투자자산이 적어 순이익은 높고 총자산은 낮아 보여 ROA가 과도하게 높게 나타날 수 있다.</li><li><strong>⚠ ROA가 높다고 R&amp;D 부족이라고 단정하지는 않는다.</strong> 업종, 경쟁사, 설비 노후화, R&amp;D 규모를 함께 확인한다.</li></ul>\n<ul><li>총자산을 투자원금으로 보는 경우에는 ROA와 ROI를 같은 의미로 쓰기도 한다. 이때 <code>순이익 ÷ 총자산 = 순이익률 × 총자산회전율</code>이다.</li><li>암기: <strong>ROA는 이익률 × 회전율. 높은 ROA는 미래 투자 부족 가능성도 확인.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-23c8f1bdd488e9bc079b\">ROI</a></li></ul>",
       "broaderIds": [
         "glossary-44012112df3c3ef9fd23"
       ],
-      "definition": "총자산이익률(ROA, Return on Assets)은 기업이 보유한 총자산을 활용해 얼마의 순이익을 냈는지 보여 준다."
+      "definition": "총자산이익률(ROA, Return on Assets)은 기업이 보유한 총자산을 활용해 얼마의 순이익을 냈는지 보여 준다.",
+      "studyPoint": "ROA는 총자산을 기준으로 수익성을 보고, ROI는 특정 투자에 들인 금액을 기준으로 수익성을 볼 때도 쓴다."
     },
     {
       "id": "glossary-718e649231fd95a3315a",
@@ -40126,7 +40127,7 @@
         "골든크로스"
       ],
       "summary": "골든크로스는 단기 이동평균선이 장기 이동평균선을 아래에서 위로 넘어가는 현상이다. 최근 가격이 장기 추세보다 강해졌다는 신호로 해석한다.",
-      "bodyMarkdown": "단기 이동평균선은 최근 가격 흐름을, 장기 이동평균선은 더 긴 기간의 큰 추세를 반영한다. 두 선의 위아래가 바뀌는 **교차(cross)**를 추세 변화 신호로 해석한다.\n\n- **골든크로스**: 단기 이동평균선이 장기 이동평균선을 아래에서 위로 **상향 돌파**. 최근 흐름이 장기 흐름보다 강해졌다는 뜻으로 상승 신호로 본다.\n[데드크로스](#glossary/glossary-cbee9f87dd1add3b01b8) — 정의와 설명 참고.\n\n| 교차 | 방향 | 일반적 해석 |\n|---|---|---|\n| 골든크로스 | 단기선이 장기선을 상향 돌파 | 상승 신호 |\n| 데드크로스 | 단기선이 장기선을 하향 돌파 | 하락 신호 |\n\n이동평균선은 과거 가격의 평균이므로 교차 신호가 늦게 나타날 수 있고, 가격이 좁은 범위에서 움직이는 횡보장에서는 거짓 신호가 생기기 쉽다.\n\n- 암기: **금(골든)은 위로, 죽음(데드)은 아래로.**\n\n- [이동평균선](#glossary/glossary-b7ba0a521df71a8f120d)\n- [데드크로스](#glossary/glossary-cbee9f87dd1add3b01b8)",
+      "bodyMarkdown": "단기 이동평균선은 최근 가격 흐름을, 장기 이동평균선은 더 긴 기간의 큰 추세를 반영한다. 두 선의 위아래가 바뀌는 **교차(cross)**를 추세 변화 신호로 해석한다.\n\n- **골든크로스**: 단기 이동평균선이 장기 이동평균선을 아래에서 위로 **상향 돌파**. 최근 흐름이 장기 흐름보다 강해졌다는 뜻으로 상승 신호로 본다.\n- **[데드크로스](#glossary/glossary-cbee9f87dd1add3b01b8)**는 단기 이동평균선이 장기 이동평균선을 위에서 아래로 지나가는 현상이다.\n\n| 교차 | 방향 | 일반적 해석 |\n|---|---|---|\n| 골든크로스 | 단기선이 장기선을 상향 돌파 | 상승 신호 |\n| 데드크로스 | 단기선이 장기선을 하향 돌파 | 하락 신호 |\n\n이동평균선은 과거 가격의 평균이므로 교차 신호가 늦게 나타날 수 있고, 가격이 좁은 범위에서 움직이는 횡보장에서는 거짓 신호가 생기기 쉽다.\n\n- 암기: **금(골든)은 위로, 죽음(데드)은 아래로.**\n\n- [이동평균선](#glossary/glossary-b7ba0a521df71a8f120d)\n- [데드크로스](#glossary/glossary-cbee9f87dd1add3b01b8)",
       "links": [
         {
           "target": "glossary-cbee9f87dd1add3b01b8",
@@ -40137,7 +40138,7 @@
           "label": "이동평균선"
         }
       ],
-      "bodyHtml": "<p>단기 이동평균선은 최근 가격 흐름을, 장기 이동평균선은 더 긴 기간의 큰 추세를 반영한다. 두 선의 위아래가 바뀌는 <strong>교차(cross)</strong>를 추세 변화 신호로 해석한다.</p>\n<ul><li><strong>골든크로스</strong>: 단기 이동평균선이 장기 이동평균선을 아래에서 위로 <strong>상향 돌파</strong>. 최근 흐름이 장기 흐름보다 강해졌다는 뜻으로 상승 신호로 본다.</li></ul>\n<p><a href=\"#glossary/glossary-cbee9f87dd1add3b01b8\">데드크로스</a> — 정의와 설명 참고.</p>\n<table><thead><tr><th>교차</th><th>방향</th><th>일반적 해석</th></tr></thead><tbody><tr><td>골든크로스</td><td>단기선이 장기선을 상향 돌파</td><td>상승 신호</td></tr><tr><td>데드크로스</td><td>단기선이 장기선을 하향 돌파</td><td>하락 신호</td></tr></tbody></table>\n<p>이동평균선은 과거 가격의 평균이므로 교차 신호가 늦게 나타날 수 있고, 가격이 좁은 범위에서 움직이는 횡보장에서는 거짓 신호가 생기기 쉽다.</p>\n<ul><li>암기: <strong>금(골든)은 위로, 죽음(데드)은 아래로.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-b7ba0a521df71a8f120d\">이동평균선</a></li><li><a href=\"#glossary/glossary-cbee9f87dd1add3b01b8\">데드크로스</a></li></ul>",
+      "bodyHtml": "<p>단기 이동평균선은 최근 가격 흐름을, 장기 이동평균선은 더 긴 기간의 큰 추세를 반영한다. 두 선의 위아래가 바뀌는 <strong>교차(cross)</strong>를 추세 변화 신호로 해석한다.</p>\n<ul><li><strong>골든크로스</strong>: 단기 이동평균선이 장기 이동평균선을 아래에서 위로 <strong>상향 돌파</strong>. 최근 흐름이 장기 흐름보다 강해졌다는 뜻으로 상승 신호로 본다.</li><li><strong><a href=\"#glossary/glossary-cbee9f87dd1add3b01b8\">데드크로스</a></strong>는 단기 이동평균선이 장기 이동평균선을 위에서 아래로 지나가는 현상이다.</li></ul>\n<table><thead><tr><th>교차</th><th>방향</th><th>일반적 해석</th></tr></thead><tbody><tr><td>골든크로스</td><td>단기선이 장기선을 상향 돌파</td><td>상승 신호</td></tr><tr><td>데드크로스</td><td>단기선이 장기선을 하향 돌파</td><td>하락 신호</td></tr></tbody></table>\n<p>이동평균선은 과거 가격의 평균이므로 교차 신호가 늦게 나타날 수 있고, 가격이 좁은 범위에서 움직이는 횡보장에서는 거짓 신호가 생기기 쉽다.</p>\n<ul><li>암기: <strong>금(골든)은 위로, 죽음(데드)은 아래로.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-b7ba0a521df71a8f120d\">이동평균선</a></li><li><a href=\"#glossary/glossary-cbee9f87dd1add3b01b8\">데드크로스</a></li></ul>",
       "studyTable": [
         [
           "교차",
@@ -40383,8 +40384,8 @@
       "aliases": [
         "공모"
       ],
-      "summary": "공모발행(public offering)은 여러 투자자에게 공개적으로 증권을 사도록 권유하는 발행 방식이다.",
-      "bodyMarkdown": "- 공모발행(Public offering): 다수 투자자에게 공개적으로 모집, 판매하는 방식.\n[사모](#glossary/glossary-280d182cd236e47c9c27) — 정의와 설명 참고.\n\n- 예: 여러 투자자에게 채권을 모집하는 공모와, 특정 기관투자자들과 금액, 만기 등을 협의하는 사모를 비교한다. 실제 법적 구분은 해당 시장의 규정에 따른다.\n\n- [Euroclear: 전자 장부 방식과 증권, 대금 결제](https://www.euroclear.com/about/en/history.html)\n- [Euroclear: 무기명 글로벌 증서와 계좌 기록](https://www.euroclear.com/services/en/primary-issuance/primary-issuance-euroclear-bank/new-global-note.html)\n\n- [사모](#glossary/glossary-280d182cd236e47c9c27)\n\n[기업공개(IPO)](#glossary/glossary-8daa485e76db76f7d79d)는 주식 공모를 포함하는 대표적 사례다. 채권 공모도 있으므로 공모와 IPO는 같은 말이 아니다.",
+      "summary": "공모발행(public offering)은 여러 투자자에게 새로 발행하는 증권을 사도록 공개적으로 권유하는 방식이다.",
+      "bodyMarkdown": "[사모](#glossary/glossary-280d182cd236e47c9c27)는 미리 정한 투자자에게만 매수를 권유하는 방식이다.\n\n[기업공개(IPO)](#glossary/glossary-8daa485e76db76f7d79d)에서는 주식을 공모할 수 있다. 공모의 대상에는 회사채도 포함된다.\n\n[자본시장법 제9조](https://www.law.go.kr/LSW/lsInfoP.do?lsId=010513&urlMode=lsInfoP)",
       "links": [
         {
           "target": "c20",
@@ -40408,9 +40409,10 @@
         }
       ],
       "comparison": false,
-      "bodyHtml": "<ul><li>공모발행(Public offering): 다수 투자자에게 공개적으로 모집, 판매하는 방식.</li></ul>\n<p><a href=\"#glossary/glossary-280d182cd236e47c9c27\">사모</a> — 정의와 설명 참고.</p>\n<ul><li>예: 여러 투자자에게 채권을 모집하는 공모와, 특정 기관투자자들과 금액, 만기 등을 협의하는 사모를 비교한다. 실제 법적 구분은 해당 시장의 규정에 따른다.</li></ul>\n<ul><li><a href=\"https://www.euroclear.com/about/en/history.html\">Euroclear: 전자 장부 방식과 증권, 대금 결제</a></li><li><a href=\"https://www.euroclear.com/services/en/primary-issuance/primary-issuance-euroclear-bank/new-global-note.html\">Euroclear: 무기명 글로벌 증서와 계좌 기록</a></li></ul>\n<ul><li><a href=\"#glossary/glossary-280d182cd236e47c9c27\">사모</a></li></ul>\n<p><a href=\"#glossary/glossary-8daa485e76db76f7d79d\">기업공개(IPO)</a>는 주식 공모를 포함하는 대표적 사례다. 채권 공모도 있으므로 공모와 IPO는 같은 말이 아니다.</p>",
-      "studyExample": "여러 투자자에게 채권을 모집하는 공모와, 특정 기관투자자들과 금액, 만기 등을 협의하는 사모를 비교한다. 실제 법적 구분은 해당 시장의 규정에 따른다.",
-      "definition": "공모발행(public offering)은 여러 투자자에게 공개적으로 증권을 사도록 권유하는 발행 방식이다."
+      "bodyHtml": "<p><a href=\"#glossary/glossary-280d182cd236e47c9c27\">사모</a>는 미리 정한 투자자에게만 매수를 권유하는 방식이다.</p>\n<p><a href=\"#glossary/glossary-8daa485e76db76f7d79d\">기업공개(IPO)</a>에서는 주식을 공모할 수 있다. 공모의 대상에는 회사채도 포함된다.</p>\n<p><a href=\"https://www.law.go.kr/LSW/lsInfoP.do?lsId=010513&amp;urlMode=lsInfoP\">자본시장법 제9조</a></p>",
+      "studyExample": "A사가 공장 증설에 필요한 100억 원을 3년 만기 회사채로 마련한다고 하자. 증권사를 통해 발행 조건을 공개하고 일반투자자 100명에게 회사채 매수를 권유하면 공모 방식이다. 같은 A사가 미리 정한 보험사 두 곳에만 매수를 권유하고 인수 조건을 협의하는 경우는 사모 방식의 예다.",
+      "definition": "공모발행(public offering)은 여러 투자자에게 새로 발행하는 증권을 사도록 공개적으로 권유하는 방식이다.",
+      "studyPoint": "국내에서 법적 구분이 필요할 때는 실제로 산 사람 수에 앞서 누구에게 청약을 권유했는지 확인한다. 권유 인원 산정과 전매 가능성에는 별도 기준이 적용된다."
     },
     {
       "id": "glossary-c122a6290a4ae0fa7987",
@@ -43303,14 +43305,14 @@
         "노동집약적 산업"
       ],
       "summary": "노동집약적 산업은 기계나 설비 같은 자본에 비해 사람의 노동을 상대적으로 많이 투입해 생산하는 산업이다.",
-      "bodyMarkdown": "노동집약적 산업은 생산에서 노동을 상대적으로 많이 사용하는 산업이고, [자본집약적 산업](#glossary/glossary-402817a6ed5153c3e954) — 정의와 설명 참고.\n\n- [자본집약적 산업](#glossary/glossary-402817a6ed5153c3e954)",
+      "bodyMarkdown": "노동집약적 산업은 생산에서 노동을 상대적으로 많이 사용하는 산업이고, [자본집약적 산업](#glossary/glossary-402817a6ed5153c3e954)은 노동보다 기계나 설비 같은 자본을 상대적으로 많이 쓴다.\n\n- [자본집약적 산업](#glossary/glossary-402817a6ed5153c3e954)",
       "links": [
         {
           "target": "glossary-402817a6ed5153c3e954",
           "label": "자본집약적 산업"
         }
       ],
-      "bodyHtml": "<p>노동집약적 산업은 생산에서 노동을 상대적으로 많이 사용하는 산업이고, <a href=\"#glossary/glossary-402817a6ed5153c3e954\">자본집약적 산업</a> — 정의와 설명 참고.</p>\n<ul><li><a href=\"#glossary/glossary-402817a6ed5153c3e954\">자본집약적 산업</a></li></ul>",
+      "bodyHtml": "<p>노동집약적 산업은 생산에서 노동을 상대적으로 많이 사용하는 산업이고, <a href=\"#glossary/glossary-402817a6ed5153c3e954\">자본집약적 산업</a>은 노동보다 기계나 설비 같은 자본을 상대적으로 많이 쓴다.</p>\n<ul><li><a href=\"#glossary/glossary-402817a6ed5153c3e954\">자본집약적 산업</a></li></ul>",
       "definition": "노동집약적 산업은 기계나 설비 같은 자본에 비해 사람의 노동을 상대적으로 많이 투입해 생산하는 산업이다."
     },
     {
@@ -45549,14 +45551,14 @@
         "물적자본"
       ],
       "summary": "물적자본은 기계, 공장, 장비처럼 눈에 보이는 생산수단이다.",
-      "bodyMarkdown": "물적자본은 기계, 공장, 장비처럼 눈에 보이는 생산수단이다. [인프라](#glossary/glossary-412ddccff12e8d862934) — 정의와 설명 참고.\n\n- [인프라](#glossary/glossary-412ddccff12e8d862934)",
+      "bodyMarkdown": "물적자본은 기계, 공장, 장비처럼 눈에 보이는 생산수단이다. 도로와 전력망 같은 [인프라](#glossary/glossary-412ddccff12e8d862934)는 여러 기업의 생산을 뒷받침하는 기반 시설이다.\n\n- [인프라](#glossary/glossary-412ddccff12e8d862934)",
       "links": [
         {
           "target": "glossary-412ddccff12e8d862934",
           "label": "인프라"
         }
       ],
-      "bodyHtml": "<p>물적자본은 기계, 공장, 장비처럼 눈에 보이는 생산수단이다. <a href=\"#glossary/glossary-412ddccff12e8d862934\">인프라</a> — 정의와 설명 참고.</p>\n<ul><li><a href=\"#glossary/glossary-412ddccff12e8d862934\">인프라</a></li></ul>"
+      "bodyHtml": "<p>물적자본은 기계, 공장, 장비처럼 눈에 보이는 생산수단이다. 도로와 전력망 같은 <a href=\"#glossary/glossary-412ddccff12e8d862934\">인프라</a>는 여러 기업의 생산을 뒷받침하는 기반 시설이다.</p>\n<ul><li><a href=\"#glossary/glossary-412ddccff12e8d862934\">인프라</a></li></ul>"
     },
     {
       "id": "glossary-342659ad578555a50304",
@@ -47414,7 +47416,7 @@
         "분리과세"
       ],
       "summary": "분리과세는 해당 소득을 다른 종합소득과 합산하지 않고 별도로 세금을 매기는 방식이다. 일반적인 소액 금융소득은 원천징수로 납세가 마무리되는 경우가 있다.",
-      "bodyMarkdown": "- 분리과세: 해당 소득을 다른 종합소득과 합치지 않고 별도로 과세를 끝내는 방식. 일반적인 소액 금융소득은 원천징수로 납세가 끝나는 경우가 있다.\n- [선택적 분리과세](#glossary/glossary-a6bb661113733ea80c4b)는 분리과세로 끝내거나 종합과세를 선택할 수 있는 경우다. 대표적으로 연간 대상 [기타소득금액](#glossary/glossary-0f5fed88daf13cfba95a) 300만 원 이하가 있다.\n- 비거주자가 국내사업장도 국내원천 부동산소득도 없다면 국내원천소득은 원칙적으로 소득별 분리과세한다. 예컨대 한국에서 받은 이자는 다른 소득과 합산하지 않고 해당 이자에 대해 따로 세액을 계산하며, 보통 지급 단계의 원천징수로 납세가 끝난다. 단, 실제 처리에는 소득별 예외와 [조세조약](#glossary/glossary-5a1f83346a096b1e14f7)을 확인한다.\n[분류과세](#glossary/glossary-921463067caf169e732c) — 정의와 설명 참고.\n\n- [소득세법 시행규칙 종합소득세 신고서 작성방법: 원천징수되지 않은 국외 배당소득](https://law.go.kr/LSW/flDownload.do?bylClsCd=110202&flSeq=153744873&gubun=)\n\n- [분류과세](#glossary/glossary-921463067caf169e732c)",
+      "bodyMarkdown": "- 분리과세: 해당 소득을 다른 종합소득과 합치지 않고 별도로 과세를 끝내는 방식. 일반적인 소액 금융소득은 원천징수로 납세가 끝나는 경우가 있다.\n- [선택적 분리과세](#glossary/glossary-a6bb661113733ea80c4b)는 분리과세로 끝내거나 종합과세를 선택할 수 있는 경우다. 대표적으로 연간 대상 [기타소득금액](#glossary/glossary-0f5fed88daf13cfba95a) 300만 원 이하가 있다.\n- 비거주자가 국내사업장도 국내원천 부동산소득도 없다면 국내원천소득은 원칙적으로 소득별 분리과세한다. 예컨대 한국에서 받은 이자는 다른 소득과 합산하지 않고 해당 이자에 대해 따로 세액을 계산하며, 보통 지급 단계의 원천징수로 납세가 끝난다. 단, 실제 처리에는 소득별 예외와 [조세조약](#glossary/glossary-5a1f83346a096b1e14f7)을 확인한다.\n[분류과세](#glossary/glossary-921463067caf169e732c)는 양도소득이나 퇴직소득처럼 소득의 종류에 따라 별도의 계산 체계를 적용한다.\n\n- [소득세법 시행규칙 종합소득세 신고서 작성방법: 원천징수되지 않은 국외 배당소득](https://law.go.kr/LSW/flDownload.do?bylClsCd=110202&flSeq=153744873&gubun=)\n\n- [분류과세](#glossary/glossary-921463067caf169e732c)",
       "links": [
         {
           "target": "c01",
@@ -47442,7 +47444,7 @@
         }
       ],
       "comparison": false,
-      "bodyHtml": "<ul><li>분리과세: 해당 소득을 다른 종합소득과 합치지 않고 별도로 과세를 끝내는 방식. 일반적인 소액 금융소득은 원천징수로 납세가 끝나는 경우가 있다.</li><li><a href=\"#glossary/glossary-a6bb661113733ea80c4b\">선택적 분리과세</a>는 분리과세로 끝내거나 종합과세를 선택할 수 있는 경우다. 대표적으로 연간 대상 <a href=\"#glossary/glossary-0f5fed88daf13cfba95a\">기타소득금액</a> 300만 원 이하가 있다.</li><li>비거주자가 국내사업장도 국내원천 부동산소득도 없다면 국내원천소득은 원칙적으로 소득별 분리과세한다. 예컨대 한국에서 받은 이자는 다른 소득과 합산하지 않고 해당 이자에 대해 따로 세액을 계산하며, 보통 지급 단계의 원천징수로 납세가 끝난다. 단, 실제 처리에는 소득별 예외와 <a href=\"#glossary/glossary-5a1f83346a096b1e14f7\">조세조약</a>을 확인한다.</li></ul>\n<p><a href=\"#glossary/glossary-921463067caf169e732c\">분류과세</a> — 정의와 설명 참고.</p>\n<ul><li><a href=\"https://law.go.kr/LSW/flDownload.do?bylClsCd=110202&amp;flSeq=153744873&amp;gubun=\">소득세법 시행규칙 종합소득세 신고서 작성방법: 원천징수되지 않은 국외 배당소득</a></li></ul>\n<ul><li><a href=\"#glossary/glossary-921463067caf169e732c\">분류과세</a></li></ul>",
+      "bodyHtml": "<ul><li>분리과세: 해당 소득을 다른 종합소득과 합치지 않고 별도로 과세를 끝내는 방식. 일반적인 소액 금융소득은 원천징수로 납세가 끝나는 경우가 있다.</li><li><a href=\"#glossary/glossary-a6bb661113733ea80c4b\">선택적 분리과세</a>는 분리과세로 끝내거나 종합과세를 선택할 수 있는 경우다. 대표적으로 연간 대상 <a href=\"#glossary/glossary-0f5fed88daf13cfba95a\">기타소득금액</a> 300만 원 이하가 있다.</li><li>비거주자가 국내사업장도 국내원천 부동산소득도 없다면 국내원천소득은 원칙적으로 소득별 분리과세한다. 예컨대 한국에서 받은 이자는 다른 소득과 합산하지 않고 해당 이자에 대해 따로 세액을 계산하며, 보통 지급 단계의 원천징수로 납세가 끝난다. 단, 실제 처리에는 소득별 예외와 <a href=\"#glossary/glossary-5a1f83346a096b1e14f7\">조세조약</a>을 확인한다.</li></ul>\n<p><a href=\"#glossary/glossary-921463067caf169e732c\">분류과세</a>는 양도소득이나 퇴직소득처럼 소득의 종류에 따라 별도의 계산 체계를 적용한다.</p>\n<ul><li><a href=\"https://law.go.kr/LSW/flDownload.do?bylClsCd=110202&amp;flSeq=153744873&amp;gubun=\">소득세법 시행규칙 종합소득세 신고서 작성방법: 원천징수되지 않은 국외 배당소득</a></li></ul>\n<ul><li><a href=\"#glossary/glossary-921463067caf169e732c\">분류과세</a></li></ul>",
       "studyExample": "기타소득 총수입 400만 원, 인정되는 필요경비 150만 원이면 기타소득금액은 250만 원이다. 이때 선택적 분리과세의 300만 원 기준은 400만 원이 아니라 250만 원으로 판단한다. 실제 필요경비 인정액은 소득 종류별 규정에 따른다.",
       "studyPoint": "선택적 분리과세와 비교하면, 무조건 분리과세는 선택 없이 별도로 과세가 끝난다.",
       "broaderIds": [
@@ -48016,12 +48018,16 @@
       "aliases": [
         "사모"
       ],
-      "summary": "사모발행(private placement)은 정해진 투자자들을 대상으로 증권을 발행하는 방식이다. 법령의 사모 요건을 충족하는지는 권유 대상과 전매 가능성 등을 살핀다.",
-      "bodyMarkdown": "- 사모발행(Private placement): 특정 투자자들을 대상으로 협의해 판매하는 방식. 비밀 또는 불법 발행이라는 뜻은 아니다.\n\n| 구분 | 기본 기준 | 누구를 세나 |\n|---|---|---|\n| 일반적인 증권 발행의 사모 | 원칙적으로 청약권유 대상 50인 미만(49인 이하) | 권유받은 사람 |\n| 일반 사모펀드의 투자자 제한 | 전체 100인 이하, 그중 일반투자자 49인 이하 | 실제 투자자 |\n\n예: 법령상 제외대상이 아닌 60명에게 청약을 권유했으나 10명만 투자했다면, 10명만 투자했다는 이유로 사모라고 할 수 없다. 반대로 일반 사모펀드에서 일반 49명+전문 51명은 기본 투자자 수 상한에 맞지만, 일반 50명+전문 10명은 일반투자자 한도를 초과한다. 실제 법정 인원 산정의 제외, 합산 규칙과 권유 방식 등 다른 요건은 별도로 충족해야 한다.\n\n권유 인원에는 이전 6개월의 동일 종류 증권 권유 대상 합산 등 규칙이 적용된다. 50인 미만에게 권유했더라도 전매가능성 때문에 모집으로 간주될 수 있어 숫자만으로 무조건 사모라고 단정하지 않는다.\n\n[사모펀드 인원 제한](#glossary/glossary-d14c9060902e8926bc24)과 [집합투자의 기본 정의(2인 이상)](#glossary/glossary-a77b648dcb9c5785cf5c)를 연결해서 공부한다. **권유49 / 일반사모 전체100, 일반49 / 집합투자 최소2**를 구별한다.\n\n근거: [자본시장법 시행령 제11조, 제14조](https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&lsId=010817), [금융위원회 사모펀드 제도 개편](https://www.fsc.go.kr/no010101/76710)\n\n공모, 사모에 따른 공시 절차는 **투자자가 돈을 넣기 전**에 적용 여부를 판단해야 한다. 청약권유는 ‘이 증권을 사도록 청약해 보세요’라고 참여를 유도하는 행위다. 단순히 증권이나 경제를 설명하는 모든 대화가 청약권유인 것은 아니다.\n\n가령 제외대상이 아닌 1,000명에게 투자를 권했는데 3명만 실제로 샀다고 해 보자. 실제 구매자만 세면 대규모 권유를 하고도 ‘3명만 샀으므로 사모였다’고 주장할 수 있다. 따라서 법은 판매가 끝난 뒤의 구매자 수에 앞서 **청약권유 대상자 수**로 모집 여부를 판단한다. 여러 사람에게 투자를 권하는 단계부터 적절한 정보를 제공하게 하여 투자판단을 보호한다는 취지로 이해하면 된다.\n\n근거: [자본시장법 제9조 제7 × 8항](https://www.law.go.kr/lsInfoP.do?efYd=20260804&lsiSeq=283193), [금융위원회 공시위반 제재 사례: 실제 발행 대상 33인과 과거 권유 대상 62인 합산](https://www.fsc.go.kr/po010101/75859?curPage=63&srchBeginDt=&srchCtgry=&srchEndDt=&srchKey=&srchText=)\n\n- [Euroclear: 전자 장부 방식과 증권, 대금 결제](https://www.euroclear.com/about/en/history.html)\n- [Euroclear: 무기명 글로벌 증서와 계좌 기록](https://www.euroclear.com/services/en/primary-issuance/primary-issuance-euroclear-bank/new-global-note.html)",
+      "summary": "사모발행(private placement)은 특정 투자자에게만 새로 발행하는 증권을 사도록 권유하는 방식이다.",
+      "bodyMarkdown": "[공모](#glossary/glossary-a0675ea172a3f8d3e414)는 여러 투자자에게 새 증권을 사도록 공개적으로 권유하는 방식이다.\n\n| 구분 | 기본 기준 | 누구를 세나 |\n|---|---|---|\n| 일반적인 증권 발행의 사모 | 원칙적으로 청약권유 대상 50인 미만(49인 이하) | 권유받은 사람 |\n| 일반 사모펀드의 투자자 제한 | 전체 100인 이하, 그중 일반투자자 49인 이하 | 실제 투자자 |\n\n예: 법령상 제외대상이 아닌 60명에게 청약을 권유했으나 10명만 투자했다면, 10명만 투자했다는 이유로 사모라고 할 수 없다. 반대로 일반 사모펀드에서 일반 49명+전문 51명은 기본 투자자 수 상한에 맞지만, 일반 50명+전문 10명은 일반투자자 한도를 초과한다. 실제 법정 인원 산정의 제외, 합산 규칙과 권유 방식 등 다른 요건은 별도로 충족해야 한다.\n\n권유 인원에는 이전 6개월의 동일 종류 증권 권유 대상 합산 등 규칙이 적용된다. 50인 미만에게 권유했더라도 전매가능성 때문에 모집으로 간주될 수 있어 숫자만으로 무조건 사모라고 단정하지 않는다.\n\n[사모펀드 인원 제한](#glossary/glossary-d14c9060902e8926bc24)과 [집합투자의 기본 정의(2인 이상)](#glossary/glossary-a77b648dcb9c5785cf5c)를 연결해서 공부한다. **권유49 / 일반사모 전체100, 일반49 / 집합투자 최소2**를 구별한다.\n\n근거: [자본시장법 시행령 제11조, 제14조](https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&lsId=010817), [금융위원회 사모펀드 제도 개편](https://www.fsc.go.kr/no010101/76710)\n\n공모, 사모에 따른 공시 절차는 **투자자가 돈을 넣기 전**에 적용 여부를 판단해야 한다. 청약권유는 ‘이 증권을 사도록 청약해 보세요’라고 참여를 유도하는 행위다. 단순히 증권이나 경제를 설명하는 모든 대화가 청약권유인 것은 아니다.\n\n가령 제외대상이 아닌 1,000명에게 투자를 권했는데 3명만 실제로 샀다고 해 보자. 실제 구매자만 세면 대규모 권유를 하고도 ‘3명만 샀으므로 사모였다’고 주장할 수 있다. 따라서 법은 판매가 끝난 뒤의 구매자 수에 앞서 **청약권유 대상자 수**로 모집 여부를 판단한다. 여러 사람에게 투자를 권하는 단계부터 적절한 정보를 제공하게 하여 투자판단을 보호한다는 취지로 이해하면 된다.\n\n근거: [자본시장법 제9조](https://www.law.go.kr/LSW/lsInfoP.do?lsId=010513&urlMode=lsInfoP), [자본시장법 시행령 제11조](https://law.go.kr/LSW/lsLinkCommonInfo.do?lsJoLnkSeq=1032576101), [금융위원회 공시위반 제재 사례: 실제 발행 대상 33인과 과거 권유 대상 62인 합산](https://www.fsc.go.kr/po010101/75859?curPage=63&srchBeginDt=&srchCtgry=&srchEndDt=&srchKey=&srchText=)\n\n- [Euroclear: 전자 장부 방식과 증권, 대금 결제](https://www.euroclear.com/about/en/history.html)\n- [Euroclear: 무기명 글로벌 증서와 계좌 기록](https://www.euroclear.com/services/en/primary-issuance/primary-issuance-euroclear-bank/new-global-note.html)",
       "links": [
         {
           "target": "c19",
           "label": "함께 비교하기"
+        },
+        {
+          "target": "glossary-a0675ea172a3f8d3e414",
+          "label": "공모"
         },
         {
           "target": "glossary-d14c9060902e8926bc24",
@@ -48033,13 +48039,13 @@
         }
       ],
       "comparison": false,
-      "bodyHtml": "<ul><li>사모발행(Private placement): 특정 투자자들을 대상으로 협의해 판매하는 방식. 비밀 또는 불법 발행이라는 뜻은 아니다.</li></ul>\n<table><thead><tr><th>구분</th><th>기본 기준</th><th>누구를 세나</th></tr></thead><tbody><tr><td>일반적인 증권 발행의 사모</td><td>원칙적으로 청약권유 대상 50인 미만(49인 이하)</td><td>권유받은 사람</td></tr><tr><td>일반 사모펀드의 투자자 제한</td><td>전체 100인 이하, 그중 일반투자자 49인 이하</td><td>실제 투자자</td></tr></tbody></table>\n<p>예: 법령상 제외대상이 아닌 60명에게 청약을 권유했으나 10명만 투자했다면, 10명만 투자했다는 이유로 사모라고 할 수 없다. 반대로 일반 사모펀드에서 일반 49명+전문 51명은 기본 투자자 수 상한에 맞지만, 일반 50명+전문 10명은 일반투자자 한도를 초과한다. 실제 법정 인원 산정의 제외, 합산 규칙과 권유 방식 등 다른 요건은 별도로 충족해야 한다.</p>\n<p>권유 인원에는 이전 6개월의 동일 종류 증권 권유 대상 합산 등 규칙이 적용된다. 50인 미만에게 권유했더라도 전매가능성 때문에 모집으로 간주될 수 있어 숫자만으로 무조건 사모라고 단정하지 않는다.</p>\n<p><a href=\"#glossary/glossary-d14c9060902e8926bc24\">사모펀드 인원 제한</a>과 <a href=\"#glossary/glossary-a77b648dcb9c5785cf5c\">집합투자의 기본 정의(2인 이상)</a>를 연결해서 공부한다. <strong>권유49 / 일반사모 전체100, 일반49 / 집합투자 최소2</strong>를 구별한다.</p>\n<p>근거: <a href=\"https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&amp;lsId=010817\">자본시장법 시행령 제11조, 제14조</a>, <a href=\"https://www.fsc.go.kr/no010101/76710\">금융위원회 사모펀드 제도 개편</a></p>\n<p>공모, 사모에 따른 공시 절차는 <strong>투자자가 돈을 넣기 전</strong>에 적용 여부를 판단해야 한다. 청약권유는 ‘이 증권을 사도록 청약해 보세요’라고 참여를 유도하는 행위다. 단순히 증권이나 경제를 설명하는 모든 대화가 청약권유인 것은 아니다.</p>\n<p>가령 제외대상이 아닌 1,000명에게 투자를 권했는데 3명만 실제로 샀다고 해 보자. 실제 구매자만 세면 대규모 권유를 하고도 ‘3명만 샀으므로 사모였다’고 주장할 수 있다. 따라서 법은 판매가 끝난 뒤의 구매자 수에 앞서 <strong>청약권유 대상자 수</strong>로 모집 여부를 판단한다. 여러 사람에게 투자를 권하는 단계부터 적절한 정보를 제공하게 하여 투자판단을 보호한다는 취지로 이해하면 된다.</p>\n<p>근거: <a href=\"https://www.law.go.kr/lsInfoP.do?efYd=20260804&amp;lsiSeq=283193\">자본시장법 제9조 제7 × 8항</a>, <a href=\"https://www.fsc.go.kr/po010101/75859?curPage=63&amp;srchBeginDt=&amp;srchCtgry=&amp;srchEndDt=&amp;srchKey=&amp;srchText=\">금융위원회 공시위반 제재 사례: 실제 발행 대상 33인과 과거 권유 대상 62인 합산</a></p>\n<ul><li><a href=\"https://www.euroclear.com/about/en/history.html\">Euroclear: 전자 장부 방식과 증권, 대금 결제</a></li><li><a href=\"https://www.euroclear.com/services/en/primary-issuance/primary-issuance-euroclear-bank/new-global-note.html\">Euroclear: 무기명 글로벌 증서와 계좌 기록</a></li></ul>",
-      "studyExample": "법령상 제외대상이 아닌 60명에게 청약을 권유했으나 10명만 투자했다면, 10명만 투자했다는 이유로 사모라고 할 수 없다. 반대로 일반 사모펀드에서 일반 49명+전문 51명은 기본 투자자 수 상한에 맞지만, 일반 50명+전문 10명은 일반투자자 한도를 초과한다. 실제 법정 인원 산정의 제외, 합산 규칙과 권유 방식 등 다른 요건은 별도로 충족해야 한다.",
-      "studyPoint": "50인 미만에게 권유했더라도 전매가능성 때문에 모집으로 간주될 수 있어 숫자만으로 무조건 사모라고 단정하지 않는다.",
+      "bodyHtml": "<p><a href=\"#glossary/glossary-a0675ea172a3f8d3e414\">공모</a>는 여러 투자자에게 새 증권을 사도록 공개적으로 권유하는 방식이다.</p>\n<table><thead><tr><th>구분</th><th>기본 기준</th><th>누구를 세나</th></tr></thead><tbody><tr><td>일반적인 증권 발행의 사모</td><td>원칙적으로 청약권유 대상 50인 미만(49인 이하)</td><td>권유받은 사람</td></tr><tr><td>일반 사모펀드의 투자자 제한</td><td>전체 100인 이하, 그중 일반투자자 49인 이하</td><td>실제 투자자</td></tr></tbody></table>\n<p>예: 법령상 제외대상이 아닌 60명에게 청약을 권유했으나 10명만 투자했다면, 10명만 투자했다는 이유로 사모라고 할 수 없다. 반대로 일반 사모펀드에서 일반 49명+전문 51명은 기본 투자자 수 상한에 맞지만, 일반 50명+전문 10명은 일반투자자 한도를 초과한다. 실제 법정 인원 산정의 제외, 합산 규칙과 권유 방식 등 다른 요건은 별도로 충족해야 한다.</p>\n<p>권유 인원에는 이전 6개월의 동일 종류 증권 권유 대상 합산 등 규칙이 적용된다. 50인 미만에게 권유했더라도 전매가능성 때문에 모집으로 간주될 수 있어 숫자만으로 무조건 사모라고 단정하지 않는다.</p>\n<p><a href=\"#glossary/glossary-d14c9060902e8926bc24\">사모펀드 인원 제한</a>과 <a href=\"#glossary/glossary-a77b648dcb9c5785cf5c\">집합투자의 기본 정의(2인 이상)</a>를 연결해서 공부한다. <strong>권유49 / 일반사모 전체100, 일반49 / 집합투자 최소2</strong>를 구별한다.</p>\n<p>근거: <a href=\"https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&amp;lsId=010817\">자본시장법 시행령 제11조, 제14조</a>, <a href=\"https://www.fsc.go.kr/no010101/76710\">금융위원회 사모펀드 제도 개편</a></p>\n<p>공모, 사모에 따른 공시 절차는 <strong>투자자가 돈을 넣기 전</strong>에 적용 여부를 판단해야 한다. 청약권유는 ‘이 증권을 사도록 청약해 보세요’라고 참여를 유도하는 행위다. 단순히 증권이나 경제를 설명하는 모든 대화가 청약권유인 것은 아니다.</p>\n<p>가령 제외대상이 아닌 1,000명에게 투자를 권했는데 3명만 실제로 샀다고 해 보자. 실제 구매자만 세면 대규모 권유를 하고도 ‘3명만 샀으므로 사모였다’고 주장할 수 있다. 따라서 법은 판매가 끝난 뒤의 구매자 수에 앞서 <strong>청약권유 대상자 수</strong>로 모집 여부를 판단한다. 여러 사람에게 투자를 권하는 단계부터 적절한 정보를 제공하게 하여 투자판단을 보호한다는 취지로 이해하면 된다.</p>\n<p>근거: <a href=\"https://www.law.go.kr/LSW/lsInfoP.do?lsId=010513&amp;urlMode=lsInfoP\">자본시장법 제9조</a>, <a href=\"https://law.go.kr/LSW/lsLinkCommonInfo.do?lsJoLnkSeq=1032576101\">자본시장법 시행령 제11조</a>, <a href=\"https://www.fsc.go.kr/po010101/75859?curPage=63&amp;srchBeginDt=&amp;srchCtgry=&amp;srchEndDt=&amp;srchKey=&amp;srchText=\">금융위원회 공시위반 제재 사례: 실제 발행 대상 33인과 과거 권유 대상 62인 합산</a></p>\n<ul><li><a href=\"https://www.euroclear.com/about/en/history.html\">Euroclear: 전자 장부 방식과 증권, 대금 결제</a></li><li><a href=\"https://www.euroclear.com/services/en/primary-issuance/primary-issuance-euroclear-bank/new-global-note.html\">Euroclear: 무기명 글로벌 증서와 계좌 기록</a></li></ul>",
+      "studyExample": "A사가 공장 증설에 필요한 100억 원을 3년 만기 회사채로 마련한다고 하자. 증권사를 통해 발행 조건을 공개하고 일반투자자 100명에게 회사채 매수를 권유하면 공모 방식이다. 같은 A사가 미리 정한 보험사 두 곳에만 매수를 권유하고 인수 조건을 협의하는 경우는 사모 방식의 예다.",
+      "studyPoint": "국내에서 법적 구분이 필요할 때는 실제로 산 사람 수에 앞서 누구에게 청약을 권유했는지 확인한다. 권유 인원 산정과 전매 가능성에는 별도 기준이 적용된다.",
       "studyOxIds": [
         "ox-9e5e16bd9a431b36"
       ],
-      "definition": "사모발행(private placement)은 정해진 투자자들을 대상으로 증권을 발행하는 방식이다. 법령의 사모 요건을 충족하는지는 권유 대상과 전매 가능성 등을 살핀다."
+      "definition": "사모발행(private placement)은 특정 투자자에게만 새로 발행하는 증권을 사도록 권유하는 방식이다."
     },
     {
       "id": "glossary-d14c9060902e8926bc24",
@@ -48076,14 +48082,14 @@
         "사양산업"
       ],
       "summary": "사양산업은 수요 감소나 대체기술 등장 등으로 장기적인 성장세가 약해지는 산업이다.",
-      "bodyMarkdown": "사양산업은 수요 감소나 대체기술 등장 등으로 장기적인 성장세가 약해지는 산업이다. [업종 다각화](#glossary/glossary-d62946bf0cd7b96dc506) — 정의와 설명 참고.\n\n- [업종 다각화](#glossary/glossary-d62946bf0cd7b96dc506)",
+      "bodyMarkdown": "사양산업은 수요 감소나 대체기술 등장 등으로 장기적인 성장세가 약해지는 산업이다. 기업은 [업종 다각화](#glossary/glossary-d62946bf0cd7b96dc506)로 다른 업종에 진출해 기존 사업에 대한 의존도를 낮출 수 있다.\n\n- [업종 다각화](#glossary/glossary-d62946bf0cd7b96dc506)",
       "links": [
         {
           "target": "glossary-d62946bf0cd7b96dc506",
           "label": "업종 다각화"
         }
       ],
-      "bodyHtml": "<p>사양산업은 수요 감소나 대체기술 등장 등으로 장기적인 성장세가 약해지는 산업이다. <a href=\"#glossary/glossary-d62946bf0cd7b96dc506\">업종 다각화</a> — 정의와 설명 참고.</p>\n<ul><li><a href=\"#glossary/glossary-d62946bf0cd7b96dc506\">업종 다각화</a></li></ul>"
+      "bodyHtml": "<p>사양산업은 수요 감소나 대체기술 등장 등으로 장기적인 성장세가 약해지는 산업이다. 기업은 <a href=\"#glossary/glossary-d62946bf0cd7b96dc506\">업종 다각화</a>로 다른 업종에 진출해 기존 사업에 대한 의존도를 낮출 수 있다.</p>\n<ul><li><a href=\"#glossary/glossary-d62946bf0cd7b96dc506\">업종 다각화</a></li></ul>"
     },
     {
       "id": "glossary-2fb7c1948b65ecfe9a6a",
@@ -48366,7 +48372,7 @@
         "산포경향"
       ],
       "summary": "산포경향은 관측값들이 평균 가까이에 모여 있는지, 넓게 퍼져 있는지를 나타낸다. 분산이나 표준편차로 흩어진 정도를 비교할 수 있다.",
-      "bodyMarkdown": "- **산포(散布)**는 흩어져 뿌려진다는 뜻. 데이터가 평균 근처에 모였는지, 넓게 퍼졌는지를 보여주는 지표다.\n[범위](#glossary/glossary-2281025b69a422c01adf) — 정의와 설명 참고.\n\n[분산](#glossary/glossary-2c6d8d8368b146d0ff25) — 정의와 설명 참고.\n\n[표준편차](#glossary/glossary-bf6a50710d77633a7a58) — 정의와 설명 참고.\n\n[평균편차](#glossary/glossary-47a24224000572910324) — 정의와 설명 참고.\n\n자세한 설명: 산포도 비교.\n\n- 암기: **거리 평균은 평균편차, 거리² 평균은 분산, 분산√은 표준편차.**\n\n- [범위](#glossary/glossary-2281025b69a422c01adf)\n- [분산](#glossary/glossary-2c6d8d8368b146d0ff25)\n- [표준편차](#glossary/glossary-bf6a50710d77633a7a58)\n- [평균편차](#glossary/glossary-47a24224000572910324)",
+      "bodyMarkdown": "- **산포(散布)**는 흩어져 뿌려진다는 뜻. 데이터가 평균 근처에 모였는지, 넓게 퍼졌는지를 보여주는 지표다.\n[범위](#glossary/glossary-2281025b69a422c01adf)는 최댓값에서 최솟값을 뺀 값이다.\n\n[분산](#glossary/glossary-2c6d8d8368b146d0ff25)은 평균에서 떨어진 거리를 제곱해 흩어진 정도를 나타낸다.\n\n[표준편차](#glossary/glossary-bf6a50710d77633a7a58)는 분산의 제곱근이며 관측값과 같은 단위로 읽는다.\n\n[평균편차](#glossary/glossary-47a24224000572910324)는 각 관측값이 평균에서 떨어진 거리의 평균이다.\n\n자세한 설명: 산포도 비교.\n\n- 암기: **거리 평균은 평균편차, 거리² 평균은 분산, 분산√은 표준편차.**\n\n- [범위](#glossary/glossary-2281025b69a422c01adf)\n- [분산](#glossary/glossary-2c6d8d8368b146d0ff25)\n- [표준편차](#glossary/glossary-bf6a50710d77633a7a58)\n- [평균편차](#glossary/glossary-47a24224000572910324)",
       "links": [
         {
           "target": "glossary-2281025b69a422c01adf",
@@ -48385,7 +48391,7 @@
           "label": "평균편차"
         }
       ],
-      "bodyHtml": "<ul><li><strong>산포(散布)</strong>는 흩어져 뿌려진다는 뜻. 데이터가 평균 근처에 모였는지, 넓게 퍼졌는지를 보여주는 지표다.</li></ul>\n<p><a href=\"#glossary/glossary-2281025b69a422c01adf\">범위</a> — 정의와 설명 참고.</p>\n<p><a href=\"#glossary/glossary-2c6d8d8368b146d0ff25\">분산</a> — 정의와 설명 참고.</p>\n<p><a href=\"#glossary/glossary-bf6a50710d77633a7a58\">표준편차</a> — 정의와 설명 참고.</p>\n<p><a href=\"#glossary/glossary-47a24224000572910324\">평균편차</a> — 정의와 설명 참고.</p>\n<p>자세한 설명: 산포도 비교.</p>\n<ul><li>암기: <strong>거리 평균은 평균편차, 거리² 평균은 분산, 분산√은 표준편차.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-2281025b69a422c01adf\">범위</a></li><li><a href=\"#glossary/glossary-2c6d8d8368b146d0ff25\">분산</a></li><li><a href=\"#glossary/glossary-bf6a50710d77633a7a58\">표준편차</a></li><li><a href=\"#glossary/glossary-47a24224000572910324\">평균편차</a></li></ul>",
+      "bodyHtml": "<ul><li><strong>산포(散布)</strong>는 흩어져 뿌려진다는 뜻. 데이터가 평균 근처에 모였는지, 넓게 퍼졌는지를 보여주는 지표다.</li></ul>\n<p><a href=\"#glossary/glossary-2281025b69a422c01adf\">범위</a>는 최댓값에서 최솟값을 뺀 값이다.</p>\n<p><a href=\"#glossary/glossary-2c6d8d8368b146d0ff25\">분산</a>은 평균에서 떨어진 거리를 제곱해 흩어진 정도를 나타낸다.</p>\n<p><a href=\"#glossary/glossary-bf6a50710d77633a7a58\">표준편차</a>는 분산의 제곱근이며 관측값과 같은 단위로 읽는다.</p>\n<p><a href=\"#glossary/glossary-47a24224000572910324\">평균편차</a>는 각 관측값이 평균에서 떨어진 거리의 평균이다.</p>\n<p>자세한 설명: 산포도 비교.</p>\n<ul><li>암기: <strong>거리 평균은 평균편차, 거리² 평균은 분산, 분산√은 표준편차.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-2281025b69a422c01adf\">범위</a></li><li><a href=\"#glossary/glossary-2c6d8d8368b146d0ff25\">분산</a></li><li><a href=\"#glossary/glossary-bf6a50710d77633a7a58\">표준편차</a></li><li><a href=\"#glossary/glossary-47a24224000572910324\">평균편차</a></li></ul>",
       "definition": "산포경향은 관측값들이 평균 가까이에 모여 있는지, 넓게 퍼져 있는지를 나타낸다. 분산이나 표준편차로 흩어진 정도를 비교할 수 있다."
     },
     {
@@ -50576,7 +50582,7 @@
         "시장 분류"
       ],
       "summary": "시장 분류는 국가별 주식시장을 경제와 금융시장의 발전 정도 등에 따라 선진시장, 신흥시장 등으로 나누는 것이다. 어떤 국가를 어느 시장에 넣는지는 분류 기관의 기준에 따라 달라질 수 있다.",
-      "bodyMarkdown": "[선진시장](#glossary/glossary-630d97ffd0de5d1dad09) — 정의와 설명 참고.\n\n[신흥시장](#glossary/glossary-af0833a6454b61e6e4f9) — 정의와 설명 참고.\n\nMSCI와 FTSE는 별도의 지수 제공자이며, 시장 규모, 유동성, 외국인 투자자의 시장 접근성 등에 대한 기준과 평가가 다르다. 한국을 단순히 부자 나라냐 아니냐로 나눈 것이 아니다.\n\n**정답: MSCI EM / FTSE DM.**\n| 제공자 | 선진시장 선택지 | 신흥시장 선택지 | 한국 |\n|---|---|---|---|\n| MSCI | World | EM | EM |\n| FTSE | DM | EM | DM |\n암기: **한국은 MSCI에서 신흥, FTSE에서 선진. World는 선진시장 지수.**\n확인: 2026-09-20. 분류는 향후 변경될 수 있다.\n출처: [MSCI World](https://www.msci.com/indexes/index/990100/msci-world-index), [MSCI Korea — Emerging Markets](https://www.msci.com/indexes/index/941000/msci-korea-index), [FTSE 국가 분류](https://www.lseg.com/en/ftse-russell/equity-country-classification), [FTSE 한국 분류 설명](https://www.ftse.com/products/downloads/FTSE_South_Korea_Whitepaper_Jan2013.pdf), [LSEG — FTSE 역사](https://www.lseg.com/content/dam/lseg/en_us/documents/investor-relations/mergers-and-acquisitions/ftse-russell/lseg-ftse-investor-analyst-presentation-apr2013.pdf)\n\n- [MSCI World](#glossary/glossary-3b47f78cbd9c5cbc9924)\n- [MSCI EM](#glossary/glossary-d22d58d1b3af15191dd5)\n- [선진시장](#glossary/glossary-630d97ffd0de5d1dad09)\n- [신흥시장](#glossary/glossary-af0833a6454b61e6e4f9)",
+      "bodyMarkdown": "지수 제공자는 주식시장을 평가해 [선진시장](#glossary/glossary-630d97ffd0de5d1dad09)이나 [신흥시장](#glossary/glossary-af0833a6454b61e6e4f9) 등으로 분류한다.\n\nMSCI와 FTSE는 별도의 지수 제공자이며, 시장 규모, 유동성, 외국인 투자자의 시장 접근성 등에 대한 기준과 평가가 다르다. 한국을 단순히 부자 나라냐 아니냐로 나눈 것이 아니다.\n\n**정답: MSCI EM / FTSE DM.**\n| 제공자 | 선진시장 선택지 | 신흥시장 선택지 | 한국 |\n|---|---|---|---|\n| MSCI | World | EM | EM |\n| FTSE | DM | EM | DM |\n암기: **한국은 MSCI에서 신흥, FTSE에서 선진. World는 선진시장 지수.**\n확인: 2026-09-20. 분류는 향후 변경될 수 있다.\n출처: [MSCI World](https://www.msci.com/indexes/index/990100/msci-world-index), [MSCI Korea — Emerging Markets](https://www.msci.com/indexes/index/941000/msci-korea-index), [FTSE 국가 분류](https://www.lseg.com/en/ftse-russell/equity-country-classification), [FTSE 한국 분류 설명](https://www.ftse.com/products/downloads/FTSE_South_Korea_Whitepaper_Jan2013.pdf), [LSEG — FTSE 역사](https://www.lseg.com/content/dam/lseg/en_us/documents/investor-relations/mergers-and-acquisitions/ftse-russell/lseg-ftse-investor-analyst-presentation-apr2013.pdf)\n\n- [MSCI World](#glossary/glossary-3b47f78cbd9c5cbc9924)\n- [MSCI EM](#glossary/glossary-d22d58d1b3af15191dd5)\n- [선진시장](#glossary/glossary-630d97ffd0de5d1dad09)\n- [신흥시장](#glossary/glossary-af0833a6454b61e6e4f9)",
       "links": [
         {
           "target": "glossary-630d97ffd0de5d1dad09",
@@ -50595,7 +50601,7 @@
           "label": "MSCI EM"
         }
       ],
-      "bodyHtml": "<p><a href=\"#glossary/glossary-630d97ffd0de5d1dad09\">선진시장</a> — 정의와 설명 참고.</p>\n<p><a href=\"#glossary/glossary-af0833a6454b61e6e4f9\">신흥시장</a> — 정의와 설명 참고.</p>\n<p>MSCI와 FTSE는 별도의 지수 제공자이며, 시장 규모, 유동성, 외국인 투자자의 시장 접근성 등에 대한 기준과 평가가 다르다. 한국을 단순히 부자 나라냐 아니냐로 나눈 것이 아니다.</p>\n<p><strong>정답: MSCI EM / FTSE DM.</strong></p>\n<table><thead><tr><th>제공자</th><th>선진시장 선택지</th><th>신흥시장 선택지</th><th>한국</th></tr></thead><tbody><tr><td>MSCI</td><td>World</td><td>EM</td><td>EM</td></tr><tr><td>FTSE</td><td>DM</td><td>EM</td><td>DM</td></tr></tbody></table>\n<p>암기: <strong>한국은 MSCI에서 신흥, FTSE에서 선진. World는 선진시장 지수.</strong> 확인: 2026-09-20. 분류는 향후 변경될 수 있다. 출처: <a href=\"https://www.msci.com/indexes/index/990100/msci-world-index\">MSCI World</a>, <a href=\"https://www.msci.com/indexes/index/941000/msci-korea-index\">MSCI Korea — Emerging Markets</a>, <a href=\"https://www.lseg.com/en/ftse-russell/equity-country-classification\">FTSE 국가 분류</a>, <a href=\"https://www.ftse.com/products/downloads/FTSE_South_Korea_Whitepaper_Jan2013.pdf\">FTSE 한국 분류 설명</a>, <a href=\"https://www.lseg.com/content/dam/lseg/en_us/documents/investor-relations/mergers-and-acquisitions/ftse-russell/lseg-ftse-investor-analyst-presentation-apr2013.pdf\">LSEG — FTSE 역사</a></p>\n<ul><li><a href=\"#glossary/glossary-3b47f78cbd9c5cbc9924\">MSCI World</a></li><li><a href=\"#glossary/glossary-d22d58d1b3af15191dd5\">MSCI EM</a></li><li><a href=\"#glossary/glossary-630d97ffd0de5d1dad09\">선진시장</a></li><li><a href=\"#glossary/glossary-af0833a6454b61e6e4f9\">신흥시장</a></li></ul>",
+      "bodyHtml": "<p>지수 제공자는 주식시장을 평가해 <a href=\"#glossary/glossary-630d97ffd0de5d1dad09\">선진시장</a>이나 <a href=\"#glossary/glossary-af0833a6454b61e6e4f9\">신흥시장</a> 등으로 분류한다.</p>\n<p>MSCI와 FTSE는 별도의 지수 제공자이며, 시장 규모, 유동성, 외국인 투자자의 시장 접근성 등에 대한 기준과 평가가 다르다. 한국을 단순히 부자 나라냐 아니냐로 나눈 것이 아니다.</p>\n<p><strong>정답: MSCI EM / FTSE DM.</strong></p>\n<table><thead><tr><th>제공자</th><th>선진시장 선택지</th><th>신흥시장 선택지</th><th>한국</th></tr></thead><tbody><tr><td>MSCI</td><td>World</td><td>EM</td><td>EM</td></tr><tr><td>FTSE</td><td>DM</td><td>EM</td><td>DM</td></tr></tbody></table>\n<p>암기: <strong>한국은 MSCI에서 신흥, FTSE에서 선진. World는 선진시장 지수.</strong> 확인: 2026-09-20. 분류는 향후 변경될 수 있다. 출처: <a href=\"https://www.msci.com/indexes/index/990100/msci-world-index\">MSCI World</a>, <a href=\"https://www.msci.com/indexes/index/941000/msci-korea-index\">MSCI Korea — Emerging Markets</a>, <a href=\"https://www.lseg.com/en/ftse-russell/equity-country-classification\">FTSE 국가 분류</a>, <a href=\"https://www.ftse.com/products/downloads/FTSE_South_Korea_Whitepaper_Jan2013.pdf\">FTSE 한국 분류 설명</a>, <a href=\"https://www.lseg.com/content/dam/lseg/en_us/documents/investor-relations/mergers-and-acquisitions/ftse-russell/lseg-ftse-investor-analyst-presentation-apr2013.pdf\">LSEG — FTSE 역사</a></p>\n<ul><li><a href=\"#glossary/glossary-3b47f78cbd9c5cbc9924\">MSCI World</a></li><li><a href=\"#glossary/glossary-d22d58d1b3af15191dd5\">MSCI EM</a></li><li><a href=\"#glossary/glossary-630d97ffd0de5d1dad09\">선진시장</a></li><li><a href=\"#glossary/glossary-af0833a6454b61e6e4f9\">신흥시장</a></li></ul>",
       "studyPoint": "MSCI와 FTSE는 별도의 지수 제공자이며, 시장 규모, 유동성, 외국인 투자자의 시장 접근성 등에 대한 기준과 평가가 다르다."
     },
     {
@@ -52276,14 +52282,14 @@
         "연구개발"
       ],
       "summary": "새로운 지식을 얻고, 그 지식을 이용해 제품이나 생산 방법을 만드는 활동이다. 영어 Research and Development를 줄여 R&D라고 한다.",
-      "bodyMarkdown": "R&D는 Research and Development, 연구개발이다. 새로운 지식을 연구하고 제품, 공정을 개발하는 활동이다. [기술혁신](#glossary/glossary-cd42458f5fb089ffd626) — 정의와 설명 참고.\n\n- [기술혁신](#glossary/glossary-cd42458f5fb089ffd626)",
+      "bodyMarkdown": "R&D는 Research and Development, 연구개발이다. 새로운 지식을 연구하고 제품, 공정을 개발하는 활동이다. 연구개발 성과를 실제 제품이나 생산 방법에 적용하면 [기술혁신](#glossary/glossary-cd42458f5fb089ffd626)으로 이어질 수 있다.\n\n- [기술혁신](#glossary/glossary-cd42458f5fb089ffd626)",
       "links": [
         {
           "target": "glossary-cd42458f5fb089ffd626",
           "label": "기술혁신"
         }
       ],
-      "bodyHtml": "<p>R&amp;D는 Research and Development, 연구개발이다. 새로운 지식을 연구하고 제품, 공정을 개발하는 활동이다. <a href=\"#glossary/glossary-cd42458f5fb089ffd626\">기술혁신</a> — 정의와 설명 참고.</p>\n<ul><li><a href=\"#glossary/glossary-cd42458f5fb089ffd626\">기술혁신</a></li></ul>",
+      "bodyHtml": "<p>R&amp;D는 Research and Development, 연구개발이다. 새로운 지식을 연구하고 제품, 공정을 개발하는 활동이다. 연구개발 성과를 실제 제품이나 생산 방법에 적용하면 <a href=\"#glossary/glossary-cd42458f5fb089ffd626\">기술혁신</a>으로 이어질 수 있다.</p>\n<ul><li><a href=\"#glossary/glossary-cd42458f5fb089ffd626\">기술혁신</a></li></ul>",
       "studyExample": "배터리 회사가 새 소재를 실험하고 그 결과로 오래가는 배터리 시제품을 만드는 활동이다.",
       "definition": "새로운 지식을 얻고, 그 지식을 이용해 제품이나 생산 방법을 만드는 활동이다. 영어 Research and Development를 줄여 R&D라고 한다."
     },
@@ -53433,7 +53439,7 @@
         "요소창출"
       ],
       "summary": "교육, 연구개발, 시설 투자 등으로 생산에 필요한 인력, 기술, 기반시설을 새로 만들거나 키우는 일이다.",
-      "bodyMarkdown": "시험에서 요소부존에 대응하는 개념은 **요소창출**이다. 요소발전이라고 하기보다는 요소창출로 기억한다.\n\n- 요소부존 = 원래 보유한 노동, 자본, 토지, 천연자원\n- 요소창출 = 교육, 훈련, R&D, 기술혁신으로 새로 만든 숙련인력, 특허, 연구시설, 생산 노하우\n\n암기: **부존은 보유, 창출은 창조.**\n\n[요소부존](#glossary/glossary-05d06db9f33ed5b81f07) — 정의와 설명 참고.\n\n- **요소창출**: 교육, 기술개발, 투자로 새로운 생산능력과 생산요소를 만드는 것. 숙련 노동자, 특허기술, 연구시설, 생산 노하우 등이 해당한다.\n\n내생적 성장이론은 정태적 비교우위와 현재의 요소부존보다 **동태적 비교우위와 요소창출**이 경제성장에 더 중요하다고 본다.\n\n- 암기: **내생적 성장 = 스스로 만들며 성장, 동태적 우위 = 앞으로 만들어낼 우위.**\n\n- [내생적 성장이론](#glossary/glossary-bbebba964f85cf2a6c07)\n- [동태적 비교우위](#glossary/glossary-6202bd17da7a0ef729b1)\n- [정태적 비교우위](#glossary/glossary-c597d6cdcbd4a52b675e)\n- [요소부존](#glossary/glossary-05d06db9f33ed5b81f07)",
+      "bodyMarkdown": "시험에서 요소부존에 대응하는 개념은 **요소창출**이다. 요소발전이라고 하기보다는 요소창출로 기억한다.\n\n- 요소부존 = 원래 보유한 노동, 자본, 토지, 천연자원\n- 요소창출 = 교육, 훈련, R&D, 기술혁신으로 새로 만든 숙련인력, 특허, 연구시설, 생산 노하우\n\n암기: **부존은 보유, 창출은 창조.**\n\n[요소부존](#glossary/glossary-05d06db9f33ed5b81f07)은 한 나라나 지역이 이미 보유한 노동, 자본, 토지 같은 생산요소를 가리킨다.\n\n- **요소창출**: 교육, 기술개발, 투자로 새로운 생산능력과 생산요소를 만드는 것. 숙련 노동자, 특허기술, 연구시설, 생산 노하우 등이 해당한다.\n\n내생적 성장이론은 정태적 비교우위와 현재의 요소부존보다 **동태적 비교우위와 요소창출**이 경제성장에 더 중요하다고 본다.\n\n- 암기: **내생적 성장 = 스스로 만들며 성장, 동태적 우위 = 앞으로 만들어낼 우위.**\n\n- [내생적 성장이론](#glossary/glossary-bbebba964f85cf2a6c07)\n- [동태적 비교우위](#glossary/glossary-6202bd17da7a0ef729b1)\n- [정태적 비교우위](#glossary/glossary-c597d6cdcbd4a52b675e)\n- [요소부존](#glossary/glossary-05d06db9f33ed5b81f07)",
       "links": [
         {
           "target": "glossary-05d06db9f33ed5b81f07",
@@ -53452,7 +53458,7 @@
           "label": "정태적 비교우위"
         }
       ],
-      "bodyHtml": "<p>시험에서 요소부존에 대응하는 개념은 <strong>요소창출</strong>이다. 요소발전이라고 하기보다는 요소창출로 기억한다.</p>\n<ul><li>요소부존 = 원래 보유한 노동, 자본, 토지, 천연자원</li><li>요소창출 = 교육, 훈련, R&amp;D, 기술혁신으로 새로 만든 숙련인력, 특허, 연구시설, 생산 노하우</li></ul>\n<p>암기: <strong>부존은 보유, 창출은 창조.</strong></p>\n<p><a href=\"#glossary/glossary-05d06db9f33ed5b81f07\">요소부존</a> — 정의와 설명 참고.</p>\n<ul><li><strong>요소창출</strong>: 교육, 기술개발, 투자로 새로운 생산능력과 생산요소를 만드는 것. 숙련 노동자, 특허기술, 연구시설, 생산 노하우 등이 해당한다.</li></ul>\n<p>내생적 성장이론은 정태적 비교우위와 현재의 요소부존보다 <strong>동태적 비교우위와 요소창출</strong>이 경제성장에 더 중요하다고 본다.</p>\n<ul><li>암기: <strong>내생적 성장 = 스스로 만들며 성장, 동태적 우위 = 앞으로 만들어낼 우위.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-bbebba964f85cf2a6c07\">내생적 성장이론</a></li><li><a href=\"#glossary/glossary-6202bd17da7a0ef729b1\">동태적 비교우위</a></li><li><a href=\"#glossary/glossary-c597d6cdcbd4a52b675e\">정태적 비교우위</a></li><li><a href=\"#glossary/glossary-05d06db9f33ed5b81f07\">요소부존</a></li></ul>",
+      "bodyHtml": "<p>시험에서 요소부존에 대응하는 개념은 <strong>요소창출</strong>이다. 요소발전이라고 하기보다는 요소창출로 기억한다.</p>\n<ul><li>요소부존 = 원래 보유한 노동, 자본, 토지, 천연자원</li><li>요소창출 = 교육, 훈련, R&amp;D, 기술혁신으로 새로 만든 숙련인력, 특허, 연구시설, 생산 노하우</li></ul>\n<p>암기: <strong>부존은 보유, 창출은 창조.</strong></p>\n<p><a href=\"#glossary/glossary-05d06db9f33ed5b81f07\">요소부존</a>은 한 나라나 지역이 이미 보유한 노동, 자본, 토지 같은 생산요소를 가리킨다.</p>\n<ul><li><strong>요소창출</strong>: 교육, 기술개발, 투자로 새로운 생산능력과 생산요소를 만드는 것. 숙련 노동자, 특허기술, 연구시설, 생산 노하우 등이 해당한다.</li></ul>\n<p>내생적 성장이론은 정태적 비교우위와 현재의 요소부존보다 <strong>동태적 비교우위와 요소창출</strong>이 경제성장에 더 중요하다고 본다.</p>\n<ul><li>암기: <strong>내생적 성장 = 스스로 만들며 성장, 동태적 우위 = 앞으로 만들어낼 우위.</strong></li></ul>\n<ul><li><a href=\"#glossary/glossary-bbebba964f85cf2a6c07\">내생적 성장이론</a></li><li><a href=\"#glossary/glossary-6202bd17da7a0ef729b1\">동태적 비교우위</a></li><li><a href=\"#glossary/glossary-c597d6cdcbd4a52b675e\">정태적 비교우위</a></li><li><a href=\"#glossary/glossary-05d06db9f33ed5b81f07\">요소부존</a></li></ul>",
       "studyPoint": "요소부존은 이미 갖춘 토지, 노동, 자본 등을 말하고, 요소창출은 노력을 들여 생산에 쓰이는 자원을 만드는 과정이다.",
       "studyOxIds": [
         "ox-b9656e0a295a06ca"
@@ -58667,7 +58673,7 @@
         "중심위치"
       ],
       "summary": "자료가 대체로 어느 값 주변에 모여 있는지 보여 주는 대표값이다. 평균, 중앙값, 최빈값이 자주 쓰인다.",
-      "bodyMarkdown": "- 데이터의 ‘대표적인 가운데’가 어디인지 보여주는 지표다.\n[산술평균](#glossary/glossary-b3bfc23b2e357051c3f9) — 정의와 설명 참고.\n\n[중앙값](#glossary/glossary-7cc8adc3a890f367c4f2) — 정의와 설명 참고.\n\n[최빈값](#glossary/glossary-c22ca12b47b8be26f63e) — 정의와 설명 참고.\n\n- **관찰치**: 자료에 들어 있는 개별 값. 예: `40, 60, 60, 70, 90`의 다섯 숫자.\n- 위 자료에서 60은 두 번 나와 빈도수가 가장 높으므로 **최빈값은 60**이다. 크기 순서의 한가운데인 세 번째 값도 60이므로 **중앙값도 60**이다.\n- 암기: **최빈값은 가장 많이 / 중앙값은 줄 세워 가운데.**\n\n- 이 단원에서 별도 조건 없이 ‘평균’이라고 하면 우선 **산술평균**으로 생각한다.\n- **가중평균**은 항목마다 다른 비중을 반영하는 평균이고, **기하평균**은 여러 기간 수익률처럼 곱으로 이어지는 값을 평균낼 때 쓴다.\n\n- [산술평균](#glossary/glossary-b3bfc23b2e357051c3f9)\n- [중앙값](#glossary/glossary-7cc8adc3a890f367c4f2)\n- [최빈값](#glossary/glossary-c22ca12b47b8be26f63e)",
+      "bodyMarkdown": "- 데이터의 ‘대표적인 가운데’가 어디인지 보여주는 지표다.\n[산술평균](#glossary/glossary-b3bfc23b2e357051c3f9)은 모든 값을 더하고 개수로 나눈 값이다.\n\n[중앙값](#glossary/glossary-7cc8adc3a890f367c4f2)은 값을 크기순으로 놓았을 때의 가운데 값이다.\n\n[최빈값](#glossary/glossary-c22ca12b47b8be26f63e)은 가장 자주 나타나는 값이다.\n\n- **관찰치**: 자료에 들어 있는 개별 값. 예: `40, 60, 60, 70, 90`의 다섯 숫자.\n- 위 자료에서 60은 두 번 나와 빈도수가 가장 높으므로 **최빈값은 60**이다. 크기 순서의 한가운데인 세 번째 값도 60이므로 **중앙값도 60**이다.\n- 암기: **최빈값은 가장 많이 / 중앙값은 줄 세워 가운데.**\n\n- 이 단원에서 별도 조건 없이 ‘평균’이라고 하면 우선 **산술평균**으로 생각한다.\n- **가중평균**은 항목마다 다른 비중을 반영하는 평균이고, **기하평균**은 여러 기간 수익률처럼 곱으로 이어지는 값을 평균낼 때 쓴다.\n\n- [산술평균](#glossary/glossary-b3bfc23b2e357051c3f9)\n- [중앙값](#glossary/glossary-7cc8adc3a890f367c4f2)\n- [최빈값](#glossary/glossary-c22ca12b47b8be26f63e)",
       "links": [
         {
           "target": "glossary-b3bfc23b2e357051c3f9",
@@ -58682,7 +58688,7 @@
           "label": "최빈값"
         }
       ],
-      "bodyHtml": "<ul><li>데이터의 ‘대표적인 가운데’가 어디인지 보여주는 지표다.</li></ul>\n<p><a href=\"#glossary/glossary-b3bfc23b2e357051c3f9\">산술평균</a> — 정의와 설명 참고.</p>\n<p><a href=\"#glossary/glossary-7cc8adc3a890f367c4f2\">중앙값</a> — 정의와 설명 참고.</p>\n<p><a href=\"#glossary/glossary-c22ca12b47b8be26f63e\">최빈값</a> — 정의와 설명 참고.</p>\n<ul><li><strong>관찰치</strong>: 자료에 들어 있는 개별 값. 예: <code>40, 60, 60, 70, 90</code>의 다섯 숫자.</li><li>위 자료에서 60은 두 번 나와 빈도수가 가장 높으므로 <strong>최빈값은 60</strong>이다. 크기 순서의 한가운데인 세 번째 값도 60이므로 <strong>중앙값도 60</strong>이다.</li><li>암기: <strong>최빈값은 가장 많이 / 중앙값은 줄 세워 가운데.</strong></li></ul>\n<ul><li>이 단원에서 별도 조건 없이 ‘평균’이라고 하면 우선 <strong>산술평균</strong>으로 생각한다.</li><li><strong>가중평균</strong>은 항목마다 다른 비중을 반영하는 평균이고, <strong>기하평균</strong>은 여러 기간 수익률처럼 곱으로 이어지는 값을 평균낼 때 쓴다.</li></ul>\n<ul><li><a href=\"#glossary/glossary-b3bfc23b2e357051c3f9\">산술평균</a></li><li><a href=\"#glossary/glossary-7cc8adc3a890f367c4f2\">중앙값</a></li><li><a href=\"#glossary/glossary-c22ca12b47b8be26f63e\">최빈값</a></li></ul>",
+      "bodyHtml": "<ul><li>데이터의 ‘대표적인 가운데’가 어디인지 보여주는 지표다.</li></ul>\n<p><a href=\"#glossary/glossary-b3bfc23b2e357051c3f9\">산술평균</a>은 모든 값을 더하고 개수로 나눈 값이다.</p>\n<p><a href=\"#glossary/glossary-7cc8adc3a890f367c4f2\">중앙값</a>은 값을 크기순으로 놓았을 때의 가운데 값이다.</p>\n<p><a href=\"#glossary/glossary-c22ca12b47b8be26f63e\">최빈값</a>은 가장 자주 나타나는 값이다.</p>\n<ul><li><strong>관찰치</strong>: 자료에 들어 있는 개별 값. 예: <code>40, 60, 60, 70, 90</code>의 다섯 숫자.</li><li>위 자료에서 60은 두 번 나와 빈도수가 가장 높으므로 <strong>최빈값은 60</strong>이다. 크기 순서의 한가운데인 세 번째 값도 60이므로 <strong>중앙값도 60</strong>이다.</li><li>암기: <strong>최빈값은 가장 많이 / 중앙값은 줄 세워 가운데.</strong></li></ul>\n<ul><li>이 단원에서 별도 조건 없이 ‘평균’이라고 하면 우선 <strong>산술평균</strong>으로 생각한다.</li><li><strong>가중평균</strong>은 항목마다 다른 비중을 반영하는 평균이고, <strong>기하평균</strong>은 여러 기간 수익률처럼 곱으로 이어지는 값을 평균낼 때 쓴다.</li></ul>\n<ul><li><a href=\"#glossary/glossary-b3bfc23b2e357051c3f9\">산술평균</a></li><li><a href=\"#glossary/glossary-7cc8adc3a890f367c4f2\">중앙값</a></li><li><a href=\"#glossary/glossary-c22ca12b47b8be26f63e\">최빈값</a></li></ul>",
       "studyExample": "2, 3, 3, 4, 18의 평균은 6이고 중앙값과 최빈값은 각각 3이다. 큰 값 18이 평균을 위로 끌어올린다.",
       "definition": "자료가 대체로 어느 값 주변에 모여 있는지 보여 주는 대표값이다. 평균, 중앙값, 최빈값이 자주 쓰인다."
     },
@@ -63089,14 +63095,14 @@
         "판매비"
       ],
       "summary": "상품을 고객에게 알리고 판매하는 데 들어가는 비용이다. 판매 직원의 인건비, 광고비, 판매 수수료 등이 이에 해당할 수 있다.",
-      "bodyMarkdown": "판매비는 상품을 판매하기 위해 지출하는 비용이다. [판촉비](#glossary/glossary-3ccb5bcbf9315aaba09b) — 정의와 설명 참고.\n\n- [판촉비](#glossary/glossary-3ccb5bcbf9315aaba09b)",
+      "bodyMarkdown": "판매비는 상품을 판매하기 위해 지출하는 비용이다. 시식 행사나 경품처럼 고객의 구매를 유도하는 데 따로 들인 비용은 [판촉비](#glossary/glossary-3ccb5bcbf9315aaba09b)다.\n\n- [판촉비](#glossary/glossary-3ccb5bcbf9315aaba09b)",
       "links": [
         {
           "target": "glossary-3ccb5bcbf9315aaba09b",
           "label": "판촉비"
         }
       ],
-      "bodyHtml": "<p>판매비는 상품을 판매하기 위해 지출하는 비용이다. <a href=\"#glossary/glossary-3ccb5bcbf9315aaba09b\">판촉비</a> — 정의와 설명 참고.</p>\n<ul><li><a href=\"#glossary/glossary-3ccb5bcbf9315aaba09b\">판촉비</a></li></ul>",
+      "bodyHtml": "<p>판매비는 상품을 판매하기 위해 지출하는 비용이다. 시식 행사나 경품처럼 고객의 구매를 유도하는 데 따로 들인 비용은 <a href=\"#glossary/glossary-3ccb5bcbf9315aaba09b\">판촉비</a>다.</p>\n<ul><li><a href=\"#glossary/glossary-3ccb5bcbf9315aaba09b\">판촉비</a></li></ul>",
       "definition": "상품을 고객에게 알리고 판매하는 데 들어가는 비용이다. 판매 직원의 인건비, 광고비, 판매 수수료 등이 이에 해당할 수 있다."
     },
     {
